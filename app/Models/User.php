@@ -1,0 +1,175 @@
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasTenants;
+use Filament\Panel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+
+class User extends Authenticatable implements FilamentUser, HasTenants
+{
+    /** @use HasFactory<UserFactory> */
+    use HasFactory, Notifiable, TwoFactorAuthenticatable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'remember_token',
+    ];
+
+    public function clinics(): BelongsToMany
+    {
+        return $this->belongsToMany(Clinic::class);
+    }
+
+    public function clinic(): BelongsToMany
+    {
+        return $this->clinics();
+    }
+
+    public function profile(): HasOne
+    {
+        return $this->hasOne(Profile::class);
+    }
+
+    public function slots(): HasMany
+    {
+        return $this->hasMany(Slot::class, 'owner_id');
+    }
+
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
+    }
+
+    public function canAccessTenant(Model $tenant): bool
+    {
+        return $this->clinics->contains($tenant);
+    }
+
+    public function getTenants(Panel $panel): array|Collection
+    {
+        return $this->clinics;
+    }
+
+    public function assignPanelRole(Panel $panel): void
+    {
+        $role = $this->resolvePanelRole($panel);
+
+        if (! $role) {
+            return;
+        }
+
+        $this->forceFill([
+            'role_id' => $role->id,
+        ])->save();
+    }
+
+    public function resolvePanelRole(Panel $panel): ?Role
+    {
+        $panelId = $panel->getId();
+
+        return match ($panelId) {
+            'owner' => Role::where('name', 'owner')->firstOrFail(),
+            'doctor' => Role::where('name', 'doctor')->firstOrFail(),
+            'staff' => Role::where('name', 'staff')->firstOrFail(),
+            default => null,
+        };
+    }
+
+    public function resolvePanelId(): ?string
+    {
+        return match (true) {
+            $this->isAdmin() || $this->isDoctor() => 'admin',
+            $this->isOwner() => 'owner',
+            $this->isStaff() => 'staff',
+            default => null,
+        };
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role->name === 'admin';
+    }
+
+    public function isNotAdmin(): bool
+    {
+        return $this->role->name !== 'admin';
+    }
+
+    public function isDoctor(): bool
+    {
+        return $this->role->name === 'doctor';
+    }
+
+    public function isOwner(): bool
+    {
+        return $this->role->name === 'owner';
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->role->name === 'staff';
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    /**
+     * Get the user's initials
+     */
+    public function initials(): string
+    {
+        return Str::of($this->name)
+            ->explode(' ')
+            ->take(2)
+            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->implode('');
+    }
+
+}

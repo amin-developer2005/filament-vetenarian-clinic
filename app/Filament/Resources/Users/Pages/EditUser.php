@@ -1,0 +1,30 @@
+<?php
+
+namespace App\Filament\Resources\Users\Pages;
+
+use App\Filament\Resources\Users\UserResource;
+use Filament\Actions\DeleteAction;
+use Filament\Pages\Page;
+use Filament\Resources\Pages\EditRecord;
+
+class EditUser extends EditRecord
+{
+    protected static string $resource = UserResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            DeleteAction::make(),
+        ];
+    }
+
+
+    public function getRedirectUrl(): ?string
+    {
+        $resource = $this->getResource();
+
+        return $resource::getUrl('index');
+    }
+
+
+}
