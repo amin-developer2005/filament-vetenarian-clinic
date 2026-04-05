@@ -16,10 +16,10 @@ class RoleFactory extends Factory
                     'name' => 'admin', 'description' => 'Admin User'
                 ],
                 [
-                    'name' => 'owner', 'description' => 'Owner Pet'
+                    'name' => 'owner', 'description' => 'Owner Vet'
                 ],
                 [
-                    'name' => 'doctor', 'description' => 'Doctor Pet'
+                    'name' => 'doctor', 'description' => 'Doctor Vet'
                 ],
                 [
                     'name' => 'staff', 'description' => 'Clinic Staff'

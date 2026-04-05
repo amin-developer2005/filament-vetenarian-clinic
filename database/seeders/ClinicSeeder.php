@@ -14,12 +14,13 @@ class ClinicSeeder extends Seeder
      */
     public function run(): void
     {
-                $clinic = Clinic::factory()->create([
-                    'name' => 'Clinic 1',
-                ]);
+        $clinic = Clinic::factory()->create([
+            'name' => 'Clinic 1',
+        ]);
 
-        $role = Role::query()->where('name', 'admin')->first();
-        $user = User::query()->where('role_id', $role->id)->first();
+        $user = User::query()->whereHas('roles', function ($query) {
+            $query->where('name', 'admin')->orWhere('name', 'doctor');
+        })->first();
 
         $clinic->users()->attach($user->id);
     }

@@ -2,8 +2,11 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\Role;
+use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Widgets\Widget;
+use Illuminate\Support\Arr;
 
 class UserAccountWidget extends Widget
 {
@@ -19,12 +22,12 @@ class UserAccountWidget extends Widget
 
     protected function getViewData(): array
     {
-        $user = Filament::auth()->user();
-        $role = $user->role->name;
+        $user = User::query()->find(Filament::auth()->id());
+        $roles = $user->roles;
 
         return [
             'user' => $user,
-            'role' => $role,
+            'roles' => $roles->map(fn(Role $rol) => $rol->name),
         ];
     }
 }

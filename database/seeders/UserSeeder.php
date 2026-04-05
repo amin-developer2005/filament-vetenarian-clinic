@@ -15,11 +15,14 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
+        $user = User::factory()->create([
             'name'    => 'admin',
             'email'   => 'admin@outlook.com',
             'password' => Hash::make('Admin@4567'),
-            'role_id' => Role::query()->where('name', 'admin')->first()->id,
         ]);
+
+        $role = Role::query()->firstWhere('name', 'admin');
+
+        $user->roles()->attach($role->id);
     }
 }

@@ -56,5 +56,4 @@ class UserForm
                 ])->columnSpanFull()
             ]);
     }
-
 }

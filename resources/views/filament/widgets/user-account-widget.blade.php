@@ -12,15 +12,21 @@
                 {{ __('filament-panels::widgets/account-widget.welcome', ['app' => config('app.name')]) }}
             </h2>
 
-            <div class="">
+            <div class="flex">
                 <p class="fi-account-widget-user-name">
                     {{ filament()->getUserName($user) }}
                 </p>
+                <div class="flex space-y-32">
+                    <p>نقش ها:</p>
 
-                <p class="fi-account-widget-user-name">
-                    Role: {{ $role }}
-                </p>
+                    @foreach($roles as $role)
+                        <p class="fi-account-widget-user-name">
+                            {{ $role }}
+                        </p>
+                    @endforeach
+                </div>
             </div>
+
         </div>
 
         <form

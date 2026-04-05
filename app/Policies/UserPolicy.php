@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
+use function Symfony\Component\Translation\t;
 
 class UserPolicy
 {

@@ -28,7 +28,7 @@ class RegisterClinic extends RegisterTenant
 
     protected function handleRegistration(array $data): Clinic
     {
-        $clinic = Clinic::create($data);
+        $clinic = $this->getModel()::create($data);
 
         $clinic->users()->attach(auth()->user());
 

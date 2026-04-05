@@ -18,8 +18,8 @@ enum EmailStatus: string implements HasColor, HasLabel
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::Verified   => 'Verified',
-            self::Unverified => 'Unverified',
+            self::Verified   => 'تایید شده',
+            self::Unverified => 'تایید نشده',
             default => null,
         };
     }

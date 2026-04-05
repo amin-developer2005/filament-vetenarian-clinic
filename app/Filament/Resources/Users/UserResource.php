@@ -19,7 +19,6 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Users;
-    protected static string|null|\UnitEnum $navigationGroup = 'Settings';
 
     public static function form(Schema $schema): Schema
     {

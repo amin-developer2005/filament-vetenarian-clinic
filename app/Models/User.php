@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Filament\Pages\Concerns\HasPanelRole;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasTenants;
@@ -23,6 +24,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasPanelRole;
 
     /**
      * The attributes that are mass assignable.
@@ -67,11 +69,6 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         return $this->hasMany(Slot::class, 'owner_id');
     }
 
-    public function role(): BelongsTo
-    {
-        return $this->belongsTo(Role::class);
-    }
-
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
@@ -85,66 +82,6 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     public function getTenants(Panel $panel): array|Collection
     {
         return $this->clinics;
-    }
-
-    public function assignPanelRole(Panel $panel): void
-    {
-        $role = $this->resolvePanelRole($panel);
-
-        if (! $role) {
-            return;
-        }
-
-        $this->forceFill([
-            'role_id' => $role->id,
-        ])->save();
-    }
-
-    public function resolvePanelRole(Panel $panel): ?Role
-    {
-        $panelId = $panel->getId();
-
-        return match ($panelId) {
-            'owner' => Role::where('name', 'owner')->firstOrFail(),
-            'doctor' => Role::where('name', 'doctor')->firstOrFail(),
-            'staff' => Role::where('name', 'staff')->firstOrFail(),
-            default => null,
-        };
-    }
-
-    public function resolvePanelId(): ?string
-    {
-        return match (true) {
-            $this->isAdmin() || $this->isDoctor() => 'admin',
-            $this->isOwner() => 'owner',
-            $this->isStaff() => 'staff',
-            default => null,
-        };
-    }
-
-    public function isAdmin(): bool
-    {
-        return $this->role->name === 'admin';
-    }
-
-    public function isNotAdmin(): bool
-    {
-        return $this->role->name !== 'admin';
-    }
-
-    public function isDoctor(): bool
-    {
-        return $this->role->name === 'doctor';
-    }
-
-    public function isOwner(): bool
-    {
-        return $this->role->name === 'owner';
-    }
-
-    public function isStaff(): bool
-    {
-        return $this->role->name === 'staff';
     }
 
     /**
