@@ -26,7 +26,7 @@ class AppointmentForm
 
                                 return $q->whereIn('clinics.id', $userClinicIds);
                             });
-                        } )
+                        })
                         ->required()
                         ->searchable()
                         ->preload()

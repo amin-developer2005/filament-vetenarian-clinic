@@ -9,10 +9,12 @@ use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Tables\UsersTable;
 use App\Models\User;
 use BackedEnum;
+use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class UserResource extends Resource
 {
@@ -46,10 +48,40 @@ class UserResource extends Resource
         ];
     }
 
+    public static function getLabel(): string
+    {
+        return static::$modelLabel ?? __('resources/users.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        if ($label = static::$pluralModelLabel ?? static::getModelLabel()) {
+            return $label;
+        }
+
+        return __('resources/users.plural_label');
+    }
+
+    /**
+     * @return string|null
+     */
+    public static function getNavigationLabel(): string
+    {
+        if ($label = static::$navigationLabel ?? static::getModelLabel()) {
+            return $label;
+        }
+
+        return __('resources/users.navigations.label');
+    }
+
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return static::$navigationGroup ?? __('resources/users.navigations.group');
+    }
 
     public static function shouldRegisterNavigation(): bool
     {
-        $user = auth()->user();
+        $user = Filament::auth()->user();
 
         return $user->isAdmin();
     }

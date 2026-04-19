@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Users\Pages;
 
 use App\Filament\Resources\Users\UserResource;
+use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateUser extends CreateRecord
@@ -12,8 +13,32 @@ class CreateUser extends CreateRecord
 
     public function getRedirectUrl(): string
     {
-        $resource = $this->getResource();
+        $resource = static::getResource();
+        $record = $this->getRecord();
 
-        return $resource::getUrl('index');
+        if (
+            filled($defaultRedirect = Filament::getResoruceCreatePageUrl()) &&
+            $resource::hasPage($$defaultRedirect) &&
+            ($this instanceof CreateRecord)
+            (
+                (($defaultRedirect !== 'view' || $resource::canView($record))) &&
+                (($defaultRedirect !== 'edit' || $resource::canEdit($record)))
+            )
+        ) {
+            return $this->getResourceUrl($defaultRedirect, $this->getRedirectUrlParameters());
+        }
+
+        if ($resource::hasPage('view') && $resource::canView($record)) {
+            return $this->getResourceUrl('view', $this->getRedirectUrlParameters());
+        }
+
+        return $this->getResourceUrl('index', $this->getRedirectUrlParameters());
+    }
+
+    protected function getRedirectUrlParameters(): array
+    {
+        return [
+            'record' => $this->getRecord(),
+        ];
     }
 }

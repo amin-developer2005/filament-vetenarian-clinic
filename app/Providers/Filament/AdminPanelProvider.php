@@ -2,12 +2,10 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Pages\EditProfile;
-use App\Filament\Pages\Profile;
 use App\Filament\Pages\Tenancy\EditClinicProfile;
 use App\Filament\Pages\Tenancy\RegisterClinic;
-use App\Http\Middleware\RoleMiddleware;
 use App\Filament\Widgets\UserAccountWidget;
+use App\Http\Middleware\RoleMiddleware;
 use App\Models\Clinic;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -17,7 +15,6 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -38,6 +35,7 @@ class AdminPanelProvider extends PanelProvider
             ->tenantRegistration(RegisterClinic::class)
             ->tenantProfile(EditClinicProfile::class)
             ->login()
+
             ->colors([
                 'primary' => Color::Emerald,
             ])
@@ -64,7 +62,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-                RoleMiddleware::class
+                RoleMiddleware::class,
             ]);
     }
 }
