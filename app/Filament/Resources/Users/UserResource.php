@@ -79,6 +79,15 @@ class UserResource extends Resource
         return static::$navigationGroup ?? __('resources/users.navigations.group');
     }
 
+    public static function getBreadcrumb(): string
+    {
+        if (filled($breadcrumb = static::$breadcrumb)) {
+            return $breadcrumb;
+        }
+
+        return __('resources/users.bread_crumb');
+    }
+
     public static function shouldRegisterNavigation(): bool
     {
         $user = Filament::auth()->user();

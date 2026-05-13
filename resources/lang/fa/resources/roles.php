@@ -11,18 +11,24 @@ return [
     ],
 
     'pages' => [
+        'index' => [
+            'actions' => [
+                'create' => 'ایجاد نقش جدید'
+            ],
+        ],
         'create' => [
-            'label' => ''
+            'record' => [
+                'title' => 'ایجاد نقش جدید'
+            ],
         ],
         'edit' => [
-            'label' => ''
+            'record' => [
+                'title' => 'ویرایش نقش'
+            ],
         ],
         'view' => [
             'label' => ''
         ],
-        'index' => [
-            'label' => ''
-        ]
     ],
     'form' => [
         'name' => [

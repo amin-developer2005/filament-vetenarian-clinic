@@ -1,8 +1,9 @@
 <?php
 
 return [
-    'label' => 'کاربر',
+    'label' => 'کاربران',
     'plural_label' => 'کاربران',
+    'singular_label' => 'کاربر',
     'bread_crumb' => 'کاربران',
 
     'navigations' => [
@@ -11,8 +12,15 @@ return [
     ],
 
     'pages' => [
-        'index' => [],
+        'index' => [
+            'actions' => [
+                'create' => 'ایجاد کاربر جدید'
+            ],
+        ],
         'create' => [
+            'record' => [
+                'title' => 'ایجاد کاربر جدید'
+            ],
             'form' => [
                 'select' => [
                     'roles' => [
@@ -22,7 +30,12 @@ return [
                         'no_options_message' => 'کلینیکی یافت نشد.'
                     ],
                 ]
-            ]
+            ],
+        ],
+        'edit' => [
+            'record' => [
+                'title' => 'ویرایش کاربر'
+            ],
         ],
     ],
     'schema' => [
@@ -71,7 +84,7 @@ return [
                 'label' => 'نقش ها'
             ],
             'clinics' => [
-                'label' => 'نقش ها'
+                'label' => 'کلینیک ها'
             ],
             'email_status' => [
                 'label' => 'وضعیت ایمیل'

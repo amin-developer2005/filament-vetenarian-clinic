@@ -5,10 +5,20 @@ namespace App\Filament\Resources\Roles\Pages;
 use App\Filament\Resources\Roles\RoleResource;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Contracts\Support\Htmlable;
 
 class CreateRole extends CreateRecord
 {
     protected static string $resource = RoleResource::class;
+
+    public function getTitle(): string|Htmlable
+    {
+        if (filled(static::$title)) {
+            return static::$title;
+        }
+
+        return __('resources/roles.pages.create.record.title');
+    }
 
     protected function getRedirectUrl(): string
     {

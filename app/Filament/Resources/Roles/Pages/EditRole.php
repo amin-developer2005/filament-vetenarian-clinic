@@ -7,10 +7,20 @@ use Filament\Actions\DeleteAction;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Support\Htmlable;
 
 class EditRole extends EditRecord
 {
     protected static string $resource = RoleResource::class;
+
+    public function getTitle(): string|Htmlable
+    {
+        if (filled(static::$title)) {
+            return static::$title;
+        }
+
+        return __('resources/roles.pages.edit.record.title');
+    }
 
     protected function getHeaderActions(): array
     {

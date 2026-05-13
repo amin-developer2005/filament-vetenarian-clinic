@@ -19,6 +19,7 @@ class SlotResource extends Resource
 {
     protected static ?string $model = Slot::class;
 
+    protected static bool $isDiscovered = false;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Schema $schema): Schema

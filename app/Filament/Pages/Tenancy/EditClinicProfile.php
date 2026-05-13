@@ -11,13 +11,14 @@ class EditClinicProfile extends EditTenantProfile
 {
     public static function getLabel(): string
     {
-        return "Edit Clinic Profile";
+        return "ویرایش پروفایل کلینیک";
     }
 
     public function form(Schema $schema): Schema
     {
         return $schema->components([
             TextInput::make('name')
+                ->label('نام کلینیک')
                 ->nullable()
                 ->dehydrated(fn (string $state) => filled($state)),
         ]);

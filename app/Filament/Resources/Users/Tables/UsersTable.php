@@ -26,14 +26,14 @@ class UsersTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('resources.users.table.columns.name.label'))
+                    ->label(__('resources/users.table.columns.name.label'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('email')
-                    ->label(__('resources.users.table.columns.email.label'))
+                    ->label(__('resources/users.table.columns.email.label'))
                     ->searchable(),
                 TextColumn::make('email_verified_at')
-                    ->label(__('resources.users.table.columns.email_status.label'))
+                    ->label(__('resources/users.table.columns.email_status.label'))
                     ->badge()
                     ->getStateUsing(
                         fn(User $user): EmailStatus => filled($user->email_verified_at) ? EmailStatus::Verified : EmailStatus::Unverified
@@ -43,51 +43,66 @@ class UsersTable
                     )
                     ->sortable(),
                 TextColumn::make('roles.name')
-                    ->label(__('resources.users.table.columns.roles.label'))
+                    ->label(__('resources/users.table.columns.roles.label'))
                     ->badge()
                     ->searchable(),
                 TextColumn::make('clinics.name')
-                    ->label(__('resources.users.table.columns.clinics.label'))
+                    ->label(__('resources/users.table.columns.clinics.label'))
                     ->searchable()
                     ->badge()
                     ->color(Color::Sky),
                 TextColumn::make('created_at')
-                    ->label(__('resources.users.table.columns.created_at.label'))
+                    ->label(__('resources/users.table.columns.created_at.label'))
                     ->dateTime()
                     ->since()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->label(__('resources.users.table.columns.updated_at.label'))
+                    ->label(__('resources/users.table.columns.updated_at.label'))
                     ->dateTime('M d Y h:i A')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('roles')
-                    ->label(__('resources.users.table.filters.roles.label'))
-                    ->relationship(null, titleAttribute: 'name')
-                    ->searchable()
-                    ->native(false)
-                    ->preload(),
-                SelectFilter::make('clinics')
-                    ->label(__('resources.users.table.filters.clinics.label'))
-                    ->relationship(null, titleAttribute: 'name', modifyQueryUsing: function (Builder $query) {
-                        $user = Filament::auth()->user();
-                        $clinicsIds = $user->clinics()->pluck('clinics.id');
-
-                        return $query->whereHas('clinics', function ($query) use ($clinicsIds) {
-                            return $query->whereIn('clinics.id', $clinicsIds);
-                        });
-                    })
-                    ->searchable()
-                    ->preload()
-                    ->native(false)
-                ,
+                Filter::make('roles')
+                    ->schema([
+                        Select::make('role')
+                            ->label(__('resources/users.table.filters.roles.label'))
+                            ->relationship(titleAttribute: 'name')
+                            ->searchable()
+                            ->native(false)
+                            ->preload(),
+                    ])->query(function (Builder $query, array $data) {
+                        return $query->when(
+                            $role = $data['role'] ?? null,
+                                function (Builder $query) use ($role) {
+                                    return $query->whereHas('roles', function (Builder $query) use ($role) {
+                                        return $query->where('roles.id', $role);
+                                    });
+                            });
+                    }),
+                Filter::make('clinics')
+                    ->schema([
+                        Select::make('clinic')
+                            ->label(__('resources/users.table.filters.clinics.label'))
+                            ->relationship(titleAttribute: 'name')
+                            ->searchable()
+                            ->preload()
+                            ->native(false),
+                    ])->query(function (Builder $query, array $data) {
+                        return $query->when(
+                             $clinic = $data['clinic'] ?? null,
+                            function (Builder $query) use ($clinic) {
+                                return $query->whereHas('clinics', function (Builder $query) use ($clinic) {
+                                        return $query->where('clinics.id', $clinic);
+                                    });
+                            }
+                        );
+                    }),
                 Filter::make('email_verified_at')
                     ->schema([
                         Select::make('email_status')
-                            ->label(__('resources.users.table.filters.email_status.label'))
+                            ->label(__('resources/users.table.filters.email_status.label'))
                             ->options(EmailStatus::class)
                             ->native(false),
                     ])->query(function (Builder $query, array $data) {

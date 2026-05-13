@@ -56,6 +56,7 @@ class UserForm
                         ->required(fn (string $context): bool => $context === 'create')
                         ->label(__('resources/users.schema.form.components.password.label'))
                         ->password()
+                        ->revealable()
                         ->dehydrateStateUsing(fn ($state) => Hash::make($state))
                         ->dehydrated(fn ($state) => filled($state)),
                 ])->columnSpanFull(),

@@ -5,11 +5,20 @@ namespace App\Filament\Resources\Users\Pages;
 use App\Filament\Resources\Users\UserResource;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Contracts\Support\Htmlable;
 
 class CreateUser extends CreateRecord
 {
     protected static string $resource = UserResource::class;
 
+    public function getTitle(): string|Htmlable
+    {
+        if (filled(static::$title)) {
+            return static::$title;
+        }
+
+        return __('resources/users.pages.create.record.title');
+    }
 
     public function getRedirectUrl(): string
     {
@@ -17,7 +26,7 @@ class CreateUser extends CreateRecord
         $record = $this->getRecord();
 
         if (
-            filled($defaultRedirect = Filament::getResoruceCreatePageUrl()) &&
+            filled($defaultRedirect = Filament::getResourceCreatePageRedirect()) &&
             $resource::hasPage($$defaultRedirect) &&
             ($this instanceof CreateRecord)
             (

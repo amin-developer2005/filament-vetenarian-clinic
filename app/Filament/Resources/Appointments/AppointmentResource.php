@@ -17,7 +17,7 @@ use Filament\Tables\Table;
 class AppointmentResource extends Resource
 {
     protected static ?string $model = Appointment::class;
-
+    protected static bool $isDiscovered = false;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::CalendarDays;
 
     public static function form(Schema $schema): Schema
