@@ -15,6 +15,8 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Width;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -35,9 +37,12 @@ class AdminPanelProvider extends PanelProvider
             ->tenantRegistration(RegisterClinic::class)
             ->tenantProfile(EditClinicProfile::class)
             ->login()
-
+            ->sidebarCollapsibleOnDesktop()
+            ->sidebarWidth("18rem")
+            ->collapsedSidebarWidth('12rem')
+            ->spa()
             ->colors([
-                'primary' => Color::Emerald,
+                'primary' => Color::Blue,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')

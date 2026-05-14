@@ -27,4 +27,5 @@ class Clinic extends Model
         return $this->belongsToMany(Slot::class);
     }
 
+
 }

@@ -14,13 +14,14 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use App\Models\Slot;
 use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 class SlotResource extends Resource
 {
     protected static ?string $model = Slot::class;
 
-    protected static bool $isDiscovered = false;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static bool $hasNavigationGroup = false;
 
     public static function form(Schema $schema): Schema
     {
@@ -39,11 +40,6 @@ class SlotResource extends Resource
         ];
     }
 
-    public static function getUrl(?string $name = null, array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?Model $tenant = null, bool $shouldGuessMissingParameters = false): string
-    {
-        return parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant);
-    }
-
     public static function getPages(): array
     {
         return [
@@ -51,5 +47,46 @@ class SlotResource extends Resource
             'create' => CreateSlot::route('/create'),
             'edit' => EditSlot::route('/{record}/edit'),
         ];
+    }
+
+    public static function getLabel(): ?string
+    {
+        return static::$modelLabel ?? __('resources/slots.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        if ($label = static::$modelLabel ?? static::getLabel()) {
+            return $label;
+        }
+
+        return __('resources/slots.plural_label');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        if ($label = static::$navigationLabel ?? static::getModelLabel()) {
+            return $label;
+        }
+
+        return __('resources/slots.navigations.label');
+    }
+
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        if (! static::$hasNavigationGroup) {
+            return null;
+        }
+
+        return static::$navigationGroup ?? __('resources/slots.navigations.group');;
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        if (filled($breadcrumb = static::$breadcrumb)) {
+            return $breadcrumb;
+        }
+
+        return __('resources/slots.breadcrumb');
     }
 }

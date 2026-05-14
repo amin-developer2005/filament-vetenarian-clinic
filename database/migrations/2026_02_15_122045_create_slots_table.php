@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\AppointmentStatus;
 use App\Enums\SlotStatus;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;

@@ -25,60 +25,49 @@ class SlotsTable
     {
         return $table
             ->columns([
-                TextColumn::make('date')
+                TextColumn::make('schedule.date')
+                    ->label(__('resources/slots.table.columns.schedule.label'))
                     ->date('M d Y')
                     ->sortable(),
                 TextColumn::make('start')
+                    ->label(__('resources/slots.table.columns.start.label'))
                     ->time('h:i A')
                     ->label('From')
                     ->sortable(),
                 TextColumn::make('end')
+                    ->label(__('resources/slots.table.columns.end.label'))
                     ->time('h:i A')
                     ->label('To')
                     ->sortable(),
-                TextColumn::make('owner.name')
-                    ->label('Owner')
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('status')
+                    ->label(__('resources/slots.table.columns.status.label'))
                     ->badge()
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label(__('resources/slots.table.columns.start.label'))
                     ->since()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
+                TextColumn::make('updated_at')
+                    ->label(__('resources/slots.table.columns.updated_at.label'))
+                    ->sortable()
+                    ->since()
+                    ->toggleable(),
             ])
             ->filters([
                 SelectFilter::make('status')
+                    ->label(__('resources/slots.table.filters.status.label'))
                     ->options(SlotStatus::class)
                     ->native(false),
-                Filter::make('date')
-                    ->schema([
-                        DatePicker::make('from')
-                            ->label('From Date')
-                            ->date()
-                            ->native(false),
-                        DatePicker::make('to')
-                            ->label('To Date')
-                            ->date()
-                            ->native(false),
-                    ])->query(function (Builder $query, array $data) {
-                        $fromDate = $data['from'] ?? null;
-                        $toDate = $data['to'] ?? null;
-
-                        return $query
-                            ->when($fromDate, fn ($q, $v) => $q->whereDate('date', '>=', $v))
-                            ->when($toDate, fn ($q, $v) => $q->whereDate('date', '<=', $v));
-                    }),
                 Filter::make('start')
                     ->schema([
                         TimePicker::make('start')
-                            ->label('From Time')
+                            ->label(__('resources/slots.table.filters.start.label'))
                             ->date()
                             ->displayFormat('h:i A'),
                         TimePicker::make('end')
-                            ->label('To Time')
+                            ->label(__('resources/slots.table.filters.end.label'))
                             ->time()
                             ->displayFormat('h:i A'),
                     ])->query(function (Builder $query, array $data) {
@@ -89,16 +78,9 @@ class SlotsTable
                             ->when($fromTime, fn ($q, $v) => $q->whereTime('start', $v))
                             ->when($toTime, fn ($q, $v) => $q->whereTime('end', $v));
                     }),
-
-                SelectFilter::make('owner_id')
-                    ->relationship('owner', 'name')
-                    ->label('Owner')
-                    ->searchable()
-                    ->preload()
-                    ->native(false),
             ], FiltersLayout::Modal)
-            ->emptyStateHeading('No Slots Found')
-            ->emptyStateDescription('Create a new slot to start managing reservations.')
+            ->emptyStateHeading(__('resources/slots.table.emptyStateHeading'))
+            ->emptyStateDescription(__('resources/slots.table.emptyStateDescription'))
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make(),

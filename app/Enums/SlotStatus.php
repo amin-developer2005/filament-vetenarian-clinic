@@ -9,6 +9,7 @@ use Filament\Support\Contracts\HasLabel;
 enum SlotStatus: string implements HasColor, HasLabel
 {
     case Created = 'created';
+    case Available = 'available';
     case Confirmed = 'confirmed';
     case Cancelled = 'cancelled';
 
@@ -16,6 +17,7 @@ enum SlotStatus: string implements HasColor, HasLabel
     {
         return match ($this) {
             self::Created => 'Created',
+            self::Available => 'Available',
             self::Confirmed => 'Confirmed',
             self::Cancelled => 'Cancelled',
         };
