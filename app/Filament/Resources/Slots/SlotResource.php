@@ -87,6 +87,6 @@ class SlotResource extends Resource
             return $breadcrumb;
         }
 
-        return __('resources/slots.breadcrumb');
+        return __('resources/slots.bread_crumb');
     }
 }

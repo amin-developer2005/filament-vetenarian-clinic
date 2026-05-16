@@ -1,27 +1,17 @@
 <?php
 
-namespace App\Filament\Resources\Slots\Pages;
+namespace App\Filament\Resources\LiveStocks\Pages;
 
-use App\Filament\Resources\Slots\SlotResource;
+use App\Filament\Resources\LiveStocks\LiveStockResource;
 use Filament\Actions\DeleteAction;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Support\Htmlable;
 
-class EditSlot extends EditRecord
+class EditLiveStock extends EditRecord
 {
-    protected static string $resource = SlotResource::class;
-
-
-    public function getTitle(): string|Htmlable
-    {
-        if (filled(static::$title)) {
-            return static::$title;
-        }
-
-        return __('resources/slots.pages.create.record.title');
-    }
+    protected static string $resource = LiveStockResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -30,6 +20,14 @@ class EditSlot extends EditRecord
         ];
     }
 
+    public function getTitle(): string|Htmlable
+    {
+        if (filled(static::$title)) {
+            return static::$title;
+        }
+
+        return __('resources/liveStocks.pages.create.record.title');
+    }
 
     public function getRedirectUrl(): ?string
     {
@@ -54,6 +52,6 @@ class EditSlot extends EditRecord
             return $this->getResourceUrl('view', $this->getRedirectUrlParameters());
         }
 
-        return $this->getResourceUrl('index', $this->getRedirectUrlParameters());
+        return $resource::getUrl('index');
     }
 }

@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\Slots\Pages;
+namespace App\Filament\Resources\LiveStocks\Pages;
 
-use App\Filament\Resources\Slots\SlotResource;
+use App\Filament\Resources\LiveStocks\LiveStockResource;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Contracts\Support\Htmlable;
 
-class CreateSlot extends CreateRecord
+class CreateLiveStock extends CreateRecord
 {
-    protected static string $resource = SlotResource::class;
+    protected static string $resource = LiveStockResource::class;
+
 
     public function getTitle(): string|Htmlable
     {
@@ -17,7 +18,7 @@ class CreateSlot extends CreateRecord
             return static::$title;
         }
 
-        return __('resources/slots.pages.create.record.title');
+        return __('resources/liveStocks.pages.create.record.title');
     }
 
     public function getRedirectUrl(): string
@@ -26,11 +27,11 @@ class CreateSlot extends CreateRecord
         $record = $this->getRecord();
 
         if (
-            ! is_null($defaultRedirect = Filament::getResourceCreatePageRedirect()) &&
+            filled($defaultRedirect = Filament::getResourceCreatePageRedirect()) &&
             $resource::hasPage($defaultRedirect) &&
             (
-                (($defaultRedirect !== 'view') || $resource::canView($record)) &&
-                (($defaultRedirect !== 'edit') || $resource::canEdit($record))
+                ($defaultRedirect !== 'view' || $resource::hasView($record)) &&
+                ($defaultRedirect !== 'edit' || $resource::hasEdit($record))
             )
         ) {
             return $this->getResourceUrl($defaultRedirect, $this->getRedirectUrlParameters());

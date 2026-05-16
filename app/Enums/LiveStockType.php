@@ -4,7 +4,7 @@ namespace App\Enums;
 
 use Filament\Support\Contracts\HasLabel;
 
-enum VetType: string implements HasLabel
+enum LiveStockType: string implements HasLabel
 {
     case Sheep = 'sheep';
     case Cow = 'cow';

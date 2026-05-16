@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\LiveStockType;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,11 +13,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('slots', function (Blueprint $table) {
-            $table->foreignId('schedule_id')
+        Schema::create('live_stocks', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(User::class, 'owner_id')
                 ->constrained()
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
+            $table->string('name');
+            $table->string('type');
+            $table->date('date_of_birth')->nullable();
+            $table->string('avatar')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -24,8 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('slots', function (Blueprint $table) {
-            $table->dropForeign('schedule_id');
-        });
+        Schema::dropIfExists('live_stocks');
     }
 };

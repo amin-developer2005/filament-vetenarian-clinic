@@ -37,7 +37,7 @@ class Slot extends Model
         return $this->belongsToMany(Clinic::class);
     }
 
-    public function clinic()
+    public function clinic(): BelongsToMany
     {
         return $this->clinics();
     }

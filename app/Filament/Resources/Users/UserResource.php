@@ -94,4 +94,11 @@ class UserResource extends Resource
 
         return $user->isAdmin();
     }
+
+    public static function canAccess(): bool
+    {
+        $user = Filament::auth()->user();
+
+        return $user->isAdmin();
+    }
 }

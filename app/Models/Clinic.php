@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PanelRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -27,5 +28,18 @@ class Clinic extends Model
         return $this->belongsToMany(Slot::class);
     }
 
+    public function liveStocks(): BelongsToMany
+    {
+        return $this->belongsToMany(Livestock::class);
+    }
 
+    public function fetchDoctors(): BelongsToMany
+    {
+        $doctor = Role::query()->firstWhere('name', PanelRole::Doctor);
+
+        return $this->users()->whereHas('roles', function ($query) use ($doctor) {
+            return $query->where('id', $doctor->id);
+        });
+
+    }
 }
