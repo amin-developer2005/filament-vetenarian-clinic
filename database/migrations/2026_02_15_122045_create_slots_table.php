@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\SlotStatus;
+use App\Models\Schedule;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -15,18 +16,15 @@ return new class extends Migration
     {
         Schema::create('slots', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class, 'owner_id')
-                ->constrained()
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
             $table->date('date');
-            $table->time('start');
-            $table->time('end');
+            $table->time('start_time');
+            $table->time('end_time');
             $table->enum('status', [
-                SlotStatus::Created,
+                SlotStatus::Available,
+                SlotStatus::Booked,
                 SlotStatus::Confirmed,
                 SlotStatus::Cancelled,
-            ])->default(SlotStatus::Created);
+            ])->default(SlotStatus::Available);
             $table->timestamps();
         });
     }

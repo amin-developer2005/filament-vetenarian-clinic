@@ -1,86 +1,76 @@
 <?php
 
 return [
-    'label' => 'زمان بندی ها',
-    'plural_label' => 'زمان بندی ها',
-    'singular_label' => 'زمان بندی',
-    'bread_crumb' => 'زمان بندی ها',
+    'label' => 'وقت ها',
+    'plural_label' => 'وقت ها',
+    'singular_label' => 'وقت',
+    'bread_crumb' => 'وقت ها',
 
     'navigations' => [
-        'label'  => 'زمان بندی',
+        'label' => 'وقت',
+        'group'  => 'مدیریت نوبت‌ها'
     ],
 
     'pages' => [
         'index' => [
             'actions' => [
-                'create' => 'ایجاد زمان بندی جدید'
+                'create' => 'ایجاد زمان بندی جدید',
             ],
         ],
         'create' => [
             'record' => [
-                'title' => 'ایجاد زمان بندی جدید'
+                'title' => 'ایجاد زمان بندی جدید',
             ],
             'form' => [
                 'select' => [
                     'schedule' => [
-                        'no_options_message' => 'نویتی مرتبط با این برنامه زمان بندی یافت نشد.'
+                        'no_options_message' => 'نویتی مرتبط با این برنامه زمان بندی یافت نشد.',
                     ],
-                ]
+                ],
             ],
         ],
         'edit' => [
             'record' => [
-                'title' => 'ویرایش زمان بندی'
+                'title' => 'ویرایش زمان بندی',
             ],
         ],
     ],
     'schema' => [
         'form' => [
             'components' => [
-                'start' => [
-                    'label' => 'ساعت شروع نوبت'
-                ],
-                'end' => [
-                    'label' => 'ساعت پایان نویت',
-                    'validationMessages' => [
-                        'unique' => 'ایمیل قبلا ثبت شده است.'
-                    ],
-                ],
                 'schedule' => [
-                    'label' => 'نوبت',
+                    'label' => 'برنامه کاری',
                     'no_options_message' => 'نویتی مرتبط با این برنامه زمان بندی یافت نشد.',
                     'createOptionForm' => [
-                        'date'     => 'تاریخ',
+                        'date' => 'تاریخ',
                         'owner_id' => 'مالک',
                     ],
                     'createOptionModalHeading' => 'افزودن نوبت جدید',
                 ],
-                'status' => [
-                    'label' => 'وضعیت'
+                'date' => [
+                    'label' => 'تاریخ',
                 ],
-            ]
+                'start_time' => [
+                    'label' => 'ساعت شروع',
+                ],
+                'end_time' => [
+                    'label' => 'ساعت پایان',
+                ],
+                'status' => [
+                    'label' => 'وضعیت',
+                ],
+            ],
         ],
     ],
     'table' => [
         'columns' => [
-            'start' => [
-                'label' => 'ساعت شروع نوبت'
-            ],
-            'end' => [
-                'label' => 'ساعت پایان نویت',
-            ],
-            'schedule' => [
-                'label' => 'نوبت',
-            ],
-            'status' => [
-                'label' => 'وضعیت'
-            ],
-            'created_at' => [
-                'label' => 'تاریخ ساخت'
-            ],
-            'updated_at' => [
-                'label' => 'تاریخ بروزرسانی'
-            ],
+            'doctor'        => 'دامپزشک',
+            'clinic'        => 'کلینیک',
+            'date'          => 'تاریخ',
+            'start_time'    => 'ساعت شروع',
+            'end_time'      => 'ساعت پایان',
+            'status'       => 'وضعیت',
+            'created_at'    => 'تاریخ ایجاد',
         ],
         'filters' => [
             'start' => [
@@ -93,7 +83,7 @@ return [
                 'label' => 'وضعیت زمانبندی',
             ],
         ],
-        'emptyStateHeading'     => 'هیچ برنامه زمانبدی وجود ندارد.',
+        'emptyStateHeading' => 'هیچ برنامه زمانبدی وجود ندارد.',
         'emptyStateDescription' => 'برای شروع مدیریت رزروها، یک برنامه زمانبندی جدید ایجاد کنید',
     ],
 

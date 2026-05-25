@@ -70,11 +70,11 @@ trait HasPanelRole
 
         $roles = $this->roles()->get();
 
-        if ($roles->contains($role)) {
-            return true;
+        if (! $roles->contains($role)) {
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     public function resolvePanelRole(Panel $panel)

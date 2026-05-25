@@ -23,6 +23,11 @@ class Clinic extends Model
         return $this->belongsToMany(User::class);
     }
 
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class);
+    }
+
     public function slots(): BelongsToMany
     {
         return $this->belongsToMany(Slot::class);
@@ -33,13 +38,8 @@ class Clinic extends Model
         return $this->belongsToMany(Livestock::class);
     }
 
-    public function fetchDoctors(): BelongsToMany
+    public function schedules(): BelongsToMany
     {
-        $doctor = Role::query()->firstWhere('name', PanelRole::Doctor);
-
-        return $this->users()->whereHas('roles', function ($query) use ($doctor) {
-            return $query->where('id', $doctor->id);
-        });
-
+        return $this->belongsToMany(Schedule::class);
     }
 }

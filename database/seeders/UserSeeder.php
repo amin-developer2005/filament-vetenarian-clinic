@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\PanelRole;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -21,7 +22,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('Admin@4567'),
         ]);
 
-        $role = Role::query()->firstWhere('name', 'admin');
+        $role = Role::query()->firstWhere('name', PanelRole::Admin);
 
         $user->roles()->attach($role->id);
     }

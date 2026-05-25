@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Slots\Tables;
 
 use App\Enums\SlotStatus;
+use App\Models\Clinic;
 use App\Models\Slot;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -25,35 +26,40 @@ class SlotsTable
     {
         return $table
             ->columns([
-                TextColumn::make('schedule.date')
-                    ->label(__('resources/slots.table.columns.schedule.label'))
-                    ->date('M d Y')
-                    ->sortable(),
-                TextColumn::make('start')
-                    ->label(__('resources/slots.table.columns.start.label'))
-                    ->time('h:i A')
-                    ->label('From')
-                    ->sortable(),
-                TextColumn::make('end')
-                    ->label(__('resources/slots.table.columns.end.label'))
-                    ->time('h:i A')
-                    ->label('To')
-                    ->sortable(),
-                TextColumn::make('status')
-                    ->label(__('resources/slots.table.columns.status.label'))
-                    ->badge()
+                TextColumn::make('schedule.doctor.name')
+                    ->label(__('resources/slots.table.columns.doctor'))
                     ->searchable()
                     ->sortable(),
+
+                TextColumn::make('schedule.clinics.name')
+                    ->label(__('resources/slots.table.columns.clinic'))
+                    ->badge()
+                    ->color(Color::Emerald)
+                    ->searchable()
+                    ->sortable()
+                    ->visible(fn () => auth()->user()?->can('viewAny', Clinic::class)),
+
+                TextColumn::make('status')
+                    ->label(__('resources/slots.table.columns.status'))
+                    ->badge(),
+                TextColumn::make('date')
+                    ->label(__('resources/slots.table.columns.date'))
+                    ->date()
+                    ->sortable(),
+
+                TextColumn::make('start_time')
+                    ->label(__('resources/slots.table.columns.start_time'))
+                    ->time('h:i A'),
+
+                TextColumn::make('end_time')
+                    ->label(__('resources/slots.table.columns.end_time'))
+                    ->time('h:i A'),
+
                 TextColumn::make('created_at')
-                    ->label(__('resources/slots.table.columns.start.label'))
-                    ->since()
+                    ->label(__('resources/slots.table.columns.created_at'))
+                    ->dateTime()
                     ->sortable()
-                    ->toggleable(),
-                TextColumn::make('updated_at')
-                    ->label(__('resources/slots.table.columns.updated_at.label'))
-                    ->sortable()
-                    ->since()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('status')
@@ -82,8 +88,22 @@ class SlotsTable
             ->emptyStateHeading(__('resources/slots.table.emptyStateHeading'))
             ->emptyStateDescription(__('resources/slots.table.emptyStateDescription'))
             ->recordActions([
+
+                Action::make('confirm')
+                    ->label('تایید')
+                    ->color(Color::Emerald)
+                    ->icon('heroicon-o-check')
+                   // ->visible(fn(Slot $slot) => $slot->isBooked() && $slot->isNotConfirmed())
+        ,
+                Action::make('cancel')
+                    ->label('کنسل')
+                    ->color(Color::Red)
+                    ->icon('heroicon-o-x-mark')
+                    ->action(fn(Slot $slot) => $slot->cancel())
+                    ->visible(fn(Slot $slot) => $slot->isNotCancelled()),
                 EditAction::make(),
                 DeleteAction::make(),
+
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

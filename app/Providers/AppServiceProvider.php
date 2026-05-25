@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Schedule;
+use App\Observers\ScheduleObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Date;
@@ -38,6 +40,8 @@ class AppServiceProvider extends ServiceProvider
         DB::prohibitDestructiveCommands(
             app()->isProduction(),
         );
+
+        Schedule::observe(ScheduleObserver::class);
 
         Password::defaults(fn (): ?Password => app()->isProduction()
             ? Password::min(12)

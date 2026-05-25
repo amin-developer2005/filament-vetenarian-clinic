@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\SlotStatus;
+use App\Models\Schedule;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,9 +13,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('slots', function (Blueprint $table) {
-            $table->string('status')
-                ->default(SlotStatus::Available)
-                ->change();
+            $table->foreignIdFor(Schedule::class)
+                ->after('id')
+                ->constrained()
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
         });
     }
 
@@ -25,7 +27,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('slots', function (Blueprint $table) {
-            $table->string('status')->change();
+            $table->dropForeignIdFor(Schedule::class);
         });
     }
 };

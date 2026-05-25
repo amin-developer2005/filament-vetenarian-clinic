@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\AppointmentStatus;
 use App\Enums\SlotStatus;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,18 +16,17 @@ class Slot extends Model
     use HasFactory;
 
     protected $fillable = [
+        'schedule_id',
         'status',
         'date',
-        'start',
-        'end',
-        'owner_id',
+        'start_time',
+        'end_time',
     ];
 
     protected $casts = [
         'status'   => SlotStatus::class,
-        'date'     => 'datetime',
-        'start'    => 'datetime:H:i',
-        'end'    => 'datetime:H:i',
+        'start'    => 'datetime',
+        'end'    => 'datetime',
     ];
 
 
@@ -45,6 +43,11 @@ class Slot extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function schedule(): BelongsTo
+    {
+        return $this->belongsTo(Schedule::class);
     }
 
     public function appointments(): HasMany
@@ -69,6 +72,11 @@ class Slot extends Model
     public function isCreated(): bool
     {
         return $this->status == SlotStatus::Created;
+    }
+
+    public function isBooked()
+    {
+        return $this->status == SlotStatus::Booked;
     }
 
     public function isConfirmed(): bool

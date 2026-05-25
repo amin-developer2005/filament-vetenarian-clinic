@@ -14,6 +14,7 @@ class ListSlots extends ListRecords
     {
         return [
             CreateAction::make()
+                ->hidden()
                 ->label(__('resources/slots.pages.index.actions.create')),
         ];
     }

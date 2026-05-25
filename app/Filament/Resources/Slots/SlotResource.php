@@ -8,6 +8,7 @@ use App\Filament\Resources\Slots\Pages\ListSlots;
 use App\Filament\Resources\Slots\Schemas\SlotForm;
 use App\Filament\Resources\Slots\Tables\SlotsTable;
 use BackedEnum;
+use Closure;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,7 +22,7 @@ class SlotResource extends Resource
     protected static ?string $model = Slot::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-    protected static bool $hasNavigationGroup = false;
+    protected static bool $hasNavigationGroup = true;
 
     public static function form(Schema $schema): Schema
     {

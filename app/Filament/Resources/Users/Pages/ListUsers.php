@@ -14,6 +14,7 @@ class ListUsers extends ListRecords
     {
         return [
             CreateAction::make()
+                ->iconButton()
                 ->label(__('resources/users.pages.index.actions.create')),
         ];
     }

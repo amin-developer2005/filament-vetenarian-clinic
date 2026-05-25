@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\PanelRole;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -13,16 +14,16 @@ class RoleFactory extends Factory
         get {
             return [
                 [
-                    'name' => 'admin', 'description' => 'Admin User'
+                    'name' => PanelRole::ADMIN, 'description' => 'Admin User'
                 ],
                 [
-                    'name' => 'owner', 'description' => 'Owner Vet'
+                    'name' => PanelRole::Owner, 'description' => 'Owner LiveStock'
                 ],
                 [
-                    'name' => 'doctor', 'description' => 'Doctor Vet'
+                    'name' => PanelRole::DOCTOR, 'description' => 'Doctor LiveStock'
                 ],
                 [
-                    'name' => 'staff', 'description' => 'Clinic Staff'
+                    'name' => PanelRole::Staff, 'description' => 'Clinic Staff'
                 ]
             ];
         }
