@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('clinic_slot', function (Blueprint $table) {
+        Schema::create('do_not_need_clinic_slot', function (Blueprint $table) {
             $table->foreignIdFor(Clinic::class);
             $table->foreignIdFor(Slot::class);
         });
@@ -24,7 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('clinic_slot', function (Blueprint $table) {
+        Schema::table('do_not_need_clinic_slot', function (Blueprint $table) {
             $table->dropForeignIdFor(Clinic::class);
             $table->dropForeignIdFor(Slot::class);
         });

@@ -10,6 +10,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TimePicker;
 use Filament\Support\Colors\Color;
@@ -31,17 +33,17 @@ class SlotsTable
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('schedule.clinics.name')
+                TextColumn::make('schedule.clinic.name')
                     ->label(__('resources/slots.table.columns.clinic'))
                     ->badge()
                     ->color(Color::Emerald)
                     ->searchable()
-                    ->sortable()
-                    ->visible(fn () => auth()->user()?->can('viewAny', Clinic::class)),
+                    ->sortable(),
 
                 TextColumn::make('status')
                     ->label(__('resources/slots.table.columns.status'))
                     ->badge(),
+
                 TextColumn::make('date')
                     ->label(__('resources/slots.table.columns.date'))
                     ->date()
@@ -59,7 +61,7 @@ class SlotsTable
                     ->label(__('resources/slots.table.columns.created_at'))
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
             ])
             ->filters([
                 SelectFilter::make('status')
@@ -88,22 +90,7 @@ class SlotsTable
             ->emptyStateHeading(__('resources/slots.table.emptyStateHeading'))
             ->emptyStateDescription(__('resources/slots.table.emptyStateDescription'))
             ->recordActions([
-
-                Action::make('confirm')
-                    ->label('تایید')
-                    ->color(Color::Emerald)
-                    ->icon('heroicon-o-check')
-                   // ->visible(fn(Slot $slot) => $slot->isBooked() && $slot->isNotConfirmed())
-        ,
-                Action::make('cancel')
-                    ->label('کنسل')
-                    ->color(Color::Red)
-                    ->icon('heroicon-o-x-mark')
-                    ->action(fn(Slot $slot) => $slot->cancel())
-                    ->visible(fn(Slot $slot) => $slot->isNotCancelled()),
-                EditAction::make(),
-                DeleteAction::make(),
-
+                ViewAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

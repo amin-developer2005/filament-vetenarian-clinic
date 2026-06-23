@@ -1,53 +1,63 @@
 <?php
 
-namespace App\Filament\Resources\LiveStocks\Tables;
+namespace App\Filament\Resources\Animals\Tables;
 
+use App\Enums\AnimalSpecies;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
-class LiveStocksTable
+class AnimalTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
                 ImageColumn::make('avatar')
-                    ->label('عکس دام')
-                    ->circular()
+                    ->label(__('resources/animals.table.columns.avatar'))
+                    ->circular(),
+
+                TextColumn::make('name')
+                    ->label(__('resources/animals.table.columns.name'))
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('name')
-                    ->label('نام دام')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('type')
-                    ->label('نوع دام')
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('owner.name')
-                    ->label('مالک دام')
+                    ->label(__('resources/animals.table.columns.owner'))
                     ->searchable()
                     ->sortable(),
+
                 TextColumn::make('clinics.name')
-                    ->label('مالک دام')
+                    ->label(__('resources/animals.table.columns.clinics'))
                     ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('species')
+                    ->label(__('resources/animals.table.columns.species'))
+                    ->badge()
                     ->sortable(),
                 TextColumn::make('date_of_birth')
-                    ->label('تاریخ تولد')
-                    ->searchable()
+                    ->label(__('resources/animals.table.columns.date_of_birth'))
+                    ->date()
                     ->sortable(),
+
                 TextColumn::make('created_at')
-                    ->label('تاریخ ساخت دام')
+                    ->label(__('resources/animals.table.columns.created_at'))
+                    ->dateTime()
                     ->sortable()
                     ->toggleable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('owner_id')
+                    ->label(__('resources/animals.table.filters.owner'))
+                    ->relationship('owner', 'name'),
+                SelectFilter::make('species')
+                    ->label(__('resources/animals.table.filters.species'))
+                    ->options(AnimalSpecies::class),
             ])
             ->recordActions([
                 EditAction::make(),

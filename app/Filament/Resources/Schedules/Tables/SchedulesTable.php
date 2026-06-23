@@ -41,8 +41,7 @@ class SchedulesTable
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color(Color::Emerald)
-                    ->visible(fn(): bool => Filament::auth()->user()->can('viewAny', Clinic::class)),
+                    ->color(Color::Emerald),
 
                 TextColumn::make('days_of_week')
                     ->label(__('resources/schedules.table.columns.days_of_week.label'))

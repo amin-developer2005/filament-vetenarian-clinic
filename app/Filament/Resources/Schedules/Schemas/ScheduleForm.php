@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Schedules\Schemas;
 
 use App\Enums\PanelRole;
+use App\Models\Clinic;
+use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
@@ -10,6 +12,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 class ScheduleForm
@@ -19,34 +23,36 @@ class ScheduleForm
         return $schema
             ->components([
                 Section::make([
-                    Select::make('doctor_id')
-                        ->label(__('resources/schedules.schema.form.components.doctor.label'))
-                        ->relationship('doctor', 'name', modifyQueryUsing: function ($query) {
-                            $tenant = Filament::getTenant();
-                            $doctors = $tenant->users()->whereHas('roles', function ($query) {
-                                $query->where('name', PanelRole::DOCTOR);
-                            });
-
-                            if (blank($doctors)) {
-                                return null;
-                            }
-
-                            return $doctors;
-                        })
-                        ->required()
-                        ->searchable()
-                        ->preload()
-                        ->noOptionsMessage(__('resources/schedules.schema.form.components.doctor.no_options_message'))
-                    ->native(false),
-                    Select::make('clinics')
+                    Select::make('clinic_id')
                         ->label(__('resources/schedules.schema.form.components.clinic.label'))
-                        ->relationship(titleAttribute: 'name')
+                        ->relationship('clinic', 'name')
                         ->required()
+                        ->live()
                         ->searchable()
-                        ->multiple()
                         ->preload()
                         ->noOptionsMessage(__('resources/schedules.schema.form.components.clinic.no_options_message'))
-                    ->native(false),
+                        ->afterStateUpdated(fn(Set $set) => $set('doctor_id', null))
+                        ->native(false),
+                    Select::make('doctor_id')
+                        ->label(__('resources/schedules.schema.form.components.doctor.label'))
+                        ->options( function (Get $get) {
+                            if (! $clinicId = $get('clinic_id')) {
+                                return [];
+                            }
+
+                            $clinic = Clinic::query()
+                                ->find($clinicId);
+
+                            return $clinic->users()
+                                ->whereHas('roles', fn($query) => $query->where('name', PanelRole::DOCTOR))
+                                ->pluck('name', 'id');
+                        })
+                        ->required()
+                        ->live()
+                        ->disabled(fn(Get $get) => blank($get('clinic_id')))
+                        ->searchable()
+                        ->noOptionsMessage(__('resources/schedules.schema.form.components.doctor.no_options_message'))
+                        ->native(false),
                 ]),
 
                 Section::make([
@@ -54,12 +60,14 @@ class ScheduleForm
                         ->label(__('resources/schedules.schema.form.components.start_date.label'))
                         ->required()
                         ->date()
+                        ->closeOnDateSelection()
                         ->displayFormat('Y-m-d')
                         ->native(false),
                     DatePicker::make('end_date')
                         ->label(__('resources/schedules.schema.form.components.end_date.label'))
                         ->required()
                         ->date()
+                        ->closeOnDateSelection()
                         ->displayFormat('Y-m-d')
                         ->afterOrEqual('start_date')
                         ->native(false),
@@ -84,10 +92,12 @@ class ScheduleForm
                     TimePicker::make('time_start')
                         ->label(__('resources/schedules.schema.form.components.time_start.label'))
                         ->required()
+                        ->closeOnDateSelection()
                         ->seconds(false),
                     TimePicker::make('time_end')
                         ->label(__('resources/schedules.schema.form.components.time_end.label'))
                         ->required()
+                        ->closeOnDateSelection()
                         ->seconds(false)
                         ->after('time_start'),
                 ]),

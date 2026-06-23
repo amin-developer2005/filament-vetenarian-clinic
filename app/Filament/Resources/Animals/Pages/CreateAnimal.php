@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\LiveStocks\Pages;
+namespace App\Filament\Resources\Animals\Pages;
 
-use App\Filament\Resources\LiveStocks\LiveStockResource;
+use App\Filament\Resources\Animals\AnimalResource;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Contracts\Support\Htmlable;
 
-class CreateLiveStock extends CreateRecord
+class CreateAnimal extends CreateRecord
 {
-    protected static string $resource = LiveStockResource::class;
+    protected static string $resource = AnimalResource::class;
 
 
     public function getTitle(): string|Htmlable
@@ -18,7 +18,7 @@ class CreateLiveStock extends CreateRecord
             return static::$title;
         }
 
-        return __('resources/liveStocks.pages.create.record.title');
+        return __('resources/animals.pages.create.record.title');
     }
 
     public function getRedirectUrl(): string

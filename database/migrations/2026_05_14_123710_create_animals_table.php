@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\LiveStockType;
+use App\Enums\AnimalSpecies;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,15 +13,30 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('live_stocks', function (Blueprint $table) {
+        Schema::create('animals', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class, 'owner_id')
                 ->constrained()
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
             $table->string('name');
-            $table->string('type');
+            $table->string('species');
+            $table->string('breed')
+                ->nullable();
+            $table->enum('gender', [
+                'male',
+                'female',
+                'unknown',
+            ])->default('unknown');
             $table->date('date_of_birth')->nullable();
+
+            $table->string('microchip_number')
+                ->nullable()
+                ->unique();
+
+            $table->boolean('is_neutered')
+                ->default(false);
+
             $table->string('avatar')->nullable();
             $table->timestamps();
         });

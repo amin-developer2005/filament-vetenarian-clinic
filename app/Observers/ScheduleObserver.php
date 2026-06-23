@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Schedule;
+use App\Models\Slot;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
@@ -17,6 +18,7 @@ class ScheduleObserver
      */
     public function created(Schedule $schedule): void
     {
+
         $startDate = Carbon::parse($schedule->start_date);
         $endDate = Carbon::parse($schedule->end_date);
         $daysOfWeek = $schedule->days_of_week;
@@ -66,7 +68,9 @@ class ScheduleObserver
      */
     public function updated(Schedule $schedule): void
     {
+        $schedule->slots()->delete();
 
+        $this->created($schedule);
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\LiveStock;
+use App\Models\Animal;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
@@ -19,7 +19,7 @@ class LiveStockPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, LiveStock $liveStock): bool
+    public function view(User $user, Animal $liveStock): bool
     {
         return $user->isAdmin() || $liveStock->isBelongsToOwner($user);
     }
@@ -35,7 +35,7 @@ class LiveStockPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, LiveStock $liveStock): bool
+    public function update(User $user, Animal $liveStock): bool
     {
         return $user->isAdmin() || $liveStock->isBelongsToOwner($user);
     }
@@ -43,7 +43,7 @@ class LiveStockPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, LiveStock $liveStock): bool
+    public function delete(User $user, Animal $liveStock): bool
     {
         return $user->isAdmin() || $liveStock->isBelongsToOwner($user);
     }
@@ -51,7 +51,7 @@ class LiveStockPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, LiveStock $liveStock): bool
+    public function restore(User $user, Animal $liveStock): bool
     {
         return $user->isAdmin() || $liveStock->isBelongsToOwner($user);
     }
@@ -59,7 +59,7 @@ class LiveStockPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, LiveStock $liveStock): bool
+    public function forceDelete(User $user, Animal $liveStock): bool
     {
         return $user->isAdmin() || $liveStock->isBelongsToOwner($user);
     }

@@ -17,7 +17,6 @@ class Clinic extends Model
         'name',
     ];
 
-
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
@@ -28,18 +27,13 @@ class Clinic extends Model
         return $this->belongsToMany(Role::class);
     }
 
-    public function slots(): BelongsToMany
-    {
-        return $this->belongsToMany(Slot::class);
-    }
-
     public function liveStocks(): BelongsToMany
     {
-        return $this->belongsToMany(Livestock::class);
+        return $this->belongsToMany(Animal::class);
     }
 
-    public function schedules(): BelongsToMany
+    public function schedules(): HasMany
     {
-        return $this->belongsToMany(Schedule::class);
+        return $this->hasMany(Schedule::class);
     }
 }

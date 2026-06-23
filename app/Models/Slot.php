@@ -4,11 +4,13 @@ namespace App\Models;
 
 use App\Enums\SlotStatus;
 use Carbon\Carbon;
+use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Slot extends Model
 {
@@ -25,20 +27,8 @@ class Slot extends Model
 
     protected $casts = [
         'status'   => SlotStatus::class,
-        'start'    => 'datetime',
-        'end'    => 'datetime',
+        'date'    => 'date',
     ];
-
-
-    public function clinics(): BelongsToMany
-    {
-        return $this->belongsToMany(Clinic::class);
-    }
-
-    public function clinic(): BelongsToMany
-    {
-        return $this->clinics();
-    }
 
     public function owner(): BelongsTo
     {
@@ -50,55 +40,38 @@ class Slot extends Model
         return $this->belongsTo(Schedule::class);
     }
 
-    public function appointments(): HasMany
+    public function appointment(): HasOne
     {
-        return $this->hasMany(Appointment::class);
+        return $this->hasOne(Appointment::class);
     }
 
-    public function confirm(): void
+    public function free(): static
     {
-        $this->forceFill([
-            'status' => SlotStatus::Confirmed,
-        ])->save();
+        $this->update([
+            'status' => SlotStatus::Available,
+        ]);
+
+        return $this;
     }
 
-    public function cancel(): void
+    public function book(): static
     {
-        $this->forceFill([
-            'status' => SlotStatus::Cancelled,
-        ])->save();
+        $this->update([
+            'status' => SlotStatus::Booked,
+        ]);
+
+        return $this;
     }
 
-    public function isCreated(): bool
-    {
-        return $this->status == SlotStatus::Created;
-    }
-
-    public function isBooked()
+    public function isBooked(): bool
     {
         return $this->status == SlotStatus::Booked;
     }
 
-    public function isConfirmed(): bool
+    public function isAvailable(): bool
     {
-        return $this->status === SlotStatus::Confirmed;
+        return $this->status == SlotStatus::Available;
     }
-
-    public function isCancelled(): bool
-    {
-        return $this->status === SlotStatus::Cancelled;
-    }
-
-    public function isNotConfirmed(): bool
-    {
-        return $this->status !== SlotStatus::Confirmed;
-    }
-
-    public function isNotCancelled(): bool
-    {
-        return $this->status !== SlotStatus::Cancelled;
-    }
-
 
     public function scopeForUser($query, $user)
     {
@@ -116,4 +89,5 @@ class Slot extends Model
             ->diff(Carbon::parse($this->end))
             ->format('%h hour %i min');
     }
+
 }

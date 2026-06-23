@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Appointment;
 use App\Models\Clinic;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,12 +12,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('appointment_clinic', function (Blueprint $table) {
+        Schema::table('appointments', function (Blueprint $table) {
             $table->foreignIdFor(Clinic::class)
-                ->constrained()
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
-            $table->foreignIdFor(Appointment::class)
                 ->constrained()
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
@@ -30,6 +25,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('appointment_clinic');
+        Schema::table('appointments', function (Blueprint $table) {
+            //
+        });
     }
 };

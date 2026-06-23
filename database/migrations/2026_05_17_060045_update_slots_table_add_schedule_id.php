@@ -14,7 +14,6 @@ return new class extends Migration
     {
         Schema::table('slots', function (Blueprint $table) {
             $table->foreignIdFor(Schedule::class)
-                ->after('id')
                 ->constrained()
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();

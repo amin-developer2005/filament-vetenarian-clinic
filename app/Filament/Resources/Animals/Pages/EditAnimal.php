@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Filament\Resources\LiveStocks\Pages;
+namespace App\Filament\Resources\Animals\Pages;
 
-use App\Filament\Resources\LiveStocks\LiveStockResource;
+use App\Filament\Resources\Animals\AnimalResource;
 use Filament\Actions\DeleteAction;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Support\Htmlable;
 
-class EditLiveStock extends EditRecord
+class EditAnimal extends EditRecord
 {
-    protected static string $resource = LiveStockResource::class;
+    protected static string $resource = AnimalResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -26,7 +26,7 @@ class EditLiveStock extends EditRecord
             return static::$title;
         }
 
-        return __('resources/liveStocks.pages.create.record.title');
+        return __('resources/animals.pages.create.record.title');
     }
 
     public function getRedirectUrl(): ?string

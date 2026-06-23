@@ -9,11 +9,13 @@ use App\Filament\Resources\Slots\Schemas\SlotForm;
 use App\Filament\Resources\Slots\Tables\SlotsTable;
 use BackedEnum;
 use Closure;
+use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use App\Models\Slot;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
@@ -23,6 +25,16 @@ class SlotResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     protected static bool $hasNavigationGroup = true;
+    //protected static ?string $tenantOwnershipRelationshipName = 'schedule';
+    protected static bool $isScopedToTenant = false;
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->whereHas('schedule', fn ($query) =>
+            $query->where('clinic_id', Filament::getTenant()->id)
+            );
+    }
 
     public static function form(Schema $schema): Schema
     {

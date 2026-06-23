@@ -48,7 +48,7 @@ return [
                     'createOptionModalHeading' => 'افزودن نوبت جدید',
                 ],
                 'date' => [
-                    'label' => 'تاریخ',
+                    'label' => 'تاریخ وقت',
                 ],
                 'start_time' => [
                     'label' => 'ساعت شروع',
@@ -66,7 +66,7 @@ return [
         'columns' => [
             'doctor'        => 'دامپزشک',
             'clinic'        => 'کلینیک',
-            'date'          => 'تاریخ',
+            'date'          => 'تاریخ وقت',
             'start_time'    => 'ساعت شروع',
             'end_time'      => 'ساعت پایان',
             'status'       => 'وضعیت',

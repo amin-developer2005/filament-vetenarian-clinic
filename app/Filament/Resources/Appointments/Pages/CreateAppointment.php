@@ -2,14 +2,25 @@
 
 namespace App\Filament\Resources\Appointments\Pages;
 
+use App\Enums\AppointmentStatus;
 use App\Filament\Resources\Appointments\AppointmentResource;
+use App\Filament\Resources\Appointments\Schemas\AppointmentForm;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Schemas\Schema;
 
 class CreateAppointment extends CreateRecord
 {
     protected static string $resource = AppointmentResource::class;
 
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        if (! isset($data['status'])) {
+            $data['status'] = AppointmentStatus::Pending;
+        }
+
+        return $data;
+    }
 
     public function getRedirectUrl(): string
     {

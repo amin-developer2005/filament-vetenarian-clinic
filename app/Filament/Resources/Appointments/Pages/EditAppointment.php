@@ -3,10 +3,13 @@
 namespace App\Filament\Resources\Appointments\Pages;
 
 use App\Filament\Resources\Appointments\AppointmentResource;
+use App\Models\Slot;
 use Filament\Actions\DeleteAction;
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class EditAppointment extends EditRecord
 {
@@ -19,6 +22,27 @@ class EditAppointment extends EditRecord
         ];
     }
 
+    protected function beforeSave(): void
+    {
+        $appointment = $this->getRecord();
+        $slotId = $this->data['slot_id'] ?? null;
+
+        if ($slotId && $appointment->slot_id !== $slotId) {
+            $slot = Slot::query()->find($slotId);
+
+            try {
+                $appointment->updateSlot($slot);
+            } catch (\Exception $exception) {
+                Notification::make()
+                    ->title($exception->getMessage())
+                    ->danger()
+                    ->send();
+
+                return;
+            }
+
+        }
+    }
 
     public function getRedirectUrl(): ?string
     {

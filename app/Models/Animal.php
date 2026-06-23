@@ -2,23 +2,24 @@
 
 namespace App\Models;
 
-use App\Enums\LiveStockType;
+use App\Enums\AnimalSpecies;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class LiveStock extends Model
+class Animal extends Model
 {
     protected $fillable = [
         'owner_id',
         'name',
-        'type',
+        'species',
         'date_of_birth',
         'avatar',
     ];
 
     protected $casts = [
-        'type' => LiveStockType::class
+        'species' => AnimalSpecies::class,
+        'date_of_birth' => 'date',
     ];
 
     public function owner(): BelongsTo
@@ -34,6 +35,11 @@ class LiveStock extends Model
     public function clinic(): BelongsToMany
     {
         return $this->clinics();
+    }
+
+    public function appointments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Appointment::class);
     }
 
     public function isBelongsToOwner(User $owner): bool

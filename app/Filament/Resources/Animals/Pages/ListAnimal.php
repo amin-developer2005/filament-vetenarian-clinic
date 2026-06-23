@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\Users\Pages;
+namespace App\Filament\Resources\Animals\Pages;
 
-use App\Filament\Resources\Users\UserResource;
+use App\Filament\Resources\Animals\AnimalResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Enums\IconSize;
 
-class ListUsers extends ListRecords
+class ListAnimal extends ListRecords
 {
-    protected static string $resource = UserResource::class;
+    protected static string $resource = AnimalResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -18,7 +18,7 @@ class ListUsers extends ListRecords
                 ->iconButton()
                 ->icon('heroicon-s-plus')
                 ->iconSize(IconSize::TwoExtraLarge)
-                ->label(__('resources/users.pages.index.actions.create')),
+                ->label(__('resources/animals.pages.index.actions.create')),
         ];
     }
 }

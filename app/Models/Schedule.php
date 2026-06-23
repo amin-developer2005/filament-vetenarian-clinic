@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Schedule extends Model
 {
     protected $fillable = [
+        'clinic_id',
         'doctor_id',
         'start_date',
         'end_date',
@@ -25,14 +26,9 @@ class Schedule extends Model
         'end_date' => 'date',
     ];
 
-    public function clinics(): BelongsToMany
+    public function clinic(): BelongsTo
     {
-        return $this->belongsToMany(Clinic::class);
-    }
-
-    public function clinic(): BelongsToMany
-    {
-        return $this->clinics();
+        return $this->belongsTo(Clinic::class);
     }
 
     public function doctor(): BelongsTo
@@ -42,6 +38,6 @@ class Schedule extends Model
 
     public function slots(): HasMany
     {
-        return $this->hasMany(Slot::class, 'schedule_id');
+        return $this->hasMany(Slot::class);
     }
 }

@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\LiveStocks;
+namespace App\Filament\Resources\Animals;
 
-use App\Filament\Resources\LiveStocks\Pages\CreateLiveStock;
-use App\Filament\Resources\LiveStocks\Pages\EditLiveStock;
-use App\Filament\Resources\LiveStocks\Pages\ListLiveStocks;
-use App\Filament\Resources\LiveStocks\Schemas\LiveStockForm;
-use App\Filament\Resources\LiveStocks\Tables\LiveStocksTable;
-use App\Models\LiveStock;
+use App\Filament\Resources\Animals\Pages\CreateAnimal;
+use App\Filament\Resources\Animals\Pages\EditAnimal;
+use App\Filament\Resources\Animals\Pages\ListAnimal;
+use App\Filament\Resources\Animals\Schemas\AnimalForm;
+use App\Filament\Resources\Animals\Tables\AnimalTable;
+use App\Models\Animal;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -17,20 +17,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use UnitEnum;
 
-class LiveStockResource extends Resource
+class AnimalResource extends Resource
 {
-    protected static ?string $model = LiveStock::class;
+    protected static ?string $model = Animal::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Schema $schema): Schema
     {
-        return LiveStockForm::configure($schema);
+        return AnimalForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return LiveStocksTable::configure($table);
+        return AnimalTable::configure($table);
     }
 
     public static function getRelations(): array
@@ -43,15 +43,15 @@ class LiveStockResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListLiveStocks::route('/'),
-            'create' => CreateLiveStock::route('/create'),
-            'edit' => EditLiveStock::route('/{record}/edit'),
+            'index' => ListAnimal::route('/'),
+            'create' => CreateAnimal::route('/create'),
+            'edit' => EditAnimal::route('/{record}/edit'),
         ];
     }
 
     public static function getLabel(): string
     {
-        return static::$modelLabel ?? __('resources/liveStocks.label');
+        return static::$modelLabel ?? __('resources/animals.label');
     }
 
     public static function getPluralModelLabel(): string
@@ -60,7 +60,7 @@ class LiveStockResource extends Resource
             return $label;
         }
 
-        return __('resources/liveStocks.plural_label');
+        return __('resources/animals.plural_label');
     }
 
     /**
@@ -72,7 +72,7 @@ class LiveStockResource extends Resource
             return $label;
         }
 
-        return __('resources/liveStocks.navigations.label');
+        return __('resources/animals.navigations.label');
     }
 
     public static function getBreadcrumb(): string
@@ -81,7 +81,7 @@ class LiveStockResource extends Resource
             return $breadcrumb;
         }
 
-        return __('resources/liveStocks.bread_crumb');
+        return __('resources/animals.bread_crumb');
     }
 
 }

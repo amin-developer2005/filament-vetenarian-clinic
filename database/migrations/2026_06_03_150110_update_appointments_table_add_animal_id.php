@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Animal;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,8 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('slots', function (Blueprint $table) {
-            $table->dropColumn('date');
+        Schema::table('appointments', function (Blueprint $table) {
+            $table->foreignIdFor(Animal::class)
+                ->constrained()
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
         });
     }
 
@@ -21,8 +25,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('slots', function (Blueprint $table) {
-            $table->date('date');
+        Schema::table('appointments', function (Blueprint $table) {
+            //
         });
     }
 };

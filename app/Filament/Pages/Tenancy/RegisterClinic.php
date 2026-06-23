@@ -4,6 +4,7 @@ namespace App\Filament\Pages\Tenancy;
 
 use App\Filament\Pages\Concerns\InteractWithTenantClinic;
 use App\Models\Clinic;
+use App\Models\Role;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\TextInput;
@@ -195,6 +196,9 @@ class RegisterClinic extends RegisterTenant
         $clinic = $this->getModel()::create($data);
 
         $clinic->users()->attach(auth()->user());
+
+        collect(Role::query()->get())
+            ->each(fn(Role $role) => $clinic->roles()->attach($role));
 
         return $clinic;
     }

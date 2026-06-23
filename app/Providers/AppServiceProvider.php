@@ -2,10 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Appointment;
 use App\Models\Schedule;
+use App\Observers\AppointmentObserver;
 use App\Observers\ScheduleObserver;
 use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -27,7 +28,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
-        Model::unguard();
+        $this->observeModels();
+    }
+
+    protected function observeModels(): void
+    {
+        Schedule::observe(ScheduleObserver::class);
+        Appointment::observe(AppointmentObserver::class);
     }
 
     /**
@@ -40,8 +47,6 @@ class AppServiceProvider extends ServiceProvider
         DB::prohibitDestructiveCommands(
             app()->isProduction(),
         );
-
-        Schedule::observe(ScheduleObserver::class);
 
         Password::defaults(fn (): ?Password => app()->isProduction()
             ? Password::min(12)

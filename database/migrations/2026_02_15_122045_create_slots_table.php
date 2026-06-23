@@ -16,15 +16,17 @@ return new class extends Migration
     {
         Schema::create('slots', function (Blueprint $table) {
             $table->id();
+//            $table->foreignIdFor(Schedule::class)
+//                ->constrained()
+//                ->cascadeOnDelete()
+//                ->cascadeOnUpdate();
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
             $table->enum('status', [
-                SlotStatus::Available,
-                SlotStatus::Booked,
-                SlotStatus::Confirmed,
-                SlotStatus::Cancelled,
-            ])->default(SlotStatus::Available);
+                SlotStatus::Available->value,
+                SlotStatus::Booked->value,
+            ])->default(SlotStatus::Available->value);
             $table->timestamps();
         });
     }

@@ -134,9 +134,9 @@ trait HasPanelRole
         return $this->hasPanelRole(PanelRole::DOCTOR);
     }
 
-    public function isStaff(): bool
+    public function isReceptionist(): bool
     {
-        return $this->hasPanelRole(PanelRole::STAFF);
+        return $this->hasPanelRole(PanelRole::Receptionist);
     }
 
     protected function fetchPanel(): ?Panel
