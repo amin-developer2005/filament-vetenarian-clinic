@@ -79,6 +79,11 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         return $this->hasMany(Slot::class, 'owner_id');
     }
 
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class, 'owner_id');
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return true;

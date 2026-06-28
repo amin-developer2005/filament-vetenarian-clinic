@@ -11,6 +11,24 @@ return [
         'group'  => 'مدیریت نوبت‌ها'
     ],
 
+    'pages' => [
+        'index' => [
+            'actions' => [
+                'create' => 'رزرو نوبت جدید'
+            ],
+        ],
+        'create' => [
+            'record' => [
+                'title' => 'افزودن حیوان دامی جدید'
+            ],
+        ],
+        'edit' => [
+            'record' => [
+                'title' => 'ویرایش نوبت'
+            ],
+        ],
+    ],
+
     'schema' => [
         'form' => [
             'components' => [
@@ -23,7 +41,15 @@ return [
                 ],
                 'animal_id' => [
                     'label' => 'دام / حیوان',
-                    'no_options_message' => 'ابتدا صاحب دام را انتخاب کنید.',
+                    'panel' => [
+                        'admin' => [
+                            'no_options_message' => 'مالک دارای حیوان نیست.',
+                        ],
+                        'owner' => [
+                            'no_options_message' => 'شما هنوز حیوانی ثبت نکرده اید.',
+                        ],
+                    ],
+
                 ],
                 'selected_date' => [
                     'label' => 'تاریخ نوبت',
@@ -57,6 +83,7 @@ return [
 
     'table' => [
         'columns' => [
+            'clinic'     => 'کلینیک',
             'animal'     => 'دام',
             'owner'      => 'صاحب',
             'doctor'     => 'دامپزشک',
@@ -66,10 +93,11 @@ return [
             'created_at' => 'تاریخ ثبت',
         ],
         'filters' => [
+            'clinic'     => 'فیلتر کلینیک',
             'status'     => 'فیلتر وضعیت',
             'owner'      => 'فیلتر صاحب دام',
             'created_at' => 'تاریخ ثبت رزرو',
-            'doctor'     =>  'دکتر',
+            'doctor'     =>  'فیلتر دکتر',
             'from_booked_date' => 'از تاریخ',
             'to_booked_date'   => 'تا تاریخ',
         ],
@@ -98,6 +126,10 @@ return [
                 'label' => 'اتمام نوبت',
                 'notification' => 'نوبت با موفقیت به اتمام رسید.',
             ],
+        ],
+        'emptyState' => [
+            'heading' => 'نوبتی برای شما پیدا نشد.',
+            'description' => 'شما هنوز نوبتی رزرو نکرده اید.',
         ],
     ],
 ];

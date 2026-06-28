@@ -10,12 +10,12 @@ enum PanelId: string implements HasLabel
     case Admin = 'admin';
     case Owner = 'owner';
     case Doctor = 'doctor';
-    case Staff = 'staff';
+    case Receptionist = 'receptionist';
 
     public const string ADMIN = 'admin';
     public const string OWNER = 'owner';
     public const string DOCTOR = 'doctor';
-    public const string STAFF = 'staff';
+    public const string RECEPTIONIST = 'receptionist';
 
     public function getLabel(): string|Htmlable|null
     {
@@ -23,7 +23,7 @@ enum PanelId: string implements HasLabel
             self::Admin => 'ادمین',
             self::Owner => 'مالک',
             self::Doctor => 'دکتر',
-            self::Staff => 'کارمند',
+            self::Receptionist => 'کارمند',
             default => null,
         };
     }

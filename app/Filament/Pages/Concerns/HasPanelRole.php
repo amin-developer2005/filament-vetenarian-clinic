@@ -53,8 +53,7 @@ trait HasPanelRole
             return $this;
         }
 
-        $this->roles()->attach($role);
-        $this->model->unsetRelation('roles');
+        $this->roles()->attach($role->id);
 
         return $this;
     }
@@ -62,13 +61,18 @@ trait HasPanelRole
     /**
      * @param  User  $user
      */
-    public function hasPanelRole(Role|string $role): bool
+    public function hasPanelRole(Role|PanelRole|string $role): bool
     {
+        if ($role instanceof PanelRole) {
+            $role = $role->value;
+        }
+
         if (is_string($role) && (! $role instanceof Role)) {
             $role = $this->fetchRole($role);
         }
 
         $roles = $this->roles()->get();
+
 
         if (! $roles->contains($role)) {
             return false;
@@ -77,7 +81,7 @@ trait HasPanelRole
         return true;
     }
 
-    public function resolvePanelRole(Panel $panel)
+    public function resolvePanelRole(Panel $panel): ?Role
     {
         $panelId = $panel->getId();
 
@@ -114,7 +118,7 @@ trait HasPanelRole
             $this->isAdmin() => PanelId::ADMIN,
             $this->isOwner() => PanelId::OWNER,
             $this->isDoctor() => PanelId::DOCTOR,
-            $this->isStaff() => PanelId::STAFF,
+            $this->isReceptionist() => PanelId::RECEPTIONIST,
             default => PanelId::ADMIN
         };
     }

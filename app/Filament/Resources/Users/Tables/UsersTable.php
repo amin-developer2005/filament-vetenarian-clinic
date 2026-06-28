@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Users\Tables;
 use App\Enums\EmailStatus;
 use App\Models\Role;
 use App\Models\User;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -12,6 +13,7 @@ use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Size;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
@@ -113,8 +115,10 @@ class UsersTable
                     }),
             ], FiltersLayout::Modal)
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ])->color(Color::Emerald)->size(Size::ExtraLarge),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -67,7 +67,7 @@ class AppointmentForm
 
                     Select::make('animal_id')
                         ->label(__('resources/appointments.schema.form.components.animal_id.label'))
-                        ->noOptionsMessage(__('resources/appointments.schema.form.components.animal_id.no_options_message'))
+                        ->noOptionsMessage(__('resources/appointments.schema.form.components.animal_id.panel.admin.no_options_message'))
                         ->required()
                         ->options(function (Get $get) {
                             if (! $ownerId = $get('owner_id')) {

@@ -207,7 +207,8 @@ class AppointmentsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->after(fn (Appointment $appointment) => $appointment->slot->free()),
                 ]),
             ]);
     }

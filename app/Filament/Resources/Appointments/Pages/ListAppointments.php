@@ -15,7 +15,6 @@ class ListAppointments extends ListRecords
     {
         return [
             CreateAction::make()
-                ->iconButton()
                 ->icon('heroicon-s-plus')
                 ->iconSize(IconSize::TwoExtraLarge),
         ];

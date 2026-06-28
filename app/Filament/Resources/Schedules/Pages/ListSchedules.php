@@ -17,7 +17,6 @@ class ListSchedules extends ListRecords
     {
         return [
             CreateAction::make()
-                ->iconButton()
                 ->icon('heroicon-s-plus')
                 ->iconSize(IconSize::TwoExtraLarge)
                 ->label(__('resources/schedules.pages.index.actions.create')),

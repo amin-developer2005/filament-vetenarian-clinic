@@ -15,7 +15,6 @@ class ListAnimal extends ListRecords
     {
         return [
             CreateAction::make()
-                ->iconButton()
                 ->icon('heroicon-s-plus')
                 ->iconSize(IconSize::TwoExtraLarge)
                 ->label(__('resources/animals.pages.index.actions.create')),

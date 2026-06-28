@@ -1,10 +1,10 @@
 <?php
 
 return [
-    'label' => 'دام‌ ها',
-    'plural_label' => 'دام‌ ها',
-    'singular_label' => 'دام',
-    'bread_crumb' => 'دام ‌ها',
+    'label' => 'دام‌ های من',
+    'plural_label' => 'دام‌ های من',
+    'singular_label' => 'دام من',
+    'bread_crumb' => 'دام‌ های من',
 
     'navigations' => [
         'label'  => 'دام ‌ها',
@@ -13,17 +13,17 @@ return [
     'pages' => [
         'index' => [
             'actions' => [
-                'create' => 'ایجاد حیوان دامی جدید'
+                'create' => 'افزودن حیوان دامی جدید'
             ],
         ],
         'create' => [
             'record' => [
-                'title' => 'ایجاد حیوان دامی جدید'
+                'title' => 'افزودن حیوان دامی جدید'
             ],
         ],
         'edit' => [
             'record' => [
-                'title' => 'ویرایش کاربر'
+                'title' => 'ویرایش دام'
             ],
         ],
     ],

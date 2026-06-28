@@ -7,15 +7,15 @@ use Illuminate\Contracts\Support\Htmlable;
 
 enum PanelRole: string implements HasLabel
 {
-    case Admin = 'ادمین';
-    case Owner = 'مالک';
-    case Doctor = 'دکتر';
-    case Staff = 'کارمند';
+    case Admin = 'admin';
+    case Owner = 'owner';
+    case Doctor = 'doctor';
+    case Receptionist = 'receptionist';
 
-    public const string ADMIN = 'ادمین';
-    public const string OWNER = 'مالک';
-    public const string DOCTOR = 'دکتر';
-    public const string Receptionist = 'پذیرش';
+    public const string ADMIN = 'admin';
+    public const string OWNER = 'owner';
+    public const string DOCTOR = 'doctor';
+    public const string RECEPTIONIST = 'receptionist';
 
     public function getLabel(): string|Htmlable|null
     {

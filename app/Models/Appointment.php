@@ -70,9 +70,14 @@ class Appointment extends Model
         $slot->book();
     }
 
-    public function isBelongsToDoctor(User $doctor): bool
+    public function isBelongsToDoctor(Authenticatable|User $doctor): bool
     {
         return $this->slot->schedule->doctor->id === $doctor->id;
+    }
+
+    public function isBelongsToOwner(Authenticatable|User $owner)
+    {
+        return $this->owner_id === $owner->id;
     }
 
     public function confirm(): void
@@ -210,7 +215,7 @@ class Appointment extends Model
     public function canBeCanceledBy(Authenticatable|User $user): bool
     {
         if ($this->isPending() || $this->isConfirmed()) {
-            if ($user->isOwner() && $this->owner_id === $user->id) {
+            if ($user->isOwner() && $this->isBelongsToOwner($user)) {
                 return true;
             }
         }

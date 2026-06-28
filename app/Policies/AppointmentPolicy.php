@@ -13,7 +13,7 @@ class AppointmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->isAdmin();
     }
 
     /**
@@ -21,7 +21,7 @@ class AppointmentPolicy
      */
     public function view(User $user, Appointment $appointment): bool
     {
-        return true;
+        return $user->isAdmin() || ($user->isOwner() && $appointment->isBelongsToOwner($user));
     }
 
     /**
@@ -29,7 +29,7 @@ class AppointmentPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return $user->isAdmin() || $user->isOwner();
     }
 
     /**
@@ -37,7 +37,7 @@ class AppointmentPolicy
      */
     public function update(User $user, Appointment $appointment): bool
     {
-        return true;
+        return $user->isAdmin() || ($user->isOwner() && $appointment->isBelongsToOwner($user));
     }
 
     /**
@@ -45,7 +45,7 @@ class AppointmentPolicy
      */
     public function delete(User $user, Appointment $appointment): bool
     {
-        return true;
+        return $user->isAdmin() || ($user->isOwner() && $appointment->isBelongsToOwner($user));
     }
 
     /**
@@ -53,7 +53,7 @@ class AppointmentPolicy
      */
     public function restore(User $user, Appointment $appointment): bool
     {
-        return true;
+        return $user->isAdmin() || ($user->isOwner() && $appointment->isBelongsToOwner($user));
     }
 
     /**
@@ -61,6 +61,6 @@ class AppointmentPolicy
      */
     public function forceDelete(User $user, Appointment $appointment): bool
     {
-        return true;
+        return $user->isAdmin() || ($user->isOwner() && $appointment->isBelongsToOwner($user));
     }
 }

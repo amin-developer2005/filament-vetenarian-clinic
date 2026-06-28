@@ -15,7 +15,6 @@ class ListRoles extends ListRecords
     {
         return [
             CreateAction::make()
-                ->iconButton()
                 ->icon('heroicon-s-plus')
                 ->iconSize(IconSize::TwoExtraLarge)
                 ->label(__('resources/roles.pages.index.actions.create')),
