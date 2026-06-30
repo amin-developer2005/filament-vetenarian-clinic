@@ -31,7 +31,6 @@ class OwnerPanelProvider extends PanelProvider
             ->registration(Signup::class)
             ->login()
             ->passwordReset()
-            ->profile()
             ->sidebarCollapsibleOnDesktop()
             ->sidebarWidth("18rem")
             ->collapsedSidebarWidth('12rem')

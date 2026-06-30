@@ -13,7 +13,7 @@ class ProfilePolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,7 +21,7 @@ class ProfilePolicy
      */
     public function view(User $user, Profile $profile): bool
     {
-        return $user->id === $profile->user_id;
+        return true;
     }
 
     /**
@@ -29,7 +29,7 @@ class ProfilePolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -37,7 +37,7 @@ class ProfilePolicy
      */
     public function update(User $user, Profile $profile): bool
     {
-        return $user->id === $profile->user_id;
+        return true;
     }
 
     /**
@@ -45,7 +45,7 @@ class ProfilePolicy
      */
     public function delete(User $user, Profile $profile): bool
     {
-        return false;
+        return true;
     }
 
     /**

@@ -41,10 +41,13 @@ class Signup extends Register
         event(new Registered($user));
         $this->sendEmailVerificationNotification($user);
 
-        $panel = Filament::getCurrentOrDefaultPanel();
         $authGuard = Filament::auth();
+        $user->profile()->create();
 
-        $user->assignPanelRole($panel);
+        $user->assignPanelRole(
+            Filament::getCurrentOrDefaultPanel()
+        );
+
         $authGuard->login($user);
 
         session()->regenerate();
