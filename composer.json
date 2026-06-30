@@ -12,7 +12,10 @@
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "livewire/flux": "^2.9.0",
-        "livewire/livewire": "^4.0"
+        "livewire/livewire": "^4.0",
+        "ext-intl": "*",
+        "ext-zip": "*",
+        "ext-gd": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -22,10 +25,7 @@
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
         "pestphp/pest": "^4.3",
-        "pestphp/pest-plugin-laravel": "^4.0",
-        "ext-intl": "*",
-        "ext-zip": "*",
-        "ext-gd": "*"
+        "pestphp/pest-plugin-laravel": "^4.0"
     },
     "autoload": {
         "psr-4": {
