@@ -27,11 +27,6 @@ class Clinic extends Model
         return $this->belongsToMany(Role::class);
     }
 
-    public function liveStocks(): BelongsToMany
-    {
-        return $this->belongsToMany(Animal::class);
-    }
-
     public function schedules(): HasMany
     {
         return $this->hasMany(Schedule::class);

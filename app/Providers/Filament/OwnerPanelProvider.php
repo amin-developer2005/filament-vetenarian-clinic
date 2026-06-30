@@ -31,6 +31,7 @@ class OwnerPanelProvider extends PanelProvider
             ->registration(Signup::class)
             ->login()
             ->passwordReset()
+            ->profile()
             ->sidebarCollapsibleOnDesktop()
             ->sidebarWidth("18rem")
             ->collapsedSidebarWidth('12rem')
@@ -38,7 +39,6 @@ class OwnerPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Emerald,
             ])
-
             ->discoverResources(in: app_path('Filament/Owner/Resources'), for: 'App\Filament\Owner\Resources')
             ->discoverPages(in: app_path('Filament/Owner/Pages'), for: 'App\Filament\Owner\Pages')
             ->pages([
@@ -47,7 +47,6 @@ class OwnerPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Owner/Widgets'), for: 'App\Filament\Owner\Widgets')
             ->widgets([
                 AccountWidget::class,
-                FilamentInfoWidget::class,
                 OwnerDashboardStats::class,
             ])
             ->middleware([

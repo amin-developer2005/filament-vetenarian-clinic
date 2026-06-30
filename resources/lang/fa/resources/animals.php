@@ -1,10 +1,10 @@
 <?php
 
 return [
-    'label' => 'دام‌ های من',
-    'plural_label' => 'دام‌ های من',
-    'singular_label' => 'دام من',
-    'bread_crumb' => 'دام‌ های من',
+    'label' => 'دام‌ ها',
+    'plural_label' => 'دام‌ ها',
+    'singular_label' => 'دام ',
+    'bread_crumb' => 'دام‌ ها',
 
     'navigations' => [
         'label'  => 'دام ‌ها',

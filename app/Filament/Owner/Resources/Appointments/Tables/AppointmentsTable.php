@@ -18,6 +18,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Size;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
@@ -81,28 +82,23 @@ class AppointmentsTable
                     ->searchable()
                     ->preload()
                     ->native(false),
-                Filter::make('doctor_id')
-                    ->label(__('resources/appointments.table.filters.doctor'))
-                    ->schema([
-                        Select::make('doctor')
-                            ->label(__('resources/appointments.table.filters.doctor.label'))
+                        SelectFilter::make('doctor')
+                            ->label(__('resources/appointments.table.filters.doctor'))
                             ->searchable()
+                            ->relationship('slot.schedule.doctor', 'name')
                             ->preload()
                             ->native(false),
-                    ])->query(function (Builder $query, array $data) {
-                        return $query->when(
-                            $data['doctor'] ?? null,
-                            fn ($q, $v) => $q->where('slot.schedule.doctor_id', $v)
-                        );
-                    }),
+
                 Filter::make('created_at')
                     ->label(__('resources/appointments.table.filters.created_at'))
                     ->schema([
                         DatePicker::make('from_booked_date')
                             ->label(__('resources/appointments.table.filters.from_booked_date'))
+                            ->native(false)
                             ->date(),
                         DatePicker::make('to_booked_date')
                             ->label(__('resources/appointments.table.filters.to_booked_date'))
+                            ->native(false)
                             ->date(),
                     ])->query(function (Builder $query, array $data) {
                         return $query
@@ -116,6 +112,7 @@ class AppointmentsTable
                             );
                     }),
             ], FiltersLayout::Modal)
+            ->filtersFormWidth(Width::FiveExtraLarge)
             ->recordActions([
                 Action::make('cancel')
                     ->label(__('resources/appointments.table.actions.cancel.label'))
@@ -127,7 +124,6 @@ class AppointmentsTable
                         $appointment->slot->free();
                     }),
                 ActionGroup::make([
-                    ViewAction::make(),
                     EditAction::make(),
                     DeleteAction::make()
                         ->after(fn (Appointment $appointment) => $appointment->slot->free()),

@@ -1,27 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\Users\Pages;
+namespace App\Filament\Owner\Resources\Animals\Pages;
 
-use App\Filament\Resources\Users\UserResource;
+use App\Filament\Owner\Resources\Animals\AnimalResource;
 use Filament\Actions\DeleteAction;
 use Filament\Facades\Filament;
-use Filament\Pages\Page;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Support\Htmlable;
 
-class EditUser extends EditRecord
+class EditAnimal extends EditRecord
 {
-    protected static string $resource = UserResource::class;
-
-    public function getTitle(): string|Htmlable
-    {
-        if (filled(static::$title)) {
-            return static::$title;
-        }
-
-        return __('resources/users.pages.edit.record.title');
-    }
+    protected static string $resource = AnimalResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -30,6 +19,14 @@ class EditUser extends EditRecord
         ];
     }
 
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        if (! isset($data['owner_id'])) {
+            $data['owner_id'] = Filament::auth()->id();
+        }
+
+        return $data;
+    }
 
     public function getRedirectUrl(): ?string
     {
@@ -54,8 +51,6 @@ class EditUser extends EditRecord
             return $this->getResourceUrl('view', $this->getRedirectUrlParameters());
         }
 
-        return $this->getResourceUrl('index', $this->getRedirectUrlParameters());
+        return $resource::getUrl('index');
     }
-
-
 }

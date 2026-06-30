@@ -20,7 +20,7 @@ use UnitEnum;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-    protected static bool $isScopedToTenant = false;
+    protected static bool $isScopedToTenant = true;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Users;
 
     public static function form(Schema $schema): Schema

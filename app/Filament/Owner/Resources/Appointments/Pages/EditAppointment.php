@@ -2,6 +2,7 @@
 
 namespace App\Filament\Owner\Resources\Appointments\Pages;
 
+use App\Enums\AppointmentStatus;
 use App\Filament\Owner\Resources\Appointments\AppointmentResource;
 use Filament\Actions\DeleteAction;
 use Filament\Facades\Filament;
@@ -19,6 +20,18 @@ class EditAppointment extends EditRecord
         ];
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        if (! isset($data['owner_id'])) {
+            $data['owner_id'] = Filament::auth()->id();
+        }
+
+        if (! isset($data['status'])) {
+            $data['status'] = AppointmentStatus::Pending;
+        }
+
+        return $data;
+    }
 
     public function getRedirectUrl(): ?string
     {

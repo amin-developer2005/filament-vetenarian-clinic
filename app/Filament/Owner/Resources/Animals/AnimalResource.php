@@ -1,36 +1,37 @@
 <?php
 
-namespace App\Filament\Resources\Appointments;
+namespace App\Filament\Owner\Resources\Animals;
 
-use App\Filament\Resources\Appointments\Pages\CreateAppointment;
-use App\Filament\Resources\Appointments\Pages\EditAppointment;
-use App\Filament\Resources\Appointments\Pages\ListAppointments;
-use App\Filament\Resources\Appointments\Schemas\AppointmentForm;
-use App\Filament\Resources\Appointments\Tables\AppointmentsTable;
-use App\Models\Appointment;
+use App\Filament\Owner\Resources\Animals\Pages\CreateAnimal;
+use App\Filament\Owner\Resources\Animals\Pages\EditAnimal;
+use App\Filament\Owner\Resources\Animals\Pages\ListAnimals;
+use App\Filament\Owner\Resources\Animals\Schemas\AnimalForm;
+use App\Filament\Owner\Resources\Animals\Tables\AnimalsTable;
+use App\Models\Animal;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
-class AppointmentResource extends Resource
+class AnimalResource extends Resource
 {
-    protected static ?string $model = Appointment::class;
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::CalendarDays;
+    protected static ?string $model = Animal::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     private static bool $hasNavigationGroup = true;
-    protected static bool $isScopedToTenant = false;
 
     public static function form(Schema $schema): Schema
     {
-        return AppointmentForm::configure($schema);
+        return AnimalForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return AppointmentsTable::configure($table);
+        return AnimalsTable::configure($table);
     }
 
     public static function getRelations(): array
@@ -40,18 +41,26 @@ class AppointmentResource extends Resource
         ];
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        $query = static::getModel()::query();
+
+        return $query
+            ->where('owner_id', Filament::auth()->id());
+    }
+
     public static function getPages(): array
     {
         return [
-            'index' => ListAppointments::route('/'),
-            'create' => CreateAppointment::route('/create'),
-            'edit' => EditAppointment::route('/{record}/edit'),
+            'index' => ListAnimals::route('/'),
+            'create' => CreateAnimal::route('/create'),
+            'edit' => EditAnimal::route('/{record}/edit'),
         ];
     }
 
     public static function getLabel(): ?string
     {
-        return static::$modelLabel ?? __('resources/appointments.label');
+        return static::$modelLabel ?? __('owner/animals.label');
     }
 
     public static function getPluralModelLabel(): string
@@ -60,7 +69,7 @@ class AppointmentResource extends Resource
             return $label;
         }
 
-        return __('resources/appointments.plural_label');
+        return __('owner/animals.plural_label');
     }
 
     public static function getNavigationLabel(): string
@@ -69,7 +78,7 @@ class AppointmentResource extends Resource
             return $label;
         }
 
-        return __('resources/appointments.navigations.label');
+        return __('owner/animals.navigations.label');
     }
 
     public static function getNavigationGroup(): string|UnitEnum|null
@@ -78,7 +87,7 @@ class AppointmentResource extends Resource
             return null;
         }
 
-        return static::$navigationGroup ?? __('resources/appointments.navigations.group');
+        return static::$navigationGroup ?? __('owner/animals.navigations.group');
     }
 
     public static function getBreadcrumb(): string
@@ -87,20 +96,20 @@ class AppointmentResource extends Resource
             return $breadcrumb;
         }
 
-        return __('resources/appointments.bread_crumb');
+        return __('owner/animals.bread_crumb');
     }
 
     public static function shouldRegisterNavigation(): bool
     {
         $user = Filament::auth()->user();
 
-        return $user->isDoctor() || $user->isAdmin();
+        return $user->isOwner() || $user->isAdmin();
     }
 
     public static function canAccess(): bool
     {
         $user = Filament::auth()->user();
 
-        return $user->isDoctor() || $user->isAdmin();
+        return $user->isOwner() || $user->isAdmin();
     }
 }

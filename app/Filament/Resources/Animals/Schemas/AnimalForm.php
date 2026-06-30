@@ -25,11 +25,14 @@ class AnimalForm
                     FileUpload::make('avatar')
                         ->label(__('resources/animals.schema.form.components.avatar.label'))
                         ->nullable()
+                        ->openable()
+                        ->downloadable()
                         ->previewable()
+                        ->avatar()
                         ->image()
                         ->imageEditor()
                         ->maxSize(2048)
-                        ->directory('avatars/liveStocks'),
+                        ->directory('avatars/animals'),
                     TextInput::make('name')
                         ->label(__('resources/animals.schema.form.components.name.label'))
                         ->required()

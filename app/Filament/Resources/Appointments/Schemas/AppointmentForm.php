@@ -89,7 +89,7 @@ class AppointmentForm
                         ->label(__('resources/appointments.schema.form.components.selected_date.label'))
                         ->required()
                         ->date()
-                        ->displayFormat('Y-m-d')
+                        ->displayFormat('Y-M-d')
                         ->closeOnDateSelection()
                         ->live()
                         ->dehydrated(false)

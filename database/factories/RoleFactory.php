@@ -17,13 +17,13 @@ class RoleFactory extends Factory
                     'name' => PanelRole::ADMIN, 'description' => 'Admin User'
                 ],
                 [
-                    'name' => PanelRole::Owner, 'description' => 'Animal Owner'
+                    'name' => PanelRole::OWNER, 'description' => 'Animal Owner'
                 ],
                 [
                     'name' => PanelRole::DOCTOR, 'description' => 'Animal Doctor'
                 ],
                 [
-                    'name' => PanelRole::Receptionist, 'description' => 'Clinic Receptionist'
+                    'name' => PanelRole::RECEPTIONIST, 'description' => 'Clinic Receptionist'
                 ]
             ];
         }
