@@ -2,8 +2,7 @@
 
 namespace App\Filament\Pages\Concerns;
 
-use App\Filament\Pages\EditProfile;
-use App\Filament\Pages\Profile;
+use App\Filament\Owner\Pages\Profile;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -33,16 +32,11 @@ trait HasProfileRoutes
            $parameters['tenant'] ??= $tenant ?? Filament::getTenant();
        }
 
-        if (blank($name)) {
-            return $this->fetchDefaultProfileUrl($panel);
+        if (filled($name) && $name == 'edit') {
+            return $this->fetchProfileEditPageUrl($panel);
         }
 
-        $url = match ($name) {
-            'edit' => $this->fetchProfileEditPageUrl($panel),
-            default => $this->fetchDefaultProfileUrl($panel),
-        };
-
-        return $url;
+        return $this->fetchDefaultProfileUrl($panel);
     }
 
     public static function getRelativeRouteName(Panel $panel): string
@@ -61,7 +55,7 @@ trait HasProfileRoutes
     {
         $panel ??= Filament::getCurrentOrDefaultPanel();
 
-        return $panel->getUrl() . EditProfile::getRoutePath($panel);
+        return $panel->getUrl() . Profile\Schemas\EditProfileSchema::fetchRoutePath();
     }
 
     public function getDefaultActionSuccessRedirectUrl(Action $action): string

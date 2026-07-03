@@ -2,9 +2,13 @@
 
 namespace App\Filament\Owner\Pages;
 
+use App\Enums\AppointmentStatus;
 use App\Enums\PanelRole;
-use App\Models\Role;
-use App\Models\User;
+use App\Filament\Owner\Pages\Profile\Schemas\EditProfileSchema;
+use App\Filament\Pages\Concerns\HasProfileRoutes;
+use App\Filament\Pages\Concerns\InteractWithProfile;
+use App\Models\Animal;
+use App\Models\Appointment;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
@@ -13,11 +17,16 @@ use Filament\Schemas\Components\Image;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Text;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\IconSize;
 use Filament\Support\Enums\Size;
 use Filament\Support\Icons\Heroicon;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class Profile extends Page
 {
+    use HasProfileRoutes;
+    use InteractWithProfile;
+
     protected static string|null|\BackedEnum $navigationIcon = Heroicon::OutlinedUserCircle;
 
     protected static ?int $navigationSort = 99;
@@ -42,119 +51,115 @@ class Profile extends Page
                     ->schema([
                         Grid::make()
                             ->schema([
-                                        Grid::make(12)
+                                Grid::make(12)
 
-                                            ->schema([
+                                    ->schema([
 
-
-                                                /*
+                                        /*
                                                 |--------------------------------------------------------------------------
                                                 | Avatar
                                                 |--------------------------------------------------------------------------
                                                 */
 
-                                                Image::make(Filament::auth()->user()->profile?->avatarUrl, asset('images/avatars/default-avatar.png'))
-                                                    ->imageHeight(110)
-                                                    ->imageWidth(110)
-                                                    ->columnSpan([
-                                                        'default' => 12,
-                                                        'lg' => 2,
-                                                    ]),
+                                        Image::make(asset('images/avatars/default-avatar.png'), asset('images/avatars/default-avatar.png'))
+                                            ->imageHeight(110)
+                                            ->imageWidth(110)
+                                            ->columnSpan([
+                                                'default' => 12,
+                                                'lg' => 2,
+                                            ]),
 
-                                                /*
+                                        /*
                                                 |--------------------------------------------------------------------------
                                                 | Information
                                                 |--------------------------------------------------------------------------
                                                 */
 
-                                                Grid::make(2)
+                                        Grid::make(2)
 
-                                                    ->columnSpan([
-                                                        'default' => 12,
-                                                        'lg' => 10,
-                                                    ])
+                                            ->columnSpan([
+                                                'default' => 12,
+                                                'lg' => 10,
+                                            ])
 
-                                                    ->schema([
+                                            ->schema([
 
-                                                        Text::make(
-                                                            Filament::auth()->user()->profile?->full_name
-                                                            ?? Filament::auth()->user()->name
-                                                        )
+                                                Text::make(
+                                                    Filament::auth()->user()->profile?->full_name
+                                                    ?? Filament::auth()->user()->name
+                                                )
 
-                                                            ->size(Size::ExtraLarge)
+                                                    ->size(Size::ExtraLarge)
 
-                                                            ->weight('bold')
+                                                    ->weight('bold')
 
-                                                            ->columnSpanFull(),
+                                                    ->columnSpanFull(),
 
-                                                        Text::make(Filament::auth()->user()->email)
+                                                Text::make(Filament::auth()->user()->email)
 
-                                                            ->icon(Heroicon::OutlinedEnvelope)
+                                                    ->icon(Heroicon::OutlinedEnvelope)
 
-                                                            ->color('gray')
+                                                    ->color('gray')
 
-                                                            ->columnSpanFull(),
+                                                    ->columnSpanFull(),
 
-                                                        Text::make(
-                                                            function () {
-                                                                $user = Filament::auth()->user();
-                                                                $userRoles = '';
+                                                Text::make(
+                                                    function () {
+                                                        $user = Filament::auth()->user();
+                                                        $userRoles = '';
 
-                                                                foreach ($user->roles()->get()->pluck('name')->toArray() as $role) {
-                                                                    if ($role === PanelRole::OWNER) {
-                                                                        $userRoles .= PanelRole::Owner->getLabel();
-                                                                    } else  if ($role === PanelRole::DOCTOR) {
-                                                                        $userRoles .= PanelRole::Doctor->getLabel();
-                                                                    } else  if ($role === PanelRole::ADMIN) {
-                                                                        $userRoles .= PanelRole::Admin->getLabel();
-                                                                    } else  if ($role === PanelRole::RECEPTIONIST) {
-                                                                        $userRoles .= PanelRole::RECEPTIONIST->getLabel();
-                                                                    }
-                                                                }
-
-                                                                return $userRoles;
+                                                        foreach ($user->roles()->get()->pluck('name')->toArray() as $role) {
+                                                            if ($role === PanelRole::OWNER) {
+                                                                $userRoles .= PanelRole::Owner->getLabel();
+                                                            } elseif ($role === PanelRole::DOCTOR) {
+                                                                $userRoles .= PanelRole::Doctor->getLabel();
+                                                            } elseif ($role === PanelRole::ADMIN) {
+                                                                $userRoles .= PanelRole::Admin->getLabel();
+                                                            } elseif ($role === PanelRole::RECEPTIONIST) {
+                                                                $userRoles .= PanelRole::Receptionist->getLabel();
                                                             }
-                                                        )
-                                                            ->badge()
-                                                            ->size(Size::ExtraLarge)
-                                                            ->formatStateUsing(
-                                                                fn ($state) => dd($state)
-                                                            )
-                                                            ->color('success'),
+                                                        }
 
-                                                        Text::make(
-                                                            __('owner/profile.member_since', [
-                                                                'date' => Filament::auth()->user()->created_at
-                                                                    ->format('Y/m/d'),
-                                                            ])
-                                                        )
+                                                        return $userRoles;
+                                                    }
+                                                )
+                                                    ->badge()
+                                                    ->size(Size::ExtraLarge)
+                                                    ->color('success'),
 
-                                                            ->icon(Heroicon::OutlinedCalendar)
+                                                Text::make(
+                                                    __('owner/profile.member_since', [
+                                                        'date' => Filament::auth()->user()->created_at
+                                                            ->format('Y/m/d'),
+                                                    ])
+                                                )
 
-                                                            ->color('gray'),
+                                                    ->icon(Heroicon::OutlinedCalendar)
 
-                                                        Text::make(
-                                                            Filament::auth()->user()->hasVerifiedEmail()
-                                                                ? __('owner/profile.email.verified')
-                                                                : __('owner/profile.email.unverified')
-                                                        )
+                                                    ->color('gray'),
 
-                                                            ->badge()
+                                                Text::make(
+                                                    Filament::auth()->user()->hasVerifiedEmail()
+                                                        ? __('owner/profile.email.verified')
+                                                        : __('owner/profile.email.unverified')
+                                                )
 
-                                                            ->color(fn () => Filament::auth()->user()->hasVerifiedEmail()
-                                                                ? 'success'
-                                                                : 'danger')
+                                                    ->badge()
 
-                                                            ->icon(fn () => Filament::auth()->user()->hasVerifiedEmail()
+                                                    ->color(fn () => Filament::auth()->user()->hasVerifiedEmail()
+                                                        ? 'success'
+                                                        : 'danger')
 
-                                                                ? Heroicon::OutlinedCheckBadge
+                                                    ->icon(fn () => Filament::auth()->user()->hasVerifiedEmail()
 
-                                                                : Heroicon::OutlinedExclamationTriangle)
+                                                        ? Heroicon::OutlinedCheckBadge
 
-                                                            ->columnSpanFull(),
+                                                        : Heroicon::OutlinedExclamationTriangle)
 
-                                                    ]),
-                                            ])->columnSpanFull(),
+                                                    ->columnSpanFull(),
+
+                                            ]),
+                                    ])->columnSpanFull(),
                             ]),
                     ])
                     ->afterHeader([
@@ -164,12 +169,12 @@ class Profile extends Page
                             ->label(__('owner/profile.actions.edit'))
 
                             ->icon(Heroicon::OutlinedPencilSquare)
-
+                            ->iconSize(IconSize::TwoExtraLarge)
                             ->color('primary')
 
                             ->button()
 
-                            ->url(route('filament.owner.pages.profile')),
+                            ->url($this->fetchProfileEditPageUrl()),
 
                     ]),
 
@@ -184,7 +189,48 @@ class Profile extends Page
                     ->schema([
                         Grid::make(4)
                             ->schema([
+                                Stat::make(
+                                    'حیوانات من',
+                                    Animal::query()
+                                        ->where('owner_id', Filament::auth()->id())
+                                        ->count()
+                                ),
+                                Stat::make(
+                                    'نوبت های من',
+                                    Appointment::query()
+                                        ->where('owner_id', Filament::auth()->id())
+                                        ->latest()
+                                        ->count(),
+                                ),
+                                Stat::make(
+                                    'نوبت‌های در انتظار تایید',
+                                    Appointment::query()
+                                        ->where('owner_id', Filament::auth()->id())
+                                        ->where('status', AppointmentStatus::Pending)
+                                        ->count()
+                                ),
+                                Stat::make(
+                                    'آخرین مراجعه',
+                                    function () {
+                                        $lastVisit = Appointment::query()
+                                            ->where('owner_id', Filament::auth()->id())
+                                            ->where('status', AppointmentStatus::Completed)
+                                            ->first();
 
+                                        if (! $lastVisit) {
+                                            return null;
+                                        }
+
+                                        return $lastVisit->slot->date->format('Y M-d');
+                                    }
+                                )->description(
+                                    function ($value) {
+                                        if (blank($value)) {
+                                            return 'هنوز مراجعه‌ای ثبت نشده است.';
+                                        }
+                                    }
+                                )
+                                ,
                             ]),
 
                     ]),
@@ -199,8 +245,6 @@ class Profile extends Page
                     ->icon(Heroicon::OutlinedIdentification)
 
                     ->schema([
-
-                        // مرحله بعد
 
                     ]),
 

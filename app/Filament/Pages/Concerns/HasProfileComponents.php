@@ -2,7 +2,7 @@
 
 namespace App\Filament\Pages\Concerns;
 
-use App\Enums\GenderType;
+use App\Enums\AnimalGender;
 use Closure;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
@@ -143,7 +143,7 @@ trait HasProfileComponents
     {
         return Select::make('gender')
             ->label(__('auth/pages/profile/edit.form.gender.label'))
-            ->options(GenderType::class)
+            ->options(AnimalGender::class)
             ->required()
             ->native(false);
     }

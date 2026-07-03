@@ -1,7 +1,7 @@
 <?php
 
 use App\Enums\AnimalSpecies;
-use App\Enums\GenderType;
+use App\Enums\AnimalGender;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -25,8 +25,8 @@ return new class extends Migration
             $table->string('breed')
                 ->nullable();
             $table->enum('gender', [
-                GenderType::Male->value,
-                GenderType::Female->value
+                AnimalGender::Male->value,
+                AnimalGender::Female->value
             ]);
             $table->date('date_of_birth')->nullable();
 

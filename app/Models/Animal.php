@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AnimalSpecies;
-use App\Enums\GenderType;
+use App\Enums\AnimalGender;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -24,7 +24,7 @@ class Animal extends Model
 
     protected $casts = [
         'species' => AnimalSpecies::class,
-        'gender'  => GenderType::class,
+        'gender'  => AnimalGender::class,
         'date_of_birth' => 'date',
     ];
 

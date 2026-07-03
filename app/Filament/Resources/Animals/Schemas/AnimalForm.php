@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Animals\Schemas;
 
 use App\Enums\AnimalSpecies;
-use App\Enums\GenderType;
+use App\Enums\AnimalGender;
 use App\Enums\PanelRole;
 use App\Models\Role;
 use Filament\Facades\Filament;
@@ -51,7 +51,7 @@ class AnimalForm
                     Select::make('gender')
                         ->label(__('resources/animals.schema.form.components.gender.label'))
                         ->required()
-                        ->options(GenderType::class)
+                        ->options(AnimalGender::class)
                         ->searchable()
                         ->preload()
                         ->native(false)

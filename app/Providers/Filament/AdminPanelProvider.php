@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Owner\Pages\Profile;
 use App\Filament\Pages\Tenancy\EditClinicProfile;
 use App\Filament\Pages\Tenancy\RegisterClinic;
 use App\Filament\Widgets\UserAccountWidget;

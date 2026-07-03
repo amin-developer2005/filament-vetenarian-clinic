@@ -3,7 +3,7 @@
 namespace App\Filament\Owner\Resources\Animals\Tables;
 
 use App\Enums\AnimalSpecies;
-use App\Enums\GenderType;
+use App\Enums\AnimalGender;
 use App\Models\Animal;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -98,7 +98,7 @@ class AnimalsTable
                     ->native(false),
                 SelectFilter::make('gender')
                     ->label(__('owner/animals.table.filters.gender'))
-                    ->options(GenderType::class)
+                    ->options(AnimalGender::class)
                     ->searchable()
                     ->preload()
                     ->native(false),

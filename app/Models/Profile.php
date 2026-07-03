@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use App\Enums\GenderType;
+use App\Enums\AnimalGender;
+use App\Enums\ProfileGender;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
@@ -20,7 +21,7 @@ class Profile extends Model
     ];
 
     protected $casts = [
-        'gender' => GenderType::class,
+        'gender' => ProfileGender::class,
     ];
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -30,9 +31,21 @@ class Profile extends Model
 
     public function getAvatarUrlAttribute(): string
     {
-        return $this?->avatar
+        return $this->hasAvatar()
             ? Storage::disk('public')->url($this->avatar)
             : asset('images/avatars/default-avatar.png');
+    }
+
+    public function hasAvatar(): bool
+    {
+        return filled($this->avatar);
+    }
+
+    public function getFullNameAttribute()
+    {
+        return collect([$this?->first_name, $this?->surname])
+            ->filter()
+            ->implode(' ') ?: $this->user->name;
     }
 
     public function updateAttributesFromFormData(array $data): void

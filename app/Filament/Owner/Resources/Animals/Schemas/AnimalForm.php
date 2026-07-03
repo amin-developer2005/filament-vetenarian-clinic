@@ -3,7 +3,7 @@
 namespace App\Filament\Owner\Resources\Animals\Schemas;
 
 use App\Enums\AnimalSpecies;
-use App\Enums\GenderType;
+use App\Enums\AnimalGender;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -89,7 +89,7 @@ class AnimalForm
                                             Select::make('gender')
                                                 ->required()
                                                 ->label(__('owner/animals.schema.form.components.gender.label'))
-                                                ->options(GenderType::class)
+                                                ->options(AnimalGender::class)
                                                 ->native(false)
                                                 ->searchable()
                                                 ->required(),

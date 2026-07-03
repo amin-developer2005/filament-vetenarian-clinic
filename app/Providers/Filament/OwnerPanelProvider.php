@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Owner\Pages\Auth\Signup;
+use App\Filament\Owner\Pages\Profile\Schemas\EditProfileSchema;
 use App\Filament\Owner\Widgets\OwnerDashboardStats;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -42,6 +43,7 @@ class OwnerPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Owner/Pages'), for: 'App\Filament\Owner\Pages')
             ->pages([
                 Dashboard::class,
+                EditProfileSchema::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Owner/Widgets'), for: 'App\Filament\Owner\Widgets')
             ->widgets([

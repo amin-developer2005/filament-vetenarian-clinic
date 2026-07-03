@@ -21,12 +21,16 @@ trait InteractWithProfile
 {
     protected Profile $profile {
         set => $this->profile = $value;
-        get => $this->profile;
+        get {
+            return $this->profile ?? $this->resolveProfile();
+        }
     }
 
     protected User $user {
         set => $this->user = $value;
-        get => $this->user;
+        get {
+            return $this->user ?? $this->resolveUser();
+        }
     }
 
     /**
@@ -49,7 +53,7 @@ trait InteractWithProfile
         return $profile;
     }
 
-    public function resolveUser(): User
+    public function resolveUser(): User|Authenticatable
     {
         $user = Filament::auth()->user();
 
@@ -69,7 +73,7 @@ trait InteractWithProfile
         return $this->profile = $this->resolveProfile();
     }
 
-    public function fetchUser(): User
+    public function fetchUser(): User|Authenticatable
     {
         if (isset($this->user)) {
             return $this->user;
@@ -77,7 +81,7 @@ trait InteractWithProfile
 
         $user = Filament::auth()->user();
 
-        return $this->user  = $user;
+        return $this->user = $user;
     }
 
     public function fetchModel(): string

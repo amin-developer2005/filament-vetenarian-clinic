@@ -3,7 +3,7 @@
 namespace App\Filament\Owner\Resources\MedicalRecords\Schemas;
 
 use App\Enums\AnimalSpecies;
-use App\Enums\GenderType;
+use App\Enums\AnimalGender;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
@@ -35,7 +35,7 @@ class MedicalRecordForm
                 TextInput::make('species')
                     ->default(AnimalSpecies::Cat),
                 TextInput::make('gender')
-                    ->default(GenderType::Male),
+                    ->default(AnimalGender::Male),
                 DateTimePicker::make('date_of_birth')
                     ->default(today()),
 
