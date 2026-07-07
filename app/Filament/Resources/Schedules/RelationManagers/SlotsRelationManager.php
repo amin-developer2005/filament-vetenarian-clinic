@@ -61,7 +61,6 @@ class SlotsRelationManager extends RelationManager
             ->headerActions([
             ])
             ->recordActions([
-                ViewAction::make(),
             ])
             ->toolbarActions([
 

@@ -3,23 +3,11 @@
 namespace App\Filament\Pages\Concerns;
 
 use App\Filament\Owner\Pages\Profile;
-use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
-use Filament\Auth\Notifications\NoticeOfEmailChangeRequest;
-use Filament\Auth\Notifications\VerifyEmailChange;
 use Filament\Facades\Filament;
-use Filament\Notifications\Notification;
 use Filament\Panel;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
-use League\CommonMark\Exception\LogicException;
-use Filament\Notifications\Notification as FilamentNotification;
-use League\Uri\Components\Query;
 
 
 trait HasProfileRoutes

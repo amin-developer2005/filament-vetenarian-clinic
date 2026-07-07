@@ -36,7 +36,7 @@ class SchedulesTable
                     ->label(__('resources/schedules.table.columns.doctor.label'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('clinics.name')
+                TextColumn::make('clinic.name')
                     ->label(__('resources/schedules.table.columns.clinics.label'))
                     ->searchable()
                     ->sortable()

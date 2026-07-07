@@ -4,11 +4,12 @@ namespace App\Filament\Owner\Pages;
 
 use App\Enums\AppointmentStatus;
 use App\Enums\PanelRole;
-use App\Filament\Owner\Pages\Profile\Schemas\EditProfileSchema;
+use App\Enums\ProfileGender;
 use App\Filament\Pages\Concerns\HasProfileRoutes;
 use App\Filament\Pages\Concerns\InteractWithProfile;
 use App\Models\Animal;
 use App\Models\Appointment;
+use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
@@ -21,6 +22,8 @@ use Filament\Support\Enums\IconSize;
 use Filament\Support\Enums\Size;
 use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use UnitEnum;
+
 
 class Profile extends Page
 {
@@ -30,6 +33,8 @@ class Profile extends Page
     protected static string|null|\BackedEnum $navigationIcon = Heroicon::OutlinedUserCircle;
 
     protected static ?int $navigationSort = 99;
+    protected static string $routePath = '/profile';
+    protected static ?string $slug = '/profile';
 
     public static function getNavigationLabel(): string
     {
@@ -39,6 +44,17 @@ class Profile extends Page
     public function getTitle(): string
     {
         return __('owner/profile.title');
+    }
+
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('owner/profile.navigation.group');
+    }
+
+    public function mount(): void
+    {
+        $this->user = $this->resolveUser();
+        $this->profile = $this->resolveProfile();
     }
 
     public function content(Schema $schema): Schema
@@ -61,7 +77,7 @@ class Profile extends Page
                                                 |--------------------------------------------------------------------------
                                                 */
 
-                                        Image::make(asset('images/avatars/default-avatar.png'), asset('images/avatars/default-avatar.png'))
+                                        Image::make($this->profile->avatarUrl, 'image')
                                             ->imageHeight(110)
                                             ->imageWidth(110)
                                             ->columnSpan([
@@ -106,21 +122,10 @@ class Profile extends Page
                                                 Text::make(
                                                     function () {
                                                         $user = Filament::auth()->user();
-                                                        $userRoles = '';
 
-                                                        foreach ($user->roles()->get()->pluck('name')->toArray() as $role) {
-                                                            if ($role === PanelRole::OWNER) {
-                                                                $userRoles .= PanelRole::Owner->getLabel();
-                                                            } elseif ($role === PanelRole::DOCTOR) {
-                                                                $userRoles .= PanelRole::Doctor->getLabel();
-                                                            } elseif ($role === PanelRole::ADMIN) {
-                                                                $userRoles .= PanelRole::Admin->getLabel();
-                                                            } elseif ($role === PanelRole::RECEPTIONIST) {
-                                                                $userRoles .= PanelRole::Receptionist->getLabel();
-                                                            }
-                                                        }
-
-                                                        return $userRoles;
+                                                        return collect($user->roles)
+                                                            ->map(fn ($role) => $role->name)
+                                                            ->join(', ');
                                                     }
                                                 )
                                                     ->badge()
@@ -245,7 +250,13 @@ class Profile extends Page
                     ->icon(Heroicon::OutlinedIdentification)
 
                     ->schema([
-
+                        Grid::make(2)
+                            ->schema([
+                                Text::make($this->profile?->first_name ?? ''),
+                                Text::make($this->profile?->surname ?? ''),
+                                Text::make($this->profile->gender->getLabel() ?? ''),
+                                Text::make($this->profile->birth_date ? Carbon::parse($this->profile->birth_date)->format('Y M/d') : ''),
+                            ])
                     ]),
 
                 /*
@@ -257,38 +268,6 @@ class Profile extends Page
                 Section::make(__('owner/profile.sections.contact_information'))
 
                     ->icon(Heroicon::OutlinedPhone)
-
-                    ->schema([
-
-                        // مرحله بعد
-
-                    ]),
-
-                /*
-                |--------------------------------------------------------------------------
-                | Avatar
-                |--------------------------------------------------------------------------
-                */
-
-                Section::make(__('owner/profile.sections.avatar'))
-
-                    ->icon(Heroicon::OutlinedPhoto)
-
-                    ->schema([
-
-                        // مرحله بعد
-
-                    ]),
-
-                /*
-                |--------------------------------------------------------------------------
-                | Password
-                |--------------------------------------------------------------------------
-                */
-
-                Section::make(__('owner/profile.sections.security'))
-
-                    ->icon(Heroicon::OutlinedLockClosed)
 
                     ->schema([
 

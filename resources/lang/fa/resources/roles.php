@@ -7,7 +7,7 @@ return [
 
     'navigations' => [
         'label'  => 'نقش ها',
-        'group'  => 'تنظیمات'
+        'group'  => 'مدیریت کاربران'
     ],
 
     'pages' => [

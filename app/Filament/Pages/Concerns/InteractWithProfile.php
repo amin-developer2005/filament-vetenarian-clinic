@@ -73,13 +73,14 @@ trait InteractWithProfile
         return $this->profile = $this->resolveProfile();
     }
 
-    public function fetchUser(): User|Authenticatable
+    public function fetchUser(): User
     {
         if (isset($this->user)) {
             return $this->user;
         }
 
         $user = Filament::auth()->user();
+        $user = User::query()->find($user->id);
 
         return $this->user = $user;
     }

@@ -5,8 +5,10 @@ namespace App\Filament\Owner\Pages\Profile\Schemas;
 use App\Enums\ProfileGender;
 use App\Filament\Pages\Concerns\HasProfileRoutes;
 use App\Filament\Pages\Concerns\InteractWithProfile;
+use App\Models\Profile;
 use App\Models\User;
 use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -18,37 +20,35 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Concerns\CanUseDatabaseTransactions;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Form;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\IconSize;
 use Filament\Support\Enums\Width;
 use Filament\Support\Exceptions\Halt;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Throwable;
 
-/**
- * @property-read Form $personalForm;
- * @property-read Form $contactForm;
- * @property-read Form $avatarForm;
- */
-class EditProfileSchema extends Page implements HasForms
+
+class EditProfileSchema extends Page
 {
     use CanUseDatabaseTransactions;
     use HasProfileRoutes;
     use InteractsWithForms;
     use InteractWithProfile;
 
-
-    protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-user-circle';
-
     protected static string $routePath = '/profile/edit';
 
-    protected static bool $isDiscovered = false;
+    public static function isDiscovered(): bool
+    {
+        return false;
+    }
 
-    protected static ?int $navigationSort = 99;
 
     protected string $personalStatePath = 'personalData';
 
@@ -62,9 +62,7 @@ class EditProfileSchema extends Page implements HasForms
 
     public array $avatarData = [];
 
-    public array $data = [];
-
-    protected static ?string $slug = 'profile/edit';
+    protected static ?string $slug = '/profile/edit';
 
     public static function fetchRoutePath(): string
     {
@@ -103,6 +101,7 @@ class EditProfileSchema extends Page implements HasForms
         $this->fillContactProfileForm();
     }
 
+
     public function content(Schema $schema): Schema
     {
         return $schema
@@ -128,31 +127,31 @@ class EditProfileSchema extends Page implements HasForms
                         $this->fetchPersonalProfileSaveAction(),
                     ])
                     ->schema([
-                                TextInput::make('first_name')
-                                    ->label(__('owner/edit-profile.schema.form.components.sections.personal.first_name.label'))
-                                    ->required()
-                                    ->string()
-                                    ->maxLength(255),
+                        TextInput::make('first_name')
+                            ->label(__('owner/edit-profile.schema.form.components.sections.personal.first_name.label'))
+                            ->required()
+                            ->string()
+                            ->maxLength(255),
 
-                                TextInput::make('surname')
-                                    ->label(__('owner/edit-profile.schema.form.components.sections.personal.surname.label'))
-                                    ->required()
-                                    ->string()
-                                    ->maxLength(255),
+                        TextInput::make('surname')
+                            ->label(__('owner/edit-profile.schema.form.components.sections.personal.surname.label'))
+                            ->required()
+                            ->string()
+                            ->maxLength(255),
 
-                                Select::make('gender')
-                                    ->label(__('owner/edit-profile.schema.form.components.sections.personal.gender.label'))
-                                    ->options(ProfileGender::class)
-                                    ->native(false)
-                                    ->required(),
+                        Select::make('gender')
+                            ->label(__('owner/edit-profile.schema.form.components.sections.personal.gender.label'))
+                            ->options(ProfileGender::class)
+                            ->native(false)
+                            ->required(),
 
-                                DatePicker::make('birth_date')
-                                    ->label(__('owner/edit-profile.schema.form.components.sections.personal.birth_date.label'))
-                                    ->required()
-                                    ->closeOnDateSelection()
-                                    ->date()
-                                    ->displayFormat('Y-M-d')
-                                    ->native(false),
+                        DatePicker::make('birth_date')
+                            ->label(__('owner/edit-profile.schema.form.components.sections.personal.birth_date.label'))
+                            ->required()
+                            ->closeOnDateSelection()
+                            ->date()
+                            ->displayFormat('Y-M-d')
+                            ->native(false),
                     ]),
             ]);
     }
@@ -160,40 +159,40 @@ class EditProfileSchema extends Page implements HasForms
     public function contactForm(): Form
     {
         return
-                Form::make()
-                    ->id('contactForm')
-                    ->statePath($this->contactStatePath)
-                    ->schema([
-                        Section::make(__('owner/edit-profile.sections.contact.title'))
-                            ->description(__('owner/edit-profile.sections.contact.description'))
-                            ->icon('heroicon-o-map-pin')
-                            ->iconColor('warning')
-                            ->columns(2)
-                            ->headerActions([
-                                $this->fetchContactProfileSaveAction(),
-                            ])
-                            ->schema([
-                                        TextInput::make('email')
-                                            ->label(__('owner/edit-profile.schema.form.components.sections.contact.email.label'))
-                                            ->required()
-                                            ->email()
-                                            ->unique(ignoreRecord: true)
-                                            ->live(),
+            Form::make()
+                ->id('contactForm')
+                ->statePath($this->contactStatePath)
+                ->schema([
+                    Section::make(__('owner/edit-profile.sections.contact.title'))
+                        ->description(__('owner/edit-profile.sections.contact.description'))
+                        ->icon('heroicon-o-map-pin')
+                        ->iconColor('warning')
+                        ->columns(2)
+                        ->headerActions([
+                            $this->fetchContactProfileSaveAction(),
+                        ])
+                        ->schema([
+                            TextInput::make('email')
+                                ->label(__('owner/edit-profile.schema.form.components.sections.contact.email.label'))
+                                ->required()
+                                ->email()
+                                ->unique(ignoreRecord: true)
+                                ->live(),
 
-                                TextInput::make('mobile')
-                                    ->label(__('owner/edit-profile.schema.form.components.sections.contact.mobile.label'))
-                                    ->tel()
-                                    ->mask('09999999999')
-                                    ->maxLength(11)
-                                    ->required(),
-                                Textarea::make('address')
-                                    ->label(__('owner/edit-profile.schema.form.components.sections.contact.address.label'))
-                                    ->nullable()
-                                    ->columnSpanFull()
-                                    ->rows(3),
+                            TextInput::make('mobile')
+                                ->label(__('owner/edit-profile.schema.form.components.sections.contact.mobile.label'))
+                                ->tel()
+                                ->mask('09999999999')
+                                ->maxLength(11)
+                                ->required(),
+                            Textarea::make('address')
+                                ->label(__('owner/edit-profile.schema.form.components.sections.contact.address.label'))
+                                ->nullable()
+                                ->columnSpanFull()
+                                ->rows(3),
 
-                            ]),
-                    ]);
+                        ]),
+                ]);
     }
 
     public function avatarForm(): Form
@@ -215,11 +214,13 @@ class EditProfileSchema extends Page implements HasForms
                         FileUpload::make('avatar')
                             ->label(__('owner/edit-profile.schema.form.components.sections.avatar.avatar.label'))
                             ->image()
+                            ->live()
                             ->maxWidth(Width::FiveExtraLarge)
                             ->visibility('public')
                             ->disk('public')
-                            ->directory('profiles')
+                            ->directory('profiles/avatars')
                             ->imageEditor()
+                            ->columnSpanFull()
                             ->previewable()
                             ->downloadable()
                             ->openable(),
@@ -253,8 +254,9 @@ class EditProfileSchema extends Page implements HasForms
             ->label(__('owner/edit-profile.actions.sections.avatar.save.title'))
             ->icon(Heroicon::OutlinedPhoto)
             ->color('primary')
+            ->disabled(fn(Get $get) => blank($get('avatar')))
             ->iconSize(IconSize::TwoExtraLarge)
-            ->action(fn () => $this->saveAvatar());
+            ->action('saveAvatar');
     }
 
     protected function fetchAvatarProfileClearAction(): Action
@@ -264,7 +266,7 @@ class EditProfileSchema extends Page implements HasForms
             ->icon('heroicon-o-trash')
             ->color('danger')
             ->iconSize(IconSize::TwoExtraLarge)
-            ->visible(fn () => $this->profile->hasAvatar())
+            ->visible(fn() => $this->profile->hasAvatar())
             ->requiresConfirmation()
             ->modalHeading(__('owner/edit-profile.modals.sections.avatar.clear.heading'))
             ->modalDescription(
@@ -272,7 +274,7 @@ class EditProfileSchema extends Page implements HasForms
             )
             ->modalSubmitActionLabel(__('owner/edit-profile.modals.sections.avatar.clear.submit'))
             ->modalCancelActionLabel(__('owner/edit-profile.modals.sections.avatar.clear.cancel'))
-            ->action(fn () => $this->clearAvatar());
+            ->action('clearAvatar');
     }
 
     protected function fetchProfileCancelAction(): Action
@@ -413,7 +415,7 @@ class EditProfileSchema extends Page implements HasForms
 
     public function clearAvatar(): void
     {
-        if (! $this->profile->hasAvatar()) {
+        if (!$this->profile->hasAvatar()) {
             return;
         }
 
@@ -447,7 +449,7 @@ class EditProfileSchema extends Page implements HasForms
     {
         $title = $this->fetchClearAvatarNotificationTitle();
 
-        if (! $title) {
+        if (!$title) {
             return null;
         }
 
@@ -466,7 +468,7 @@ class EditProfileSchema extends Page implements HasForms
         return $data;
     }
 
-    protected function handlePersonalInformationUpdate(\App\Models\Profile $profile, array $data): \App\Models\Profile
+    protected function handlePersonalInformationUpdate(Profile $profile, array $data): Profile
     {
         $profile->update($data);
 
@@ -477,7 +479,7 @@ class EditProfileSchema extends Page implements HasForms
     {
         $title = $this->fetchSavePersonalInformationNotificationTitle();
 
-        if (! $title) {
+        if (!$title) {
             return null;
         }
 
@@ -491,7 +493,7 @@ class EditProfileSchema extends Page implements HasForms
         return __('owner/edit-profile.notifications.sections.personal.actions.save.title');
     }
 
-    protected function handleContactInformationUpdate(\App\Models\Profile $profile, User $user, array $data): array
+    protected function handleContactInformationUpdate(Profile $profile, User $user, array $data): array
     {
         if ($user->getAttributeValue('email') !== $data['email']) {
             $user->update([
@@ -508,7 +510,7 @@ class EditProfileSchema extends Page implements HasForms
     {
         $title = $this->fetchSaveContactInformationNotificationTitle();
 
-        if (! $title) {
+        if (!$title) {
             return null;
         }
 
@@ -522,10 +524,13 @@ class EditProfileSchema extends Page implements HasForms
         return __('owner/edit-profile.notifications.sections.contact.actions.save.title');
     }
 
-    protected function handleAvatarUpdate(\App\Models\Profile $profile, array $data): \App\Models\Profile
+    protected function handleAvatarUpdate(Profile $profile, array $data): Profile
     {
+        $avatar = collect($data['avatar'])->first();
+        $newPath = $avatar->store('profiles/avatars', 'public');
+
         $profile->update([
-            'avatar' => $data['avatar'],
+            'avatar' => $newPath,
         ]);
 
         return $profile;
@@ -535,7 +540,7 @@ class EditProfileSchema extends Page implements HasForms
     {
         $title = $this->fetchSaveAvatarNotificationTitle();
 
-        if (! $title) {
+        if (!$title) {
             return null;
         }
 

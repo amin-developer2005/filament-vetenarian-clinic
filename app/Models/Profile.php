@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\AnimalGender;
 use App\Enums\ProfileGender;
+use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
@@ -33,7 +34,7 @@ class Profile extends Model
     {
         return $this->hasAvatar()
             ? Storage::disk('public')->url($this->avatar)
-            : asset('images/avatars/default-avatar.png');
+            : Filament::getUserAvatarUrl($this->user);
     }
 
     public function hasAvatar(): bool

@@ -8,7 +8,7 @@ return [
 
     'navigations' => [
         'label'  => 'کاربران',
-        'group'  => 'تنظیمات'
+        'group'  => 'مدیریت کاربران'
     ],
 
     'pages' => [
