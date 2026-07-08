@@ -43,7 +43,7 @@ class OwnerPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Owner/Pages'), for: 'App\Filament\Owner\Pages')
             ->pages([
                 Dashboard::class,
-                EditProfileSchema::class,
+            //    EditProfileSchema::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Owner/Widgets'), for: 'App\Filament\Owner\Widgets')
             ->widgets([
