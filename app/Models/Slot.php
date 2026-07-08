@@ -63,6 +63,15 @@ class Slot extends Model
         return $this;
     }
 
+    public function expire(): static
+    {
+        $this->update([
+            'status' => SlotStatus::Expired,
+        ]);
+
+        return $this;
+    }
+
     public function isBooked(): bool
     {
         return $this->status == SlotStatus::Booked;
@@ -71,6 +80,11 @@ class Slot extends Model
     public function isAvailable(): bool
     {
         return $this->status == SlotStatus::Available;
+    }
+
+    public function isExpired(): bool
+    {
+        return $this->status == SlotStatus::Expired;
     }
 
     public function scopeForUser($query, $user)

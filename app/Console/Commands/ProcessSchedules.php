@@ -26,7 +26,14 @@ class ProcessSchedules extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
+    {
+        $this->checkExpiredSchedules();
+
+        return self::SUCCESS;
+    }
+
+    private function checkExpiredSchedules(): void
     {
         $expiredSchedules = Schedule::query()
             ->whereDate('end_date', '<=', now())
@@ -37,8 +44,8 @@ class ProcessSchedules extends Command
             })
             ->get();
 
-        foreach ($expiredSchedules as $schedule) {
-            $schedule->slots->expire();
-        }
+        $expiredSchedules->each(
+            fn (Schedule $schedule) => $schedule->slots->expire()
+        );
     }
 }
