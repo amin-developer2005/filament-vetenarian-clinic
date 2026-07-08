@@ -4,6 +4,7 @@ return [
     'slots' => [
         'available' => 'آزاد',
         'booked'    => 'رزرو شده',
+        'expired'   => 'منقضی شده',
     ],
     'appointments' => [
         'pending'      => 'در انتظار تأیید',

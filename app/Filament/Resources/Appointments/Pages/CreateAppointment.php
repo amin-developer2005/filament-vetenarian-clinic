@@ -8,10 +8,20 @@ use App\Filament\Resources\Appointments\Schemas\AppointmentForm;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Schemas\Schema;
+use Illuminate\Contracts\Support\Htmlable;
 
 class CreateAppointment extends CreateRecord
 {
     protected static string $resource = AppointmentResource::class;
+
+    public function getTitle(): string|Htmlable
+    {
+        if (filled(static::$title)) {
+            return static::$title;
+        }
+
+        return __('resources/appointments.pages.create.record.title');
+    }
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

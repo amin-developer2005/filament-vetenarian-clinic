@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use App\Models\Schedule;
 use App\Observers\AppointmentObserver;
 use App\Observers\ScheduleObserver;
+use App\Services\ScheduleService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(ScheduleService::class, function () {
+            return new ScheduleService();
+        });
+
+        $this->app->singletonIf(ScheduleObserver::class, function () {
+            return new ScheduleObserver($this->app->make(ScheduleService::class));
+        });
     }
 
     /**

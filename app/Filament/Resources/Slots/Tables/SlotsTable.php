@@ -36,7 +36,7 @@ class SlotsTable
                 TextColumn::make('schedule.clinic.name')
                     ->label(__('resources/slots.table.columns.clinic'))
                     ->badge()
-                    ->color(Color::Emerald)
+                    ->color(Color::Blue)
                     ->searchable()
                     ->sortable(),
 
@@ -90,7 +90,8 @@ class SlotsTable
             ->emptyStateHeading(__('resources/slots.table.emptyStateHeading'))
             ->emptyStateDescription(__('resources/slots.table.emptyStateDescription'))
             ->recordActions([
-                ViewAction::make(),
+                ViewAction::make()
+                    ->modalHeading(__('resources/slots.table.actions.view.modal.heading')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

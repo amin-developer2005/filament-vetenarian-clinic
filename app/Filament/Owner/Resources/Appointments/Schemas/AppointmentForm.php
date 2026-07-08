@@ -68,6 +68,7 @@ class AppointmentForm
                                 ->required()
                                 ->date()
                                 ->live()
+                                ->afterOrEqual(today())
                                 ->closeOnDateSelection()
                                 ->disabled(fn (Get $get) => blank($get('clinic_id')))
                                 ->native(false)

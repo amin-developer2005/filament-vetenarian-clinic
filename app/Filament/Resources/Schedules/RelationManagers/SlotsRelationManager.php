@@ -69,6 +69,6 @@ class SlotsRelationManager extends RelationManager
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return __('resources/slots.label');
+        return __('resources/schedules.relationManagers.slots.title');
     }
 }

@@ -60,6 +60,7 @@ class ScheduleForm
                         ->label(__('resources/schedules.schema.form.components.start_date.label'))
                         ->required()
                         ->date()
+                        ->afterOrEqual(today())
                         ->closeOnDateSelection()
                         ->displayFormat('Y-m-d')
                         ->native(false),
@@ -67,6 +68,7 @@ class ScheduleForm
                         ->label(__('resources/schedules.schema.form.components.end_date.label'))
                         ->required()
                         ->date()
+                        ->afterOrEqual(today())
                         ->closeOnDateSelection()
                         ->displayFormat('Y-m-d')
                         ->afterOrEqual('start_date')

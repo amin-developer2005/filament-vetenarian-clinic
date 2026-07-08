@@ -58,6 +58,25 @@ trait HasPanelRole
         return $this;
     }
 
+    public function assignRole(Role|PanelRole|string $role): static
+    {
+        if ($role instanceof PanelRole) {
+            $role = $role->value;
+        }
+
+        if (is_string($role) && (! $role instanceof Role)) {
+            $role = $this->fetchRole($role);
+        }
+
+        if ($this->hasPanelRole($role)) {
+            return $this;
+        }
+
+        $this->role()->attach($role->id);
+
+        return $this;
+    }
+
     /**
      * @param  User  $user
      */
@@ -72,7 +91,6 @@ trait HasPanelRole
         }
 
         $roles = $this->roles()->get();
-
 
         if (! $roles->contains($role)) {
             return false;

@@ -99,6 +99,11 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         return $this->clinics;
     }
 
+    public function hasSchedules()
+    {
+        return filled($this->schedules);
+    }
+
     /**
      * Get the attributes that should be cast.
      *

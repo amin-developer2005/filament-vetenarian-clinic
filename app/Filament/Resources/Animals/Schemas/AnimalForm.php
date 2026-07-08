@@ -2,11 +2,10 @@
 
 namespace App\Filament\Resources\Animals\Schemas;
 
-use App\Enums\AnimalSpecies;
 use App\Enums\AnimalGender;
+use App\Enums\AnimalSpecies;
 use App\Enums\PanelRole;
-use App\Models\Role;
-use Filament\Facades\Filament;
+use App\Models\User;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -33,59 +32,59 @@ class AnimalForm
                         ->imageEditor()
                         ->maxSize(2048)
                         ->directory('avatars/animals'),
-                    TextInput::make('name')
-                        ->label(__('resources/animals.schema.form.components.name.label'))
-                        ->required()
-                        ->string(),
-                    Select::make('species')
-                        ->label(__('resources/animals.schema.form.components.species.label'))
-                        ->required()
-                        ->options(AnimalSpecies::class)
-                        ->searchable()
-                        ->preload()
-                        ->native(false),
-                    TextInput::make('breed')
-                        ->label(__('resources/animals.schema.form.components.breed.label'))
-                        ->required()
-                        ->string(),
-                    Select::make('gender')
-                        ->label(__('resources/animals.schema.form.components.gender.label'))
-                        ->required()
-                        ->options(AnimalGender::class)
-                        ->searchable()
-                        ->preload()
-                        ->native(false)
-                    ,
-                    DatePicker::make('date_of_birth')
-                        ->label(__('resources/animals.schema.form.components.date_of_birth.label'))
-                        ->required()
-                        ->date()
-                        ->displayFormat('Y-m-d')
-                        ->closeOnDateSelection()
-                        ->maxDate(now())
-                        ->native(false),
-                ]),
+                ])->columnSpanFull(),
                 Section::make([
-                    Select::make('owner_id')
-                        ->label(__('resources/animals.schema.form.components.owner_id.label'))
-                        ->relationship('owner', 'name', modifyQueryUsing: function (Builder $query) {
-                            $tenant = Filament::getTenant();
+                    \Filament\Schemas\Components\Grid::make(3)
+                        ->schema([
 
-                            return $query->whereHas('clinics', function (Builder $query) use ($tenant) {
-                                return $query->where('clinics.id', $tenant->id);
-                            })
-                                ->whereHas('roles', function (Builder $query) {
-                                return $query->where('name', PanelRole::Owner);
-                            });
-                        })
-                        ->required()
-                        ->searchable()
-                        ->preload()
-                        ->noOptionsMessage(__('resources/animals.schema.form.components.owner_id.no_options_message'))
-                        ->native(false),
+                            TextInput::make('name')
+                                ->label(__('resources/animals.schema.form.components.name.label'))
+                                ->required()
+                                ->string(),
+                            Select::make('species')
+                                ->label(__('resources/animals.schema.form.components.species.label'))
+                                ->required()
+                                ->options(AnimalSpecies::class)
+                                ->searchable()
+                                ->preload()
+                                ->native(false),
+                            TextInput::make('breed')
+                                ->label(__('resources/animals.schema.form.components.breed.label'))
+                                ->required()
+                                ->string(),
+                            Select::make('gender')
+                                ->label(__('resources/animals.schema.form.components.gender.label'))
+                                ->required()
+                                ->options(AnimalGender::class)
+                                ->searchable()
+                                ->preload()
+                                ->native(false),
+                            DatePicker::make('date_of_birth')
+                                ->label(__('resources/animals.schema.form.components.date_of_birth.label'))
+                                ->required()
+                                ->date()
+                                ->displayFormat('Y-m-d')
+                                ->closeOnDateSelection()
+                                ->maxDate(now())
+                                ->native(false),
 
-                ])
-
+                            Select::make('owner_id')
+                                ->label(__('resources/animals.schema.form.components.owner_id.label'))
+                                ->relationship(
+                                    name: 'owner',
+                                    titleAttribute: 'name',
+                                    modifyQueryUsing: fn (Builder $query) => $query->whereHas(
+                                        'roles',
+                                        fn(Builder $query) => $query->where('name', 'owner')
+                                    )
+                                )
+                                ->required()
+                                ->searchable()
+                                ->preload()
+                                ->noOptionsMessage(__('resources/animals.schema.form.components.owner_id.no_options_message'))
+                                ->native(false),
+                        ]),
+                ])->columnSpanFull(),
             ]);
     }
 }

@@ -8,7 +8,7 @@ return [
 
     'navigations' => [
         'label' => 'وقت',
-        'group'  => 'مدیریت نوبت‌ها'
+        'group'  => 'مدیریت نوبت ها'
     ],
 
     'pages' => [
@@ -81,6 +81,13 @@ return [
             ],
             'status' => [
                 'label' => 'وضعیت زمانبندی',
+            ],
+        ],
+        'actions' => [
+            'view' => [
+                'modal' => [
+                    'heading' => 'اطلاعات وقت',
+                ],
             ],
         ],
         'emptyStateHeading' => 'هیچ برنامه زمانبدی وجود ندارد.',

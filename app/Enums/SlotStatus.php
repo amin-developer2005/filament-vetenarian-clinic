@@ -10,12 +10,14 @@ enum SlotStatus: string implements HasColor, HasLabel
 {
     case Available = 'available';
     case Booked = 'booked';
+    case Expired = 'expired';
 
     public function getLabel(): ?string
     {
         return match ($this) {
             self::Available => __('statuses.slots.available'),
             self::Booked    => __('statuses.slots.booked'),
+            self::Expired    => __('statuses.slots.Expired'),
         };
     }
 
@@ -24,6 +26,7 @@ enum SlotStatus: string implements HasColor, HasLabel
         return match ($this) {
             self::Available => Color::Green,
             self::Booked    => Color::Blue,
+            self::Expired   => Color::Red,
         };
     }
 }

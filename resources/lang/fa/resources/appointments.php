@@ -4,11 +4,11 @@ return [
     'label'         => 'نوبت‌ ها',
     'plural_label'  => 'نوبت ‌ها',
     'singular_label'=> 'نوبت',
-    'bread_crumb' => 'دام‌ها',
+    'bread_crumb' => 'نوبت‌ ها',
 
     'navigations' => [
         'label'  => 'نوبت ‌ها',
-        'group'  => 'مدیریت نوبت‌ها'
+        'group'  => 'مدیریت نوبت ها'
     ],
 
     'pages' => [
@@ -19,7 +19,7 @@ return [
         ],
         'create' => [
             'record' => [
-                'title' => 'افزودن حیوان دامی جدید'
+                'title' => 'رزرو نوبت جدید'
             ],
         ],
         'edit' => [
@@ -37,7 +37,7 @@ return [
                 ],
                 'owner_id' => [
                     'label' => 'صاحب دام',
-                    'no_options_message' => ' مالکی در کلینیک انتخاب شده وجود ندارد.',
+                    'no_options_message' => ' مالکی یافت نشد.',
                 ],
                 'animal_id' => [
                     'label' => 'دام / حیوان',

@@ -29,17 +29,16 @@ class ProcessSchedules extends Command
     public function handle()
     {
         $expiredSchedules = Schedule::query()
-            ->whereDate('end_date', '<', now())
+            ->whereDate('end_date', '<=', now())
             ->whereHas('slots', function (Builder $query) {
                 $query
                     ->where('status', SlotStatus::Available)
                     ->whereDoesntHave('appointments');
             })
-            ->whereDoesntHave('appointments')
             ->get();
 
         foreach ($expiredSchedules as $schedule) {
-            $schedule->slots()->delete();
+            $schedule->slots->expire();
         }
     }
 }

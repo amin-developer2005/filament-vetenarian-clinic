@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\Users;
+namespace App\Filament\Resources\Doctors;
 
 use App\Enums\PanelRole;
-use App\Filament\Resources\Users\Pages\CreateUser;
-use App\Filament\Resources\Users\Pages\EditUser;
-use App\Filament\Resources\Users\Pages\ListUsers;
-use App\Filament\Resources\Users\Schemas\UserForm;
-use App\Filament\Resources\Users\Tables\UsersTable;
+use App\Filament\Resources\Doctors\Pages\CreateDoctor;
+use App\Filament\Resources\Doctors\Pages\EditDoctor;
+use App\Filament\Resources\Doctors\Pages\ListDoctors;
+use App\Filament\Resources\Doctors\RelationManagers\AppointmentsRelationManager;
+use App\Filament\Resources\Doctors\RelationManagers\SchedulesRelationManager;
+use App\Filament\Resources\Doctors\Schemas\DoctorForm;
+use App\Filament\Resources\Doctors\Tables\DoctorsTable;
 use App\Models\User;
 use BackedEnum;
 use Filament\Facades\Filament;
@@ -18,41 +20,51 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
-class UserResource extends Resource
+class DoctorResource extends Resource
 {
     protected static ?string $model = User::class;
-    protected static bool $isScopedToTenant = false;
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::Users;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Schema $schema): Schema
     {
-        return UserForm::configure($schema);
+        return DoctorForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return UsersTable::configure($table);
+        return DoctorsTable::configure($table);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->whereHas(
+                'roles',
+                fn(Builder $query): Builder => $query->where('name', PanelRole::Doctor)
+            );
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            SchedulesRelationManager::class,
+            AppointmentsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ListUsers::route('/'),
-            'create' => CreateUser::route('/create'),
-            'edit' => EditUser::route('/{record}/edit'),
+            'index' => ListDoctors::route('/'),
+            'create' => CreateDoctor::route('/create'),
+            'edit' => EditDoctor::route('/{record}/edit'),
         ];
     }
 
     public static function getLabel(): string
     {
-        return static::$modelLabel ?? __('resources/users.label');
+        return static::$modelLabel ?? __('resources/doctors.label');
     }
 
     public static function getPluralModelLabel(): string
@@ -61,7 +73,7 @@ class UserResource extends Resource
             return $label;
         }
 
-        return __('resources/users.plural_label');
+        return __('resources/doctors.plural_label');
     }
 
     /**
@@ -73,12 +85,12 @@ class UserResource extends Resource
             return $label;
         }
 
-        return __('resources/users.navigations.label');
+        return __('resources/doctors.navigations.label');
     }
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
-        return static::$navigationGroup ?? __('resources/users.navigations.group');
+        return static::$navigationGroup ?? __('resources/doctors.navigations.group');
     }
 
     public static function getBreadcrumb(): string
@@ -87,7 +99,7 @@ class UserResource extends Resource
             return $breadcrumb;
         }
 
-        return __('resources/users.bread_crumb');
+        return __('resources/doctors.bread_crumb');
     }
 
     public static function shouldRegisterNavigation(): bool

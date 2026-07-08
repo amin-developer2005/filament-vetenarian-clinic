@@ -74,6 +74,16 @@ class EditProfileSchema extends Page
         return __('owner/edit-profile.title');
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('owner/profile.navigation.label');
+    }
+
+    public static function getNavigationGroup(): string|null|\UnitEnum
+    {
+        return __('owner/profile.navigation.group');
+    }
+
     public function getHeading(): string|Htmlable|null
     {
         return __('owner/edit-profile.heading');

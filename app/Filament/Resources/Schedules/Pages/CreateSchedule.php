@@ -10,6 +10,15 @@ class CreateSchedule extends CreateRecord
 {
     protected static string $resource = ScheduleResource::class;
 
+    public function getTitle(): \Illuminate\Contracts\Support\Htmlable|string
+    {
+        if (filled(static::$title)) {
+            return static::$title;
+        }
+
+        return __('resources/schedules.pages.create.record.title');
+    }
+
 
     public function getRedirectUrl(): string
     {

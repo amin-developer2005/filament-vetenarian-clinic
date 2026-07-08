@@ -37,7 +37,6 @@ class AppointmentForm
                         ->preload()
                         ->live()
                         ->afterStateUpdated(function (Set $set) {
-                            $set('owner_id', null);
                             $set('doctor_id', null);
                             $set('slot_id', null);
                         })
@@ -46,15 +45,8 @@ class AppointmentForm
                     Select::make('owner_id')
                         ->label(__('resources/appointments.schema.form.components.owner_id.label'))
                         ->noOptionsMessage(__('resources/appointments.schema.form.components.owner_id.no_options_message'))
-                        ->options(function (Get $get) {
-                            if (! $clinicId = $get('clinic_id')) {
-                                return [];
-                            }
-
-                            $clinic = Clinic::query()
-                                ->find($clinicId);
-
-                            return $clinic->users()
+                        ->options(function () {
+                            return User::query()
                                 ->whereHas('roles', fn (Builder $query) => $query->where('name', PanelRole::Owner))
                                 ->pluck('name', 'id');
                         })
@@ -62,7 +54,6 @@ class AppointmentForm
                         ->live()
                         ->searchable()
                         ->preload()
-                        ->disabled(fn(Get $get) => blank($get('clinic_id')))
                         ->afterStateUpdated(fn (Set $set) => $set('animal_id', null)),
 
                     Select::make('animal_id')
@@ -94,7 +85,7 @@ class AppointmentForm
                         ->live()
                         ->dehydrated(false)
                         ->disabled(fn(Get $get) => blank($get('clinic_id')))
-                        //->afterOrEqual(today())
+                        ->afterOrEqual(today())
                         ->afterStateUpdated(function (Set $set) {
                             $set('doctor_id', null);
                             $set('slot_id', null);

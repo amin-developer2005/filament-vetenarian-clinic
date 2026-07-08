@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Filament\Owner\Resources\Appointments\Pages;
+namespace App\Filament\Resources\Doctors\Pages;
 
-use App\Enums\AppointmentStatus;
-use App\Filament\Owner\Resources\Appointments\AppointmentResource;
+use App\Enums\PanelRole;
+use App\Filament\Resources\Doctors\DoctorResource;
+use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 
-class CreateAppointment extends CreateRecord
+class CreateDoctor extends CreateRecord
 {
-    protected static string $resource = AppointmentResource::class;
+    protected static string $resource = DoctorResource::class;
 
     public function getTitle(): string|Htmlable
     {
@@ -19,22 +20,21 @@ class CreateAppointment extends CreateRecord
             return static::$title;
         }
 
-        return __('resources/appointments.pages.create.record.title');
+        return __('resources/doctors.pages.create.record.title');
     }
 
-    protected function mutateFormDataBeforeCreate(array $data): array
+    protected function handleRecordCreation(array $data): Model
     {
-        if (! isset($data['owner_id'])) {
-            $data['owner_id'] = Filament::auth()->id();
+        $record = $this->getModel()::query()->create($data);
+
+        if ($parentRecord = $this->getParentRecord()) {
+            return $this->associateRecordWithParent($record, $parentRecord);
         }
 
-        if (! isset($data['status'])) {
-            $data['status'] = AppointmentStatus::Pending;
-        }
+        $record->assignRole(PanelRole::Doctor);
 
-        return $data;
+        return $record;
     }
-
 
     public function getRedirectUrl(): string
     {
@@ -43,10 +43,11 @@ class CreateAppointment extends CreateRecord
 
         if (
             filled($defaultRedirect = Filament::getResourceCreatePageRedirect()) &&
-            $resource::hasPage($defaultRedirect) &&
+            $resource::hasPage($$defaultRedirect) &&
+            ($this instanceof CreateRecord)
             (
-                ($defaultRedirect !== 'view' || $resource::hasView($record)) &&
-                ($defaultRedirect !== 'edit' || $resource::hasEdit($record))
+                (($defaultRedirect !== 'view' || $resource::canView($record))) &&
+                (($defaultRedirect !== 'edit' || $resource::canEdit($record)))
             )
         ) {
             return $this->getResourceUrl($defaultRedirect, $this->getRedirectUrlParameters());
@@ -58,4 +59,5 @@ class CreateAppointment extends CreateRecord
 
         return $this->getResourceUrl('index', $this->getRedirectUrlParameters());
     }
+
 }

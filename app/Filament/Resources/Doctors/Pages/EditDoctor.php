@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Filament\Resources\Schedules\Pages;
+namespace App\Filament\Resources\Doctors\Pages;
 
-use App\Filament\Resources\Schedules\ScheduleResource;
+use App\Filament\Resources\Doctors\DoctorResource;
 use Filament\Actions\DeleteAction;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Support\Htmlable;
 
-class EditSchedule extends EditRecord
+class EditDoctor extends EditRecord
 {
-    protected static string $resource = ScheduleResource::class;
+    protected static string $resource = DoctorResource::class;
 
     public function getTitle(): string|Htmlable
     {
@@ -19,7 +19,7 @@ class EditSchedule extends EditRecord
             return static::$title;
         }
 
-        return __('resources/schedules.pages.edit.record.title');
+        return __('resources/doctors.pages.edit.record.title');
     }
 
     protected function getHeaderActions(): array
@@ -53,6 +53,7 @@ class EditSchedule extends EditRecord
             return $this->getResourceUrl('view', $this->getRedirectUrlParameters());
         }
 
-        return $resource::getUrl('index');
+        return $this->getResourceUrl('index', $this->getRedirectUrlParameters());
     }
+
 }

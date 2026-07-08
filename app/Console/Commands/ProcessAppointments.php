@@ -3,9 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Enums\AppointmentStatus;
-use App\Jobs\ProcessNoShowAppointment;
 use App\Models\Appointment;
-use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class ProcessAppointments extends Command
@@ -37,16 +35,16 @@ class ProcessAppointments extends Command
     private function markAsNoShow(): void
     {
         $appointments = Appointment::query()
-            ->where('status', AppointmentStatus::InProgress)
+            ->where('status', AppointmentStatus::Confirmed)
             ->whereHas('slot', function ($query) {
                 $query
-                    ->whereDate(Carbon::today())
-                    ->whereTime('end_time', '<=', Carbon::now());
+                    ->whereDate('date', '<=', today())
+                    ->whereTime('end_time', '<', now()->toTimeString());
             })
             ->get();
 
         foreach ($appointments as $appointment) {
-            ProcessNoShowAppointment::dispatch($appointment);
+            $appointment->changeStatusTo(AppointmentStatus::NoShow);
         }
     }
 }

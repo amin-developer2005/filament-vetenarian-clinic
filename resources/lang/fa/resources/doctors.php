@@ -1,30 +1,30 @@
 <?php
 
 return [
-    'label' => 'کاربران',
-    'plural_label' => 'کاربران',
-    'singular_label' => 'کاربر',
-    'bread_crumb' => 'کاربران',
+    'label' => 'پزشکان',
+    'plural_label' => 'پزشکان',
+    'singular_label' => 'پزشک',
+    'bread_crumb' => 'پزشکان',
 
     'navigations' => [
-        'label'  => 'کاربران',
+        'label'  => 'پزشکان',
         'group'  => 'مدیریت کاربران'
     ],
 
     'pages' => [
         'index' => [
             'actions' => [
-                'create' => 'ایجاد کاربر جدید'
+                'create' => 'ایجاد پزشک جدید'
             ],
         ],
         'create' => [
             'record' => [
-                'title' => 'ایجاد کاربر جدید'
+                'title' => 'ایجاد پزشک جدید'
             ],
             'form' => [
                 'select' => [
-                    'roles' => [
-                        'no_options_message' => 'نقشی یافت نشد.'
+                    'specialties' => [
+                        'no_options_message' => 'تخصصی یافت نشد.'
                     ],
                     'clinics' => [
                         'no_options_message' => 'کلینیکی یافت نشد.'
@@ -34,7 +34,7 @@ return [
         ],
         'edit' => [
             'record' => [
-                'title' => 'ویرایش کاربر'
+                'title' => 'ویرایش پزشک'
             ],
         ],
     ],
@@ -50,13 +50,16 @@ return [
                         'unique' => 'ایمیل قبلا ثبت شده است.'
                     ],
                 ],
-                'roles' => [
-                    'label' => 'نقش ها',
-                    'no_options_message' => 'نقشی یافت نشد.',
+                'phone' => [
+                    'label' => 'شماره تماس'
+                ],
+                'specialties' => [
+                    'label' => 'تخصص ها',
+                    'no_options_message' => 'تخصصی یافت نشد.',
                     'createOptionForm' => [
-                        'name' => 'نام نقش'
+                        'name' => 'نام تخصص'
                     ],
-                    'createOptionModalHeading' => 'افزودن نقش جدید',
+                    'createOptionModalHeading' => 'افزودن تخصص جدید',
                 ],
                 'clinics' => [
                     'label' => 'کلینیک ها',
@@ -80,8 +83,11 @@ return [
             'email' => [
                 'label' => 'ایمیل'
             ],
-            'roles' => [
-                'label' => 'نقش ها'
+            'phone' => [
+                'label' => 'شماره تماس'
+            ],
+            'specialties' => [
+                'label' => 'تخصص ها'
             ],
             'clinics' => [
                 'label' => 'کلینیک ها'
@@ -97,16 +103,38 @@ return [
             ],
         ],
         'filters' => [
-            'roles' => [
-                'label' => ' نقش ',
-            ],
             'clinics' => [
-                'label' => 'کلینیک ',
+                'label' => ' کلینیک ',
             ],
             'email_status' => [
-                'label' => 'وضعیت ایمیل',
+                'label' => 'وضعیت ایمیل ',
             ],
         ],
     ],
+
+    'relationManagers' => [
+
+        'schedules' => [
+
+            'empty' => [
+
+                'heading' => 'هنوز هیچ برنامه کاری برای این دامپزشک تعریف نشده است.',
+
+                'description' => 'در حال حاضر هیچ برنامه زمانی برای این دامپزشک ثبت نشده است. پس از ایجاد اولین برنامه کاری، اطلاعات آن در این بخش نمایش داده خواهد شد.',
+
+            ],
+        ],
+        'appointments' => [
+
+            'empty' => [
+
+                'heading' => 'هنوز هیچ نوبتی برای این دامپزشک ثبت نشده است.',
+
+                'description' =>
+                    'در حال حاضر هیچ مراجعه‌کننده‌ای برای این دامپزشک نوبت رزرو نکرده است. پس از ثبت اولین نوبت، اطلاعات آن در این بخش نمایش داده خواهد شد.',
+            ],
+        ],
+    ],
+
 
 ];

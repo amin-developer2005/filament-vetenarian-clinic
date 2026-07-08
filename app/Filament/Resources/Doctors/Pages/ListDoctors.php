@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\Appointments\Pages;
+namespace App\Filament\Resources\Doctors\Pages;
 
-use App\Filament\Resources\Appointments\AppointmentResource;
+use App\Filament\Resources\Doctors\DoctorResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Enums\IconSize;
 
-class ListAppointments extends ListRecords
+class ListDoctors extends ListRecords
 {
-    protected static string $resource = AppointmentResource::class;
+    protected static string $resource = DoctorResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -17,7 +17,7 @@ class ListAppointments extends ListRecords
             CreateAction::make()
                 ->icon('heroicon-s-plus')
                 ->iconSize(IconSize::TwoExtraLarge)
-                ->label(__('resources/appointments.pages.index.actions.create')),
+                ->label(__('resources/doctors.pages.index.actions.create')),
         ];
     }
 }

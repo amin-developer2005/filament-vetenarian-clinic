@@ -49,7 +49,7 @@ class AppointmentsTable
                 TextColumn::make('slot.start_time')
                     ->label(__('resources/appointments.table.columns.time'))
                     ->formatStateUsing(
-                        fn (Appointment $record) => Carbon::parse($record->slot->start_time)->format('H:i').' - '.Carbon::parse($record->slot->end_time)->format('H:i')
+                        fn (Appointment $record) => Carbon::parse($record->slot->start_time)->format('H:i A').' '.Carbon::parse($record->slot->end_time)->format('H:i A')
                     ),
 
                 TextColumn::make('status')

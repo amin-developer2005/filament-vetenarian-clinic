@@ -254,7 +254,7 @@ class Profile extends Page
                             ->schema([
                                 Text::make($this->profile?->first_name ?? ''),
                                 Text::make($this->profile?->surname ?? ''),
-                                Text::make($this->profile->gender->getLabel() ?? ''),
+                                Text::make($this->profile?->gender?->getLabel() ?? ''),
                                 Text::make($this->profile->birth_date ? Carbon::parse($this->profile->birth_date)->format('Y M/d') : ''),
                             ])
                     ]),

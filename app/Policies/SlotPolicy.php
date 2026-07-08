@@ -29,7 +29,7 @@ class SlotPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -37,7 +37,7 @@ class SlotPolicy
      */
     public function update(User $user, Slot $slot): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -45,7 +45,7 @@ class SlotPolicy
      */
     public function delete(User $user, Slot $slot): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -53,7 +53,7 @@ class SlotPolicy
      */
     public function restore(User $user, Slot $slot): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -61,6 +61,6 @@ class SlotPolicy
      */
     public function forceDelete(User $user, Slot $slot): bool
     {
-        return true;
+        return false;
     }
 }
