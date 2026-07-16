@@ -2,13 +2,18 @@
 
 namespace App\Filament\Resources\Clinics\Schemas\Sections;
 
-use Filament\Forms\Components\RichEditor;
+use Dotswan\MapPicker\Facades\MapPicker;
+use Dotswan\MapPicker\Fields\Map;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Support\Enums\IconSize;
 
-class GeneralInformationSection extends Section
+class AddressSection extends Section
 {
     protected function setUp(): void
     {
@@ -20,88 +25,92 @@ class GeneralInformationSection extends Section
     private function build(): void
     {
         $this
-            ->label(__('resources/clinics.form.sections.general.label'))
+            ->label(__('resources/clinics.schema.form.sections.address.label'))
             ->icon('heroicon-o-building-office-2')
-            ->description(__('resources/clinics.form.sections.general.description'))
+            ->description(__('resources/clinics.schema.form.sections.address.description'))
             ->schema([
-                Grid::make(2)
+                Grid::make(3)
                     ->schema([
-                        TextInput::make('name')
-                            ->label(__('resources/schema.form.components.name.label'))
-                            ->placeholder(__('resources/schema.form.components.name.placeholder'))
+                        TextInput::make('address.country')
+                            ->label(__('resources/clinics.schema.address_form.components.country.label'))
+                            ->placeholder(__('resources/clinics.schema.address_form.components.country.placeholder'))
                             ->required()
+                            ->string()
                             ->maxLength(255)
-                            ->autofocus()
                             ->columnSpan(1),
-
-                        TextInput::make('code')
-                            ->label(__('resources/schema.form.components.code.label'))
-                            ->placeholder(__('resources/schema.form.components.code.placeholder'))
+                        TextInput::make('address.province')
+                            ->label(__('resources/clinics.schema.address_form.components.province.label'))
+                            ->placeholder(__('resources/clinics.schema.address_form.components.province.placeholder'))
                             ->required()
-                            ->unique(ignoreRecord: true)
-                            ->maxLength(50)
-                            ->validationMessages([
-                                'unique' => __('resources/validation.code.unique'),
-                            ])
-                            ->hint(__('resources/schema.form.components.code.hint'))
-                            ->hintIcon('heroicon-o-information-circle')
-                            ->columnSpan(1),
-
-                        TextInput::make('phone')
-                            ->label(__('resources/schema.form.components.phone.label'))
-                            ->placeholder(__('resources/schema.form.components.phone.placeholder'))
-                            ->tel()
-                            ->maxLength(20)
-                            ->columnSpan(1),
-
-                        TextInput::make('email')
-                            ->label(__('resources/schema.form.components.email.label'))
-                            ->placeholder(__('resources/schema.form.components.email.placeholder'))
-                            ->email()
-                            ->unique(ignoreRecord: true)
-                            ->maxLength(255)
-                            ->validationMessages([
-                                'unique' => __('resources/validation.email.unique'),
-                            ])
-                            ->hint(__('resources/schema.form.components.email.hint'))
-                            ->hintIcon('heroicon-o-envelope')
-                            ->columnSpan(1),
-
-                        TextInput::make('website')
-                            ->label(__('resources/schema.form.components.website.label'))
-                            ->placeholder(__('resources/schema.form.components.website.placeholder'))
-                            ->url()
+                            ->string()
                             ->maxLength(255)
                             ->columnSpan(1),
-
-                        Toggle::make('is_active')
-                            ->label(__('resources/schema.form.components.is_active.label'))
-                            ->default(true)
-                            ->inline(false)
-                            ->onColor('success')
-                            ->offColor('danger')
+                        TextInput::make('address.city')
+                            ->label(__('resources/clinics.schema.address_form.components.city.label'))
+                            ->placeholder(__('resources/clinics.schema.address_form.components.city.placeholder'))
+                            ->required()
+                            ->string()
+                            ->maxLength(255)
                             ->columnSpan(1),
                     ]),
-
-                RichEditor::make('description')
-                    ->label(__('resources/schema.form.components.description.label'))
-                    ->placeholder(__('resources/schema.form.components.description.placeholder'))
+                Textarea::make('address.address')
+                    ->label(__('resources/clinics.schema.address_form.components.address.label'))
+                    ->placeholder(__('resources/clinics.schema.address_form.components.address.placeholder'))
+                    ->rows(3)
                     ->columnSpanFull()
-                    ->toolbarButtons([
-                        'bold',
-                        'italic',
-                        'underline',
-                        'strike',
-                        'h2',
-                        'h3',
-                        'bulletList',
-                        'orderedList',
-                        'link',
-                        'blockquote',
-                        'undo',
-                        'redo',
-                    ])
-                    ->maxLength(5000),
+                    ->maxLength(500),
+
+                Grid::make(3)
+                    ->schema([
+                        Actions::make([
+                            Action::make('map-picker')
+                                ->label(__('resources/clinics.schema.form.sections.address.actions.map-picker.label'))
+                                ->modalHeading(__('resources/clinics.schema.form.sections.address.actions.map-picker.modalHeading'))
+                                ->modalCloseButton()
+                                ->iconSize(IconSize::ExtraLarge)
+                                ->icon('heroicon-o-map-pin')
+                                ->schema([
+                                    Map::make('location')
+                                        ->zoom(12)
+                                        ->reactive()
+                                        ->defaultLocation(34.6416, 50.8746)
+                                        ->afterStateUpdated(function ($state, Set $set) {
+                                            $location = $state ?? [];
+
+                                            if (! $location) {
+                                                return;
+                                            }
+
+                                            $set('address.latitude', $location['lat'] ?? null);
+                                            $set('address.longitude', $location['lng'] ?? null);
+                                        })
+                                        ->live()
+                                        ->draggable()
+                                        ->clickable(true),
+                                ])->action(function (array $data, Set $set) {
+                                    $location = $data['location'] ?? [];
+
+                                    if (! $location) {
+                                        return;
+                                    }
+
+                                    $set('address.latitude', $location['lat'] ?? null);
+                                    $set('address.longitude', $location['lng'] ?? null);
+                                }),
+                        ]),
+
+                        TextInput::make('address.longitude')
+                            ->live()
+                            ->label(__('resources/clinics.schema.address_form.components.longitude.label'))
+                            ->minValue(-90)
+                            ->maxValue(90),
+                        TextInput::make('address.latitude')
+                            ->live()
+                            ->label(__('resources/clinics.schema.address_form.components.latitude.label'))
+                            ->minValue(-90)
+                            ->maxValue(90),
+                    ]),
+
             ]);
     }
 }

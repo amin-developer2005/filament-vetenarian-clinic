@@ -75,7 +75,7 @@ class AnimalForm
                                     titleAttribute: 'name',
                                     modifyQueryUsing: fn (Builder $query) => $query->whereHas(
                                         'roles',
-                                        fn(Builder $query) => $query->where('name', 'owner')
+                                        fn(Builder $query) => $query->withoutGlobalScopes()->where('name', 'owner')
                                     )
                                 )
                                 ->required()

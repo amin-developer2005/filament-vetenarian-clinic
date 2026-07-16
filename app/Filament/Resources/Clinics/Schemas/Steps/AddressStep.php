@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Clinics\Schemas\Steps;
 
+use App\Filament\Resources\Clinics\Schemas\Sections\AddressSection;
 use App\Filament\Resources\Clinics\Schemas\Sections\GeneralInformationSection;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -10,15 +11,14 @@ use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Wizard\Step;
 
-class GeneralInformationStep
+class AddressStep
 {
-    public static function build()
+    public static function build(): Step
     {
-        return Step::make(__('resources/schema.steps.basic_info.label'))
-            ->description(__('resources/schema.steps.basic_info.description'))
-            ->icon('heroicon-o-info')
+        return Step::make(__('resources/clinics.schema.wizard.steps.address.label'))
+            ->description(__('resources/clinics.schema.wizard.steps.address.description'))
             ->schema([
-                GeneralInformationSection::make(),
+                AddressSection::make(),
             ]);
     }
 }

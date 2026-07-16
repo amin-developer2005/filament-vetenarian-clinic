@@ -38,6 +38,7 @@ class UserForm
                                 ->label(__('resources/users.schema.form.components.roles.label'))
                                 ->required()
                                 ->multiple()
+                                ->getOptionLabelFromRecordUsing(fn(Role $role) => $role->name->value)
                                 ->searchable()
                                 ->live()
                                 ->preload()
@@ -55,21 +56,6 @@ class UserForm
                                 ->label(__('resources/users.schema.form.components.clinics.label'))
                                 ->required()
                                 ->multiple()
-                                ->visible(function (Get $get) {
-                                    if (! $roleIds = $get('roles')) {
-                                        return false;
-                                    }
-
-                                    foreach ($roleIds as $roleId) {
-                                        $role = Role::query()->find($roleId);
-
-                                        if ($role->name == PanelRole::OWNER) {
-                                            return false;
-                                        }
-                                    }
-
-                                    return true;
-                                })
                                 ->searchable()
                                 ->preload()
                                 ->native(false)

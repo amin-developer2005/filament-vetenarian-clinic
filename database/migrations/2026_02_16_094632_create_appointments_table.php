@@ -29,6 +29,7 @@ return new class extends Migration
             $table->enum('status', [
                 AppointmentStatus::Pending->value,
                 AppointmentStatus::Confirmed->value,
+                AppointmentStatus::Rejected->value,
                 AppointmentStatus::CheckedIn->value,
                 AppointmentStatus::InProgress->value,
                 AppointmentStatus::Completed->value,

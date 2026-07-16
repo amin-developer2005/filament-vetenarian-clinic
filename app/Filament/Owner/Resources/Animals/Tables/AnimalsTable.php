@@ -87,6 +87,7 @@ class AnimalsTable
                 TextColumn::make('created_at')
                     ->label(__('owner/animals.table.columns.created_at'))
                     ->since()
+                    ->jalaliDateTime('d M ,Y H:i A')
                     ->sortable(),
             ])
             ->filters([

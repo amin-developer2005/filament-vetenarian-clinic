@@ -2,10 +2,12 @@
 
 namespace App\Filament\Pages\Tenancy;
 
+use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
 use Filament\Pages\Tenancy\EditTenantProfile;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Model;
 
 class EditClinicProfile extends EditTenantProfile
 {

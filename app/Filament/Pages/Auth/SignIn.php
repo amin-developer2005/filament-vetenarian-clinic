@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Owner\Pages\Auth;
+namespace App\Filament\Pages\Auth;
 
 use App\Models\Clinic;
 use App\Models\User;
@@ -18,12 +18,12 @@ class SignIn extends Login
 {
     public function getTitle(): string|Htmlable
     {
-        return __('ورود به پنل مالک | کلینیک دامپزشکی');
+        return __('ورود به پنل ادمین | کلینیک دامپزشکی');
     }
 
     public function getHeading(): string|Htmlable|null
     {
-        return __('ورود به پنل مالک');
+        return __('ورود به پنل ادمین');
     }
 
 }

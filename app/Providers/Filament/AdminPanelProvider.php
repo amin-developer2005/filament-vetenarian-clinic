@@ -2,10 +2,13 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Owner\Pages\Profile;
+use App\Filament\Pages\Auth\SignIn;
 use App\Filament\Pages\Tenancy\EditClinicProfile;
 use App\Filament\Pages\Tenancy\RegisterClinic;
+use App\Filament\Widgets\AdminDashboardStats;
+use App\Filament\Widgets\AppointmentTrendChart;
 use App\Filament\Widgets\UserAccountWidget;
+use App\Filament\Widgets\WelcomeWidget;
 use App\Http\Middleware\RoleMiddleware;
 use App\Models\Clinic;
 use Filament\Http\Middleware\Authenticate;
@@ -16,9 +19,6 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Support\Enums\Width;
-use Filament\View\PanelsRenderHook;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -34,12 +34,12 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->tenant(Clinic::class)
             ->tenantRegistration(RegisterClinic::class)
             ->tenantProfile(EditClinicProfile::class)
-            ->login()
-            ->sidebarCollapsibleOnDesktop()
-            ->sidebarWidth("18rem")
+            ->login(SignIn::class)
+            ->sidebarWidth('18rem')
             ->collapsedSidebarWidth('12rem')
             ->spa()
             ->colors([
@@ -52,7 +52,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                UserAccountWidget::class,
+                WelcomeWidget::class,
+                AppointmentTrendChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,

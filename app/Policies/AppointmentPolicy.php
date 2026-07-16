@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Appointment;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class AppointmentPolicy
 {
@@ -62,5 +61,65 @@ class AppointmentPolicy
     public function forceDelete(User $user, Appointment $appointment): bool
     {
         return $user->isAdmin() || ($user->isOwner() && $appointment->isBelongsToOwner($user));
+    }
+
+    public function confirm(User $user, Appointment $appointment): bool
+    {
+        if ($user->isAdmin()) {
+            return true;
+        }
+        if ($user->isDoctor() && $appointment->isBelongsToDoctor($user)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function reject(User $user, Appointment $appointment): bool
+    {
+        return $user->can('confirm', $appointment);
+    }
+
+    public function checkIn(User $user, Appointment $appointment): bool
+    {
+        if ($user->isAdmin() || $user->isStaff()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function startVisit(User $user, Appointment $appointment): bool
+    {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        if ($user->isDoctor() && $appointment->isBelongsToDoctor($user)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function complete(User $user, Appointment $appointment): bool
+    {
+        if ($user->isAdmin()) {
+            return true;
+        }
+        if ($user->isDoctor() && $appointment->isBelongsToDoctor($user)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function cancel(User $user, Appointment $appointment): bool
+    {
+        if ($user->isOwner() && $appointment->isBelongsToOwner($user)) {
+            return true;
+        }
+
+        return false;
     }
 }

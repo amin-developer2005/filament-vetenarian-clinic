@@ -14,6 +14,20 @@ class UserAccountWidget extends Widget
     protected static bool $isLazy = false;
 
     protected string $view = 'filament.widgets.user-account-widget';
+    protected int|string|array $columnSpan = 'full';
+    protected static bool $isDiscovered = false;
+
+    public int $todayAppointments = 0;
+
+    public int $pendingAppointments = 0;
+
+    public int $completedAppointments = 0;
+
+    public int $noShowAppointments = 0;
+
+    public ?string $firstAppointment = null;
+
+    public ?string $lastAppointment = null;
 
     public static function canView(): bool
     {

@@ -23,6 +23,11 @@ class CreateAppointment extends CreateRecord
         return __('resources/appointments.pages.create.record.title');
     }
 
+    public function canCreateAnother(): bool
+    {
+        return false;
+    }
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         if (! isset($data['status'])) {

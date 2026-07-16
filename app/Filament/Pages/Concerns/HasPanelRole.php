@@ -136,7 +136,7 @@ trait HasPanelRole
             $this->isAdmin() => PanelId::ADMIN,
             $this->isOwner() => PanelId::OWNER,
             $this->isDoctor() => PanelId::DOCTOR,
-            $this->isReceptionist() => PanelId::RECEPTIONIST,
+            $this->isStaff() => PanelId::STAFF,
             default => PanelId::ADMIN
         };
     }
@@ -156,9 +156,9 @@ trait HasPanelRole
         return $this->hasPanelRole(PanelRole::DOCTOR);
     }
 
-    public function isReceptionist(): bool
+    public function isStaff(): bool
     {
-        return $this->hasPanelRole(PanelRole::Receptionist);
+        return $this->hasPanelRole(PanelRole::Staff);
     }
 
     protected function fetchPanel(): ?Panel

@@ -23,7 +23,7 @@ class RoleFactory extends Factory
                     'name' => PanelRole::DOCTOR, 'description' => 'Animal Doctor'
                 ],
                 [
-                    'name' => PanelRole::RECEPTIONIST, 'description' => 'Clinic Receptionist'
+                    'name' => PanelRole::STAFF, 'description' => 'Clinic Receptionist'
                 ]
             ];
         }

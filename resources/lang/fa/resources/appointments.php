@@ -70,7 +70,7 @@ return [
                 ],
                 'sections' => [
                     'info' => 'اطلاعات نوبت',
-                    'medical_info' => 'اطلاعات پزشکی',
+                    'medical_info' => 'توضیحات نوبت',
                 ],
             ],
             'steps' => [

@@ -2,9 +2,12 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Owner\Pages\Auth\SignIn;
 use App\Filament\Owner\Pages\Auth\Signup;
 use App\Filament\Owner\Pages\Profile\Schemas\EditProfileSchema;
 use App\Filament\Owner\Widgets\OwnerDashboardStats;
+use App\Http\Middleware\RoleMiddleware;
+use App\Models\Clinic;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -30,9 +33,8 @@ class OwnerPanelProvider extends PanelProvider
             ->path('owner')
             ->viteTheme('resources/css/filament/owner/theme.css')
             ->registration(Signup::class)
-            ->login()
-            ->passwordReset()
-            ->sidebarCollapsibleOnDesktop()
+            ->login(SignIn::class)
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->sidebarWidth("18rem")
             ->collapsedSidebarWidth('12rem')
             ->spa()
@@ -63,6 +65,7 @@ class OwnerPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                RoleMiddleware::class,
             ]);
     }
 }

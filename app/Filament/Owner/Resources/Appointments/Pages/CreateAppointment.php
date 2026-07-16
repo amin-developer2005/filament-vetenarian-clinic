@@ -4,6 +4,7 @@ namespace App\Filament\Owner\Resources\Appointments\Pages;
 
 use App\Enums\AppointmentStatus;
 use App\Filament\Owner\Resources\Appointments\AppointmentResource;
+use App\Models\Clinic;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Contracts\Support\Htmlable;
@@ -35,6 +36,21 @@ class CreateAppointment extends CreateRecord
         return $data;
     }
 
+    protected function handleRecordCreation(array $data): Model
+    {
+        $record = $this->getModel()::query()->create($data);
+
+        $clinic = Clinic::query()->find($record->clinic_id);
+        $clinic->users()->attach($record->owner_id);
+
+        return $record;
+    }
+
+
+    public function canCreateAnother(): bool
+    {
+        return false;
+    }
 
     public function getRedirectUrl(): string
     {

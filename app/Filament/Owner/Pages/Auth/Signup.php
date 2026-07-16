@@ -11,10 +11,21 @@ use Filament\Auth\Pages\Register;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
 use Filament\Support\Exceptions\Halt;
+use Illuminate\Contracts\Support\Htmlable;
 
 class Signup extends Register
 {
     protected int $maxAttempts = 4;
+
+    public function getTitle(): string|Htmlable
+    {
+        return __('ثبت‌نام مالک | کلینیک دامپزشکی');
+    }
+
+    public function getHeading(): string|Htmlable|null
+    {
+        return __('ساخت حساب کاربری مالک');
+    }
 
     public function register(): ?RegistrationResponse
     {

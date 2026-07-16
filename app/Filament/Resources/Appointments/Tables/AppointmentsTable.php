@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Appointments\Tables;
 
 use App\Enums\AppointmentStatus;
 use App\Models\Appointment;
+use App\Services\AppointmentService;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -43,11 +44,12 @@ class AppointmentsTable
 
                 TextColumn::make('slot.date')
                     ->label(__('resources/appointments.table.columns.date'))
-                    ->date()
+                    ->jalaliDate('d M ,Y')
                     ->sortable(),
 
                 TextColumn::make('slot.start_time')
                     ->label(__('resources/appointments.table.columns.time'))
+                    ->jalaliDateTime()
                     ->formatStateUsing(
                         fn (Appointment $record) => Carbon::parse($record->slot->start_time)->format('H:i A').' '.Carbon::parse($record->slot->end_time)->format('H:i A')
                     ),
@@ -60,6 +62,7 @@ class AppointmentsTable
                 TextColumn::make('created_at')
                     ->label(__('resources/appointments.table.columns.created_at'))
                     ->since()
+                    ->jalaliDateTime('d M ,Y H:i A')
                     ->sortable()
                     ->toggleable(),
             ])
@@ -75,34 +78,16 @@ class AppointmentsTable
                     ->options(AppointmentStatus::class)
                     ->searchable()
                     ->native(false),
-                /*
-                SelectFilter::make('doctor_id')
-                    ->label(__('resources/appointments.table.filters.doctor'))
-                    ->relationship('slot.schedule', 'doctor.name')
-                    ->searchable()
-                    ->preload(),*/
-                Filter::make('doctor_id')
-                    ->label(__('resources/appointments.table.filters.doctor'))
-                    ->schema([
-                        Select::make('doctor')
-                            ->label(__('resources/appointments.table.filters.doctor.label'))
-                            ->searchable()
-                            ->preload()
-                            ->native(false),
-                    ])->query(function (Builder $query, array $data) {
-                        return $query->when(
-                            $data['doctor'] ?? null,
-                            fn ($q, $v) => $q->where('slot.schedule.doctor_id', $v)
-                        );
-                    }),
 
                 Filter::make('created_at')
                     ->label(__('resources/appointments.table.filters.created_at'))
                     ->schema([
                         DatePicker::make('from_booked_date')
+                            ->jalali()
                             ->label(__('resources/appointments.table.filters.from_booked_date'))
                             ->date(),
                         DatePicker::make('to_booked_date')
+                            ->jalali()
                             ->label(__('resources/appointments.table.filters.to_booked_date'))
                             ->date(),
                     ])->query(function (Builder $query, array $data) {
@@ -123,8 +108,10 @@ class AppointmentsTable
                     ->button()
                     ->color(Color::Emerald)
                     ->icon('heroicon-o-check')
-                    ->visible(fn (Appointment $appointment) => $appointment->canBeConfirmedBy(Filament::auth()->user()))
-                    ->action(fn (Appointment $appointment) => $appointment->confirm())
+                    ->visible(
+                        fn (Appointment $appointment) => app(AppointmentService::class)->canBeConfirmed($appointment) && Filament::auth()->user()->can('confirm', $appointment),
+                    )
+                    ->action(fn (Appointment $appointment) => app(AppointmentService::class)->confirm($appointment))
                     ->after(fn () => Notification::make()
                         ->title(__('resources/appointments.table.actions.confirm.notification'))
                         ->success()
@@ -136,10 +123,10 @@ class AppointmentsTable
                     ->button()
                     ->color(Color::Red)
                     ->visible(
-                        fn (Appointment $appointment) => $appointment->canBeRejectedBy(Filament::auth()->user())
+                        fn (Appointment $appointment) =>  app(AppointmentService::class)->canBeRejected($appointment) && Filament::auth()->user()->can('reject', $appointment)
                     )
                     ->action(function (Appointment $appointment) {
-                        $appointment->reject();
+                        app(AppointmentService::class)->reject($appointment);
                         $appointment->slot->free();
                     })
                     ->after(fn () => Notification::make()
@@ -152,8 +139,8 @@ class AppointmentsTable
                     ->button()
                     ->color(Color::Emerald)
                     ->icon('heroicon-o-check')
-                    ->visible(fn (Appointment $appointment) => $appointment->canBeCheckedInBy(Filament::auth()->user()))
-                    ->action(fn (Appointment $appointment) => $appointment->checkIn())
+                    ->visible(fn (Appointment $appointment) =>  app(AppointmentService::class)->canBeCheckedIn($appointment) && Filament::auth()->user()->can('checkIn', $appointment))
+                    ->action(fn (Appointment $appointment) => app(AppointmentService::class)->checkIn($appointment))
                     ->after(fn () => Notification::make()
                         ->title(__('resources/appointments.table.actions.check_in.notification'))
                         ->success()
@@ -164,8 +151,8 @@ class AppointmentsTable
                     ->button()
                     ->color(Color::Cyan)
                     ->icon('heroicon-o-play')
-                    ->visible(fn (Appointment $appointment) => $appointment->canBeStartedVisitingBy(Filament::auth()->user()))
-                    ->action(fn (Appointment $appointment) => $appointment->startVisit())
+                    ->visible(fn (Appointment $appointment) =>  app(AppointmentService::class)->canBeStartedVisiting($appointment) && Filament::auth()->user()->can('startVisit', $appointment))
+                    ->action(fn (Appointment $appointment) => app(AppointmentService::class)->startVisit($appointment))
                     ->after(fn () => Notification::make()
                         ->title(__('resources/appointments.table.actions.start_visit.notification'))
                         ->success()
@@ -177,10 +164,10 @@ class AppointmentsTable
                     ->color(Color::Red)
                     ->icon('heroicon-o-x-mark')
                     ->visible(
-                        fn (Appointment $appointment) => $appointment->canBeCanceledBy(Filament::auth()->user()),
+                        fn (Appointment $appointment) =>  app(AppointmentService::class)->canBeCanceled($appointment) && Filament::auth()->user()->can('cancel', $appointment),
                     )
                     ->action(function (Appointment $appointment) {
-                        $appointment->cancel();
+                        app(AppointmentService::class)->cancel($appointment);
                         $appointment->slot->free();
                     })->after(fn () => Notification::make()
                     ->title(__('resources/appointments.table.actions.cancel.notification'))
@@ -193,9 +180,9 @@ class AppointmentsTable
                     ->button()
                     ->color(Color::Cyan)
                     ->visible(
-                        fn (Appointment $appointment) => $appointment->canBeCompletedBy(Filament::auth()->user())
+                        fn (Appointment $appointment) =>  app(AppointmentService::class)->canBeCompleted($appointment) && Filament::auth()->user()->can('complete', $appointment),
                     )
-                    ->action(fn (Appointment $appointment) => $appointment->complete())
+                    ->action(fn (Appointment $appointment) => app(AppointmentService::class)->complete($appointment))
                     ->after(fn () => Notification::make()
                         ->title(__('resources/appointments.table.actions.complete.notification'))
                         ->success()

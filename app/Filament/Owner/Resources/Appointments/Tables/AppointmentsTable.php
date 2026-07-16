@@ -4,6 +4,8 @@ namespace App\Filament\Owner\Resources\Appointments\Tables;
 
 use App\Enums\AppointmentStatus;
 use App\Models\Appointment;
+use App\Models\User;
+use App\Services\AppointmentService;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -24,6 +26,7 @@ use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
 
 class AppointmentsTable
@@ -47,13 +50,13 @@ class AppointmentsTable
 
                 TextColumn::make('slot.date')
                     ->label(__('resources/appointments.table.columns.date'))
-                    ->date()
+                    ->jalaliDate('d M ,Y')
                     ->sortable(),
 
                 TextColumn::make('slot.start_time')
                     ->label(__('resources/appointments.table.columns.time'))
                     ->formatStateUsing(
-                        fn (Appointment $record) => Carbon::parse($record->slot->start_time)->format('H:i').' - '.Carbon::parse($record->slot->end_time)->format('H:i')
+                        fn (Appointment $record) => Carbon::parse($record->slot->start_time)->format('h:i A').' - '.Carbon::parse($record->slot->end_time)->format('h:i A')
                     ),
 
                 TextColumn::make('status')
@@ -64,6 +67,7 @@ class AppointmentsTable
                 TextColumn::make('created_at')
                     ->label(__('resources/appointments.table.columns.created_at'))
                     ->since()
+                    ->jalaliDateTime('d M ,Y H:i A')
                     ->sortable()
                     ->toggleable(),
             ])
@@ -95,11 +99,11 @@ class AppointmentsTable
                         DatePicker::make('from_booked_date')
                             ->label(__('resources/appointments.table.filters.from_booked_date'))
                             ->native(false)
-                            ->date(),
+                            ->jalali(),
                         DatePicker::make('to_booked_date')
                             ->label(__('resources/appointments.table.filters.to_booked_date'))
                             ->native(false)
-                            ->date(),
+                            ->jalali(),
                     ])->query(function (Builder $query, array $data) {
                         return $query
                             ->when(
@@ -118,16 +122,15 @@ class AppointmentsTable
                     ->label(__('resources/appointments.table.actions.cancel.label'))
                     ->button()
                     ->icon('heroicon-o-x-mark')
-                    ->visible(fn(Appointment $appointment) => $appointment->canBeCanceledBy(Filament::auth()->user()))
+                    ->visible(fn(Appointment $appointment) => app(AppointmentService::class)->canBeCanceled($appointment) && Filament::auth()->user()->can('cancel', $appointment))
                     ->action(function (Appointment $appointment) {
-                        $appointment->cancel();
+                        app(AppointmentService::class)->cancel($appointment);
                         $appointment->slot->free();
                     }),
-                ActionGroup::make([
                     EditAction::make(),
                     DeleteAction::make()
                         ->after(fn (Appointment $appointment) => $appointment->slot->free()),
-                ])->color(Color::Emerald)->size(Size::ExtraLarge),
+
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

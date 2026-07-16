@@ -34,16 +34,6 @@ class UsersTable
                 TextColumn::make('email')
                     ->label(__('resources/users.table.columns.email.label'))
                     ->searchable(),
-                TextColumn::make('email_verified_at')
-                    ->label(__('resources/users.table.columns.email_status.label'))
-                    ->badge()
-                    ->getStateUsing(
-                        fn(User $user): EmailStatus => filled($user->email_verified_at) ? EmailStatus::Verified : EmailStatus::Unverified
-                    )
-                    ->color(
-                        fn(User $user) => filled($user->email_verified_at) ? Color::Emerald : Color::Red
-                    )
-                    ->sortable(),
                 TextColumn::make('roles.name')
                     ->label(__('resources/users.table.columns.roles.label'))
                     ->badge()
@@ -55,7 +45,7 @@ class UsersTable
                     ->color(Color::Sky),
                 TextColumn::make('created_at')
                     ->label(__('resources/users.table.columns.created_at.label'))
-                    ->dateTime()
+                    ->jalaliDateTime('d M ,Y H:i A')
                     ->since()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -72,6 +62,7 @@ class UsersTable
                             ->label(__('resources/users.table.filters.roles.label'))
                             ->relationship(titleAttribute: 'name')
                             ->searchable()
+                            ->getOptionLabelFromRecordUsing(fn(Role $role) => $role->name->value)
                             ->native(false)
                             ->preload(),
                     ])->query(function (Builder $query, array $data) {
@@ -101,24 +92,12 @@ class UsersTable
                             }
                         );
                     }),
-                Filter::make('email_verified_at')
-                    ->schema([
-                        Select::make('email_status')
-                            ->label(__('resources/users.table.filters.email_status.label'))
-                            ->options(EmailStatus::class)
-                            ->native(false),
-                    ])->query(function (Builder $query, array $data) {
-                        return $query->when(
-                            $data['email_status'] ?? null,
-                            fn ($q, $v) => $v === EmailStatus::VERIFIED ? $q->whereNotNull('email_verified_at') : $q->whereNull('email_verified_at'),
-                        );
-                    }),
             ], FiltersLayout::Modal)
             ->recordActions([
-                ActionGroup::make([
+
                     EditAction::make(),
                     DeleteAction::make(),
-                ])->color(Color::Emerald)->size(Size::ExtraLarge),
+
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

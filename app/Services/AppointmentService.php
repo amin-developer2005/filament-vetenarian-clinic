@@ -2,12 +2,19 @@
 
 namespace App\Services;
 
+use App\Enums\AppointmentStatus;
+use App\Models\Appointment;
 use App\Models\Schedule;
+use App\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Filament\Pages\Concerns\CanUseDatabaseTransactions;
+use Illuminate\Contracts\Auth\Authenticatable;
 
-class ScheduleService
+class AppointmentService
 {
+    use CanUseDatabaseTransactions;
+
     /**
      * Create a new class instance.
      */
@@ -16,43 +23,146 @@ class ScheduleService
         //
     }
 
-    public function generateSlots(Schedule $schedule): void
+    public function confirm(Appointment $appointment): bool
     {
-        $startDate = Carbon::parse($schedule->start_date);
-        $endDate = Carbon::parse($schedule->end_date);
-
-        $period = CarbonPeriod::create($startDate, $endDate);
-
-        foreach ($period as $date) {
-            $timeStart = Carbon::parse($schedule->time_start);
-            $timeEnd = Carbon::parse($schedule->time_end);
-            $duration = $schedule->slot_duration;
-
-            $totalSlotTimes = $this->fetchTimesDifference($timeStart, $timeEnd);
-            $slotDurationTime = $this->calculateSlotDurationTime($totalSlotTimes, $duration);
-
-            for ($i = 0; $i < $slotDurationTime; $i++) {
-                $slotEndTime = $timeStart->copy()->addMinutes($duration);
-
-                $schedule->slots()->create([
-                    'date'       => $date->toDateString(),
-                    'start_time' => $timeStart,
-                    'end_time'   => $slotEndTime,
-                ]);
-
-                $timeStart->addMinutes($duration);
-            }
-
+        if (! $this->canBeConfirmed($appointment)) {
+            return false;
         }
+
+        $this->beginDatabaseTransaction();
+
+        $result = $appointment->changeStatusTo(AppointmentStatus::Confirmed);
+
+        $this->commitDatabaseTransaction();
+
+        return $result;
     }
 
-    private function fetchTimesDifference(Carbon $start, Carbon $end): float
+    public function checkIn(Appointment $appointment): bool
     {
-        return $start->diffInMinutes($end);
+        if (! $this->canBeCheckedIn($appointment)) {
+            return false;
+        }
+
+        $this->beginDatabaseTransaction();
+
+        $result = $appointment->changeStatusTo(AppointmentStatus::CheckedIn);
+
+        $this->commitDatabaseTransaction();
+
+        return $result;
     }
 
-    private function calculateSlotDurationTime(float $totalSlotTimes, int $duration): float
+    public function startVisit(Appointment $appointment): bool
     {
-        return $totalSlotTimes / $duration;
+        if (! $this->canBeStartedVisiting($appointment)) {
+            return false;
+        }
+
+        $this->beginDatabaseTransaction();
+
+        $result = $appointment->changeStatusTo(AppointmentStatus::InProgress);
+
+        $this->commitDatabaseTransaction();
+
+        return $result;
     }
+
+    public function complete(Appointment $appointment): bool
+    {
+        if (! $this->canBeCompleted($appointment)) {
+            return false;
+        }
+
+        $this->beginDatabaseTransaction();
+
+        $result = $appointment->changeStatusTo(AppointmentStatus::Completed);
+
+        $this->commitDatabaseTransaction();
+
+        return $result;
+    }
+
+    public function cancel(Appointment $appointment): bool
+    {
+        if (! $this->canBeCanceled($appointment)) {
+            return false;
+        }
+
+        $this->beginDatabaseTransaction();
+
+        $result = $appointment->changeStatusTo(AppointmentStatus::Cancelled);
+
+        $this->commitDatabaseTransaction();
+
+        return $result;
+    }
+
+    public function reject(Appointment $appointment): bool
+    {
+        if (! $this->canBeRejected($appointment)) {
+            return false;
+        }
+
+        $this->beginDatabaseTransaction();
+
+        $result = $appointment->changeStatusTo(AppointmentStatus::Rejected);
+
+        $this->commitDatabaseTransaction();
+
+        return $result;
+    }
+
+
+    public function canBeConfirmed(Appointment $appointment): bool
+    {
+        if ($appointment->isPending()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function canBeRejected(Appointment $appointment): bool
+    {
+        return $this->canBeConfirmed($appointment);
+    }
+
+    public function canBeCheckedIn(Appointment $appointment): bool
+    {
+        if ($appointment->isConfirmed()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function canBeStartedVisiting(Appointment $appointment): bool
+    {
+        if ($appointment->isCheckedIn()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function canBeCompleted(Appointment $appointment): bool
+    {
+        if ($appointment->isInProgress()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function canBeCanceled(Appointment $appointment): bool
+    {
+        if ($appointment->isPending()) {
+            return true;
+        }
+
+        return false;
+    }
+
+
 }

@@ -82,6 +82,7 @@ class AppointmentForm
                         ->date()
                         ->displayFormat('Y-M-d')
                         ->closeOnDateSelection()
+                        ->jalali()
                         ->live()
                         ->dehydrated(false)
                         ->disabled(fn(Get $get) => blank($get('clinic_id')))

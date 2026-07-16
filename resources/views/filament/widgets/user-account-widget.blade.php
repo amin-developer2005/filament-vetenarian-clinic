@@ -1,51 +1,94 @@
 <x-filament-widgets::widget class="fi-account-widget">
     <x-filament::section>
-        {{-- Widget content --}}
+        <div class="grid gap-6 lg:grid-cols-3">
 
-        <x-filament-panels::avatar.user
-            size="lg"
-            :user="$user"
-            loading="lazy" />
+            {{-- Left --}}
+            <div class="flex items-center gap-5">
+                <x-filament-panels::avatar.user
+                    size="xl"
+                    :user="$user"
+                    loading="lazy"
+                />
 
-        <div class="fi-account-widget-main">
-            <h2 class="fi-account-widget-heading">
-                {{ __('filament-panels::widgets/account-widget.welcome', ['app' => config('app.name')]) }}
-            </h2>
+                <div>
+                    <h2 class="text-2xl font-bold">
+                        👋 {{ __('خوش آمدید') }}
+                    </h2>
 
-            <div class="flex">
-                <p class="fi-account-widget-user-name">
-                    {{ filament()->getUserName($user) }}
-                </p>
-                <div class="flex space-y-32">
-                    <p>نقش ها:</p>
+                    <p class="text-lg font-semibold mt-1">
+                        {{ filament()->getUserName($user) }}
+                    </p>
 
-                    @foreach($roles as $role)
-                        <p class="fi-account-widget-user-name">
-                            {{ $role }}
-                        </p>
-                    @endforeach
+                    <div class="mt-2 flex gap-2">
+
+                        <x-filament::badge color="success">
+                            {{ auth()->user()->roles->first()?->name }}
+                        </x-filament::badge>
+
+                        <x-filament::badge color="primary">
+                            {{ filament()->getTenant()?->name }}
+                        </x-filament::badge>
+
+                    </div>
+
                 </div>
             </div>
 
+            {{-- Right --}}
+            <div class="flex flex-col justify-between">
+
+                <div>
+
+                    <p class="text-gray-500">
+                        {{ \Morilog\Jalali\Jalalian::now()->format('l d F Y') }}
+                    </p>
+
+                    <div class="mt-5">
+
+                        <p>
+                            🕗 First Appointment
+                        </p>
+
+                        <h3 class="font-bold">
+                            {{ $firstAppointment ?? '--:--' }}
+                        </h3>
+
+                    </div>
+
+                    <div class="mt-4">
+
+                        <p>
+                            🕔 Last Appointment
+                        </p>
+
+                        <h3 class="font-bold">
+                            {{ $lastAppointment ?? '--:--' }}
+                        </h3>
+
+                    </div>
+
+                </div>
+
+                <form
+                    action="{{ filament()->getLogoutUrl() }}"
+                    method="POST"
+                    class="mt-5"
+                >
+                    @csrf
+
+                    <x-filament::button
+                        type="submit"
+                        color="danger"
+                        icon="heroicon-o-arrow-left-on-rectangle"
+                        class="w-full"
+                    >
+                        Logout
+                    </x-filament::button>
+
+                </form>
+
+            </div>
+
         </div>
-
-        <form
-            action="{{ filament()->getLogoutUrl() }}"
-            method="post"
-            class="fi-account-widget-logout-form"
-        >
-            @csrf
-            <x-filament::button color="gray"
-                                :icon="\Filament\Support\Icons\Heroicon::ArrowLeftEndOnRectangle"
-                                :icon-alias="\Filament\View\PanelsIconAlias::WIDGETS_ACCOUNT_LOGOUT_BUTTON"
-                                labeled-from="sm"
-                                tag="button"
-                                type="submit"
-            >
-                {{ __('filament-panels::widgets/account-widget.actions.logout.label') }}
-
-            </x-filament::button>
-        </form>
-
     </x-filament::section>
 </x-filament-widgets::widget>

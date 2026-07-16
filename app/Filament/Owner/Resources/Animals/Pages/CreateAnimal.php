@@ -5,10 +5,20 @@ namespace App\Filament\Owner\Resources\Animals\Pages;
 use App\Filament\Owner\Resources\Animals\AnimalResource;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Contracts\Support\Htmlable;
 
 class CreateAnimal extends CreateRecord
 {
     protected static string $resource = AnimalResource::class;
+
+    public function getTitle(): string|Htmlable
+    {
+        if (filled(static::$title)) {
+            return static::$title;
+        }
+
+        return __('resources/animals.pages.create.record.title');
+    }
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

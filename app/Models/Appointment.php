@@ -72,50 +72,12 @@ class Appointment extends Model
 
     public function isBelongsToDoctor(Authenticatable|User $doctor): bool
     {
-        return $this->slot->schedule->doctor->id === $doctor->id;
+        return $this->slot?->schedule?->doctor_id === $doctor->id;
     }
 
-    public function isBelongsToOwner(Authenticatable|User $owner)
+    public function isBelongsToOwner(Authenticatable|User $owner): bool
     {
         return $this->owner_id === $owner->id;
-    }
-
-    public function confirm(): void
-    {
-        $this->update([
-            'status' => AppointmentStatus::Confirmed,
-        ]);
-    }
-
-    public function checkIn(): void
-    {
-        $this->changeStatusTo(AppointmentStatus::CheckedIn);
-    }
-
-    public function startVisit(): void
-    {
-        $this->changeStatusTo(AppointmentStatus::InProgress);
-    }
-
-    public function complete(): void
-    {
-        $this->update([
-            'status' => AppointmentStatus::Completed,
-        ]);
-    }
-
-    public function cancel(): void
-    {
-        $this->update([
-            'status' => AppointmentStatus::Cancelled,
-        ]);
-    }
-
-    public function reject(): void
-    {
-        $this->update([
-            'status' => AppointmentStatus::Rejected
-        ]);
     }
 
     public function isPending(): bool
@@ -158,74 +120,9 @@ class Appointment extends Model
         return $this->status === AppointmentStatus::NoShow;
     }
 
-    public function canBeConfirmedBy(Authenticatable|User $user): bool
+    public function changeStatusTo(AppointmentStatus $status): bool
     {
-        if ($this->isPending()) {
-            if ($user->isAdmin()) return true;
-            if ($user->isDoctor() && $user->id === $this->slot?->schedule?->doctor_id) return true;
-        }
-
-        return false;
-    }
-
-    public function canBeRejectedBy(Authenticatable|User $user): bool
-    {
-        return $this->canBeConfirmedBy($user);
-    }
-
-    public function canBeCheckedInBy(Authenticatable|User $user): bool
-    {
-        if ($this->isConfirmed()) {
-            if ($user->isAdmin() || $user->isReceptionist()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function canBeStartedVisitingBy(Authenticatable|User $user): bool
-    {
-        if ($this->isCheckedIn()) {
-
-            if ($user->isAdmin()) {
-                return true;
-            }
-
-            if ($user->isDoctor() && $user->id === $this->slot?->schedule?->doctor_id) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function canBeCompletedBy(Authenticatable|User $user): bool
-    {
-        if ($this->isInProgress()) {
-            if ($user->isAdmin()) return true;
-            if ($user->isDoctor() && $user->id === $this->slot?->schedule?->doctor_id) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function canBeCanceledBy(Authenticatable|User $user): bool
-    {
-        if ($this->isPending() || $this->isConfirmed()) {
-            if ($user->isOwner() && $this->isBelongsToOwner($user)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function changeStatusTo(AppointmentStatus $status): void
-    {
-        $this->update([
+        return $this->update([
             'status' => $status,
         ]);
     }

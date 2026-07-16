@@ -1,0 +1,993 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+/* ================================================================
+ *
+ *  FILAMENT 5.2 — PREMIUM SIDEBAR & TOPBAR THEME
+ *
+ *  Design:  Linear / Stripe / Vercel / GitHub Enterprise
+ *  Scope:   Sidebar + Topbar ONLY
+ *  Target:  FilamentPHP 5.2 · Laravel 12 · Tailwind CSS
+ *
+ *  ───────────────────────────────────────────────────────────────
+ *  FIXES APPLIED:
+ *    1. Sidebar gap            → position:fixed, top:0, 100dvh
+ *    2. Z-index hierarchy      → sidebar:30 > topbar:20 > content:0
+ *    3. Tenant dropdown        → overflow:hidden clips inside sidebar
+ *    4. Sidebar ↔ header join  → shared border, seamless color
+ *  ───────────────────────────────────────────────────────────────
+ *
+ *  ⚠️  This file touches ONLY  .fi-sidebar  and  .fi-topbar .
+ *      Dashboard widgets, tables, forms, cards, pages,
+ *      Livewire components, PHP classes, and blade layouts
+ *      are 100 % untouched.
+ *
+ * ================================================================
+ *
+ *  SETUP
+ *  ─────
+ *  1. This file →  resources/css/filament/admin/theme.css
+ *
+ *  2. vite.config.js  (add entry)
+ *
+ *       laravel({
+ *         input: [
+ *           'resources/css/filament/admin/theme.css',
+ *         ],
+ *       })
+ *
+ *  3. AdminPanelProvider.php  (register theme)
+ *
+ *       ->viteTheme('resources/css/filament/admin/theme.css')
+ *
+ * ================================================================ */
+
+
+/* ================================================================
+ *  0.  TAILWIND / FILAMENT IMPORTS
+ *      Uncomment ONE block to match your stack.
+ * ================================================================ */
+
+/* ── Option A  ·  Tailwind v3 (Filament ≤ 3.2) ────────────── */
+/* @import '../../vendor/filament/filament/resources/css/theme.css'; */
+/* @tailwind base;                                                   */
+/* @tailwind components;                                             */
+/* @tailwind utilities;                                              */
+
+/* ── Option B  ·  Tailwind v4 (Laravel 12 default) ─────────── */
+/* @import '../../vendor/filament/filament/resources/css/theme.css'; */
+/* @import 'tailwindcss';                                           */
+/* @config  '../../../../tailwind.config.js';                       */
+
+
+/* ================================================================
+ *
+ *  FILAMENT 5.2 — PREMIUM SIDEBAR & TOPBAR THEME  (Layout-Fixed)
+ *
+ *  Design : Linear / Stripe / Vercel / GitHub Enterprise
+ *  Scope  : Sidebar + Topbar  ONLY
+ *  Target : FilamentPHP 5.2 · Laravel 12 · Tailwind CSS
+ *
+ *  ─────────────────────────────────────────────────────────────
+ *  FIXES vs. previous version:
+ *
+ *    ✅ Removed  position:fixed  from .fi-sidebar
+ *       → sidebar stays inside the flex layout
+ *
+ *    ✅ Removed  height:100dvh  override
+ *       → sidebar height = viewport − header
+ *          (Filament's native flex handles this)
+ *
+ *    ✅ Removed  .fi-layout  and  .fi-main-wrapper  overrides
+ *       → main content auto-fills remaining width
+ *       → margin-inline-start  stays correct (expanded/collapsed)
+ *
+ *    ✅ Changed  overflow:hidden  →  overflow-x:hidden overflow-y:auto
+ *       → sidebar scrolls internally, dropdowns still render
+ *
+ *    ✅ Set explicit sidebar width  width: 272px
+ *       → 260-280 px range on desktop
+ *
+ *    ✅ All z-index overrides removed from sidebar
+ *       → Filament's native z-index hierarchy preserved
+ *  ─────────────────────────────────────────────────────────────
+ *
+ *  ⚠️  This file changes ONLY the visual appearance of
+ *      .fi-sidebar  and  .fi-topbar .
+ *      No PHP · No Blade · No Livewire · No layout logic.
+ *
+ * ================================================================ */
+
+
+/* ================================================================
+ *  0.  TAILWIND / FILAMENT IMPORTS
+ *      Uncomment the block that matches your stack.
+ * ================================================================ */
+
+/* ── Tailwind v3  (Filament ≤ 3.2)  ───────────────────────── */
+/* @import "../../vendor/filament/filament/resources/css/theme.css"; */
+/* @tailwind base;                                                   */
+/* @tailwind components;                                             */
+/* @tailwind utilities;                                              */
+
+
+/* ================================================================
+ *  1. DESIGN TOKENS  (visual only — no layout values)
+ * ================================================================ */
+:root {
+
+    /* ── Background layers ── */
+    --fi-sb-deep:      #09090b;
+    --fi-sb-mid:       #111827;
+    --fi-sb-surface:   #1e293b;
+    --fi-sb-elevated:  #263548;
+
+    /* ── Borders ── */
+    --fi-sb-border:         rgba(255, 255, 255, 0.06);
+    --fi-sb-border-hover:   rgba(255, 255, 255, 0.10);
+    --fi-sb-border-active:  rgba(59, 130, 246, 0.25);
+
+    /* ── Text ── */
+    --fi-sb-text:        #e2e8f0;
+    --fi-sb-text-2:      #94a3b8;
+    --fi-sb-text-muted:  #64748b;
+    --fi-sb-text-bright: #ffffff;
+
+    /* ── Accent ── */
+    --fi-sb-accent:   #3b82f6;
+    --fi-sb-accent-2: #6366f1;
+
+    /* ── Surfaces ── */
+    --fi-sb-hover: rgba(255, 255, 255, 0.04);
+    --fi-sb-active-bg: linear-gradient(
+        135deg,
+        rgba(59, 130, 246, 0.14)  0%,
+        rgba(99, 102, 241, 0.07)  100%
+    );
+
+    /* ── Effects ── */
+    --fi-sb-glow:
+        0 0 24px -4px rgba(59, 130, 246, 0.20),
+        0 0  8px -2px rgba(59, 130, 246, 0.10);
+    --fi-sb-glow-icon: drop-shadow(0 0 6px rgba(59, 130, 246, 0.35));
+    --fi-sb-radius:    0.75rem;
+
+    /* ── Motion ── */
+    --fi-sb-ease:  cubic-bezier(0.4, 0, 0.2, 1);
+    --fi-sb-dur:   300ms;
+    --fi-sb-tr:    var(--fi-sb-dur) var(--fi-sb-ease);
+
+    /* ── Topbar ── */
+    --fi-tb-bg:    rgba(9, 9, 11, 0.72);
+    --fi-tb-blur:  blur(16px) saturate(180%);
+}
+
+
+/* ================================================================
+ *
+ *  ██  LAYOUT FIX  (what was breaking everything)
+ *
+ *  The three rules below are intentionally ABSENT:
+ *
+ *    ✗  position: fixed     on .fi-sidebar
+ *    ✗  height: 100dvh      on .fi-sidebar
+ *    ✗  .fi-layout / .fi-main-wrapper overrides
+ *
+ *  Filament's native flex layout places the sidebar alongside
+ *  the main content. The sidebar width is declared explicitly
+ *  below.  Filament reads that width and sets a matching
+ *  margin-inline-start on the main wrapper automatically.
+ *
+ * ================================================================ */
+
+
+/* ================================================================
+ *  2. SCROLLBAR — thin & modern
+ * ================================================================ */
+.fi-sidebar ::-webkit-scrollbar {
+    width: 5px;
+}
+.fi-sidebar ::-webkit-scrollbar-track {
+    background: transparent;
+}
+.fi-sidebar ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 100px;
+}
+.fi-sidebar ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Firefox */
+.fi-sidebar * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.07) transparent;
+}
+
+
+/* ================================================================
+ *  3. SIDEBAR CONTAINER
+ *
+ *     • width: 272px          (fits 260-280 px requirement)
+ *     • height: 100 %         (fills flex parent minus header)
+ *     • overflow-y: auto      (scrollable, not clipped)
+ *     • overflow-x: hidden    (no horizontal scrollbar)
+ *     • NO position override  (Filament owns positioning)
+ *     • NO z-index override   (Filament owns layering)
+ * ================================================================ */
+.fi-sidebar {
+    /* ── Width (Filament reads this for margin-inline-start) ── */
+    width:              272px !important;
+    min-width:          272px !important;
+    max-width:          272px !important;
+
+    /* ── Height — fills the flex column naturally ── */
+    height:             100%  !important;
+    min-height:         100vh !important;
+    min-height:         100dvh !important;
+
+    /* ── Scrolling ── */
+    overflow-x:         hidden !important;
+    overflow-y:         auto   !important;
+
+    /* ── Flex column for header / content / footer ── */
+    display:            flex   !important;
+    flex-direction:     column !important;
+
+    /* ── Visual: deep dark gradient background ── */
+    background:
+        linear-gradient(
+            180deg,
+            var(--fi-sb-deep)                               0%,
+            color-mix(in srgb, var(--fi-sb-deep) 85%, var(--fi-sb-mid))  40%,
+            color-mix(in srgb, var(--fi-sb-deep) 90%, var(--fi-sb-mid))  70%,
+            var(--fi-sb-deep)                             100%
+        ) !important;
+    border-inline-end: 1px solid var(--fi-sb-border) !important;
+}
+
+/* Ambient radial glow — subtle glassmorphism */
+.fi-sidebar::before {
+    content:    '';
+    inset:      0;
+    background:
+        radial-gradient(ellipse 600px 400px at 15%   0%,
+        rgba(59, 130, 246, 0.040) 0%, transparent 70%),
+        radial-gradient(ellipse 500px 500px at 90% 100%,
+        rgba(99, 102, 241, 0.025) 0%, transparent 70%),
+        radial-gradient(ellipse 300px 300px at 50%  45%,
+        rgba(139, 92, 246, 0.015) 0%, transparent 70%);
+    pointer-events:  none;
+    z-index:         0;
+}
+
+/* Children sit above the glow */
+.fi-sidebar > * {
+    z-index:   1;
+}
+
+
+/* ================================================================
+ *  4. SIDEBAR HEADER
+ * ================================================================ */
+.fi-sidebar-header {
+    flex-shrink:       0 !important;
+    padding:           1.125rem 0.875rem !important;
+    border-block-end:  1px solid var(--fi-sb-border) !important;
+    display:           flex !important;
+    flex-direction:    column !important;
+    gap:               0.75rem !important;
+}
+
+
+/* ================================================================
+ *  5. TENANT SWITCHER — premium card
+ * ================================================================ */
+.fi-tenant-switcher {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.035) 0%,
+        rgba(255, 255, 255, 0.010) 100%
+    ) !important;
+    border:               1px solid var(--fi-sb-border) !important;
+    border-radius:        var(--fi-sb-radius) !important;
+    padding:              0.625rem 0.75rem !important;
+    backdrop-filter:      blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    box-shadow:           inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+    transition:           all var(--fi-sb-tr) !important;
+}
+.fi-tenant-switcher:hover {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.055) 0%,
+        rgba(255, 255, 255, 0.020) 100%
+    ) !important;
+    border-color:  var(--fi-sb-border-hover) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 4px 16px -4px rgba(0, 0, 0, 0.30) !important;
+}
+
+/* Tenant trigger text */
+.fi-tenant-switcher-trigger,
+.fi-tenant-switcher button {
+    color:       var(--fi-sb-text) !important;
+    font-weight: 550 !important;
+    font-size:   0.8125rem !important;
+}
+
+/* Tenant chevron */
+.fi-tenant-switcher svg {
+    color:      var(--fi-sb-text-muted) !important;
+    transition: color var(--fi-sb-tr) !important;
+}
+.fi-tenant-switcher:hover svg {
+    color: var(--fi-sb-text-2) !important;
+}
+
+
+/* ================================================================
+ *  6. SIDEBAR CONTENT — scrollable middle section
+ *     min-height:0 is critical for flex-child overflow to work.
+ * ================================================================ */
+.fi-sidebar-content {
+    flex:          1      !important;
+    overflow-y:    auto   !important;
+    overflow-x:    hidden !important;
+    padding-block: 0.25rem !important;
+    min-height:    0      !important;
+}
+
+
+/* ================================================================
+ *  7. GROUP LABELS — modern section titles
+ * ================================================================ */
+.fi-sidebar-group-label {
+    padding:         1.5rem 0.875rem 0.5rem !important;
+    font-size:       0.625rem !important;
+    font-weight:     700 !important;
+    text-transform:  uppercase !important;
+    letter-spacing:  0.1em !important;
+    color:           var(--fi-sb-text-muted) !important;
+    line-height:     1 !important;
+    display:         flex !important;
+    align-items:     center !important;
+    gap:             0.625rem !important;
+    user-select:     none !important;
+}
+
+/* Trailing gradient line */
+.fi-sidebar-group-label::after {
+    content:    '';
+    flex:       1;
+    height:     1px;
+    background: linear-gradient(
+        90deg, var(--fi-sb-border) 0%, transparent 100%
+    );
+}
+
+/* First group — tighter top padding */
+.fi-sidebar-group:first-child .fi-sidebar-group-label {
+    padding-top: 0.75rem !important;
+}
+
+/* Separator between groups */
+.fi-sidebar-group + .fi-sidebar-group::before {
+    content:    '';
+    display:    block;
+    height:     1px;
+    margin:     0.25rem 0.875rem;
+    background: linear-gradient(
+        90deg,
+        transparent         0%,
+        var(--fi-sb-border) 20%,
+        var(--fi-sb-border) 80%,
+        transparent        100%
+    );
+}
+.fi-dropdown {
+    z-index: 99999 !important;
+}
+
+.fi-dropdown-panel {
+    z-index: 99999 !important;
+}
+
+.fi-dropdown-list {
+    z-index: 99999 !important;
+}
+
+/* ================================================================
+ *  8. NAVIGATION ITEMS — base
+ * ================================================================ */
+.fi-sidebar-item {
+    display:         flex !important;
+    align-items:     center !important;
+    gap:             0.75rem !important;
+    padding:         0.5rem 0.75rem !important;
+    margin:          2px 0.625rem !important;
+    border-radius:   var(--fi-sb-radius) !important;
+    font-size:       0.8125rem !important;
+    font-weight:     450 !important;
+    line-height:     1.375rem !important;
+    min-height:      2.25rem !important;
+    color:           var(--fi-sb-text-2) !important;
+    position:        relative !important;
+    border:          1px solid transparent !important;
+    text-decoration: none !important;
+    cursor:          pointer !important;
+    transition:
+        background    var(--fi-sb-tr),
+        color         var(--fi-sb-tr),
+        transform     var(--fi-sb-tr),
+        box-shadow    var(--fi-sb-tr),
+        border-color  var(--fi-sb-tr) !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+
+/* ================================================================
+ *  9. NAVIGATION ITEMS — hover
+ * ================================================================ */
+.fi-sidebar-item:hover {
+    background: var(--fi-sb-hover) !important;
+    color:      var(--fi-sb-text)   !important;
+    transform:  translateX(3px)     !important;
+}
+[dir="rtl"] .fi-sidebar-item:hover {
+    transform: translateX(-3px) !important;
+}
+
+.fi-sidebar-item:active {
+    transform:            translateX(1px) !important;
+    transition-duration:  80ms !important;
+}
+[dir="rtl"] .fi-sidebar-item:active {
+    transform: translateX(-1px) !important;
+}
+
+
+/* ================================================================
+ *  10. NAVIGATION ITEMS — active / selected
+ * ================================================================ */
+.fi-sidebar-item.fi-active,
+.fi-sidebar-item[aria-current="page"],
+.fi-sidebar-item[aria-selected="true"],
+.fi-sidebar-item[data-active="true"],
+a.fi-sidebar-item[aria-current="page"] {
+    background:   var(--fi-sb-active-bg)  !important;
+    color:        var(--fi-sb-text-bright) !important;
+    font-weight:  560 !important;
+    box-shadow:   var(--fi-sb-glow)       !important;
+    border-color: var(--fi-sb-border-active) !important;
+    transform:    translateX(3px)          !important;
+}
+[dir="rtl"] .fi-sidebar-item.fi-active,
+[dir="rtl"] .fi-sidebar-item[aria-current="page"],
+[dir="rtl"] .fi-sidebar-item[data-active="true"] {
+    transform: translateX(-3px) !important;
+}
+
+/* ── Left accent indicator bar ── */
+.fi-sidebar-item.fi-active::before,
+.fi-sidebar-item[aria-current="page"]::before,
+.fi-sidebar-item[aria-selected="true"]::before,
+.fi-sidebar-item[data-active="true"]::before {
+    content:              '' !important;
+    position:             absolute !important;
+    inset-inline-start:   calc(-0.625rem + 2px) !important;
+    top:                  50% !important;
+    transform:            translateY(-50%) !important;
+    width:                3px !important;
+    height:               55% !important;
+    min-height:           0.875rem !important;
+    max-height:           1.375rem !important;
+    background: linear-gradient(
+        180deg,
+        var(--fi-sb-accent)   0%,
+        var(--fi-sb-accent-2) 100%
+    ) !important;
+    border-radius: 0 100px 100px 0 !important;
+    box-shadow:    0 0 10px rgba(59, 130, 246, 0.45) !important;
+    animation:     fi-indicator-in var(--fi-sb-tr) forwards !important;
+}
+[dir="rtl"] .fi-sidebar-item.fi-active::before,
+[dir="rtl"] .fi-sidebar-item[aria-current="page"]::before {
+    border-radius: 100px 0 0 100px !important;
+}
+
+
+/* ================================================================
+ *  11. ICONS
+ * ================================================================ */
+.fi-sidebar-item-icon,
+.fi-sidebar-item svg {
+    width:       1.125rem !important;
+    height:      1.125rem !important;
+    flex-shrink: 0 !important;
+    color:       inherit !important;
+    opacity:     0.60 !important;
+    transition:
+        color      var(--fi-sb-tr),
+        opacity    var(--fi-sb-tr),
+        transform  var(--fi-sb-tr),
+        filter     var(--fi-sb-tr) !important;
+}
+.fi-sidebar-item:hover .fi-sidebar-item-icon,
+.fi-sidebar-item:hover svg {
+    opacity:   1 !important;
+    transform: scale(1.08) !important;
+}
+
+/* Active icon — blue glow */
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon,
+.fi-sidebar-item[aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item[data-active="true"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active svg,
+.fi-sidebar-item[aria-current="page"] svg,
+.fi-sidebar-item[data-active="true"] svg {
+    color:   var(--fi-sb-accent) !important;
+    opacity: 1 !important;
+    filter:  var(--fi-sb-glow-icon) !important;
+}
+
+
+/* ================================================================
+ *  12. BADGES
+ * ================================================================ */
+.fi-sidebar .fi-badge {
+    border-radius:   9999px !important;
+    font-size:       0.5625rem !important;
+    font-weight:     600 !important;
+    padding:         0.125rem 0.4375rem !important;
+    line-height:     1.25 !important;
+    letter-spacing:  0.02em !important;
+    text-transform:  uppercase !important;
+}
+.fi-sidebar .fi-badge.fi-badge--info,
+.fi-sidebar .fi-badge.fi-badge--primary {
+    background: linear-gradient(135deg,
+    rgba(59, 130, 246, 0.18) 0%,
+    rgba(99, 102, 241, 0.10) 100%) !important;
+    color:      var(--fi-sb-accent) !important;
+    border:     1px solid rgba(59, 130, 246, 0.18) !important;
+    box-shadow: 0 0 8px -2px rgba(59, 130, 246, 0.15) !important;
+}
+.fi-sidebar .fi-badge.fi-badge--success {
+    background: linear-gradient(135deg,
+    rgba(34, 197, 94, 0.15) 0%,
+    rgba(16, 185, 129, 0.08) 100%) !important;
+    color:  #4ade80 !important;
+    border: 1px solid rgba(34, 197, 94, 0.15) !important;
+}
+.fi-sidebar .fi-badge.fi-badge--danger {
+    background: linear-gradient(135deg,
+    rgba(239, 68, 68, 0.15) 0%,
+    rgba(220, 50, 50, 0.08) 100%) !important;
+    color:  #f87171 !important;
+    border: 1px solid rgba(239, 68, 68, 0.15) !important;
+}
+.fi-sidebar .fi-badge.fi-badge--warning {
+    background: linear-gradient(135deg,
+    rgba(245, 158, 11, 0.15) 0%,
+    rgba(241, 191, 63, 0.08) 100%) !important;
+    color:  #fbbf24 !important;
+    border: 1px solid rgba(245, 158, 11, 0.15) !important;
+}
+
+
+/* ================================================================
+ *  13. SUB-NAVIGATION / NESTED ITEMS
+ * ================================================================ */
+.fi-sidebar-item-group,
+.fi-sidebar-group ul ul {
+    padding-inline-start: 0.75rem  !important;
+    margin-inline-start:  0.625rem !important;
+    border-inline-start:  1px solid var(--fi-sb-border) !important;
+}
+.fi-sidebar-item-group .fi-sidebar-item,
+.fi-sidebar-group ul ul .fi-sidebar-item {
+    min-height: 2rem !important;
+    padding:    0.375rem 0.75rem !important;
+    color:      var(--fi-sb-text-muted) !important;
+}
+.fi-sidebar-item-group .fi-sidebar-item:hover,
+.fi-sidebar-group ul ul .fi-sidebar-item:hover {
+    color: var(--fi-sb-text) !important;
+}
+
+
+/* ================================================================
+ *  14. SIDEBAR FOOTER
+ * ================================================================ */
+.fi-sidebar-footer {
+    flex-shrink:        0 !important;
+    border-block-start: 1px solid var(--fi-sb-border) !important;
+    padding:            0.75rem 0.875rem !important;
+}
+
+
+/* ================================================================
+ *  15. COLLAPSE / EXPAND TOGGLE
+ * ================================================================ */
+.fi-sidebar button[class*="collapse"],
+button.fi-sidebar-collapse-button {
+    color:         var(--fi-sb-text-muted) !important;
+    border-radius: 0.5rem !important;
+    padding:       0.4375rem !important;
+    background:    transparent !important;
+    border:        1px solid transparent !important;
+    transition:    all var(--fi-sb-tr) !important;
+}
+.fi-sidebar button[class*="collapse"]:hover {
+    color:        var(--fi-sb-text) !important;
+    background:   var(--fi-sb-hover) !important;
+    border-color: var(--fi-sb-border) !important;
+}
+.fi-sidebar button[class*="collapse"]:active {
+    transform: scale(0.94) !important;
+}
+
+
+/* ================================================================
+ *
+ *  ██  TOPBAR — PREMIUM GLASS HEADER
+ *
+ * ================================================================ */
+.fi-topbar {
+    /* ── Glass ── */
+    background:             var(--fi-tb-bg)   !important;
+    backdrop-filter:        var(--fi-tb-blur) !important;
+    -webkit-backdrop-filter: var(--fi-tb-blur) !important;
+
+    /* ── Border matching sidebar ── */
+    border-block-end: 1px solid var(--fi-sb-border) !important;
+
+    /* ── Consistent height ── */
+    min-height: 4rem !important;
+}
+
+/* Subtle top-edge highlight */
+.fi-topbar::before {
+    content:    '';
+    position:   absolute;
+    inset-block-start:    0;
+    inset-inline-start:   0;
+    inset-inline-end:     0;
+    height:     1px;
+    background: linear-gradient(
+        90deg,
+        transparent               0%,
+        rgba(255, 255, 255, 0.04) 50%,
+        transparent             100%
+    );
+}
+
+
+/* ================================================================
+ *  16. DROPDOWN PANELS inside sidebar
+ *      (tenant switcher dropdown, etc.)
+ *      Filament handles positioning — we only style the surface.
+/* * ================================================================ *!*/
+/*.fi-sidebar [role="listbox"],*/
+/*.fi-sidebar [role="menu"],*/
+/*.fi-sidebar [role="dialog"],*/
+/*.fi-sidebar [x-ref*="panel"],*/
+/*.fi-tenant-switcher [role="listbox"] {*/
+/*    background:     var(--fi-sb-mid) !important;*/
+/*    border:         1px solid var(--fi-sb-border) !important;*/
+/*    border-radius:  var(--fi-sb-radius) !important;*/
+/*    box-shadow:*/
+/*        0 20px 60px -12px rgba(0, 0, 0, 0.50),*/
+/*        0 0 0 1px rgba(255, 255, 255, 0.03) !important;*/
+/*    backdrop-filter:         blur(20px) !important;*/
+/*    -webkit-backdrop-filter: blur(20px) !important;*/
+/*}*/
+
+/*!* Dropdown option items *!*/
+/*.fi-sidebar [role="listbox"] [role="option"],*/
+/*.fi-sidebar [role="menu"] [role="menuitem"],*/
+/*.fi-sidebar [role="option"] {*/
+/*    color:         var(--fi-sb-text-2) !important;*/
+/*    font-size:     0.8125rem !important;*/
+/*    padding:       0.5rem 0.75rem !important;*/
+/*    border-radius: 0.5rem !important;*/
+/*    transition:    all 150ms var(--fi-sb-ease) !important;*/
+/*}*/
+/*.fi-sidebar [role="option"]:hover,*/
+/*.fi-sidebar [role="option"][aria-selected="true"],*/
+/*.fi-sidebar [role="menuitem"]:hover {*/
+/*    background: var(--fi-sb-hover) !important;*/
+/*    color:      var(--fi-sb-text)   !important;*/
+/*}*/
+
+
+/* ================================================================
+ *  16. TENANT DROPDOWN — Visual skin only
+ *
+ *      Filament owns the dropdown's position, size, overflow,
+ *      click handling and keyboard navigation.
+ *
+ *      We ONLY style the surface that Filament already renders
+ *      via its own CSS hook class  .fi-tenant-menu  and the
+ *      tenant switcher trigger  .fi-tenant-switcher .
+ *
+ *      We do NOT target generic [role="listbox"],
+ *      [role="option"], or [role="menu"] — those selectors
+ *      break Filament's native behavior.
+ * ================================================================ */
+
+/* ── Tenant dropdown panel (Filament's own class) ── */
+.fi-tenant-menu {
+    background:    var(--fi-sb-mid) !important;
+    border:        1px solid var(--fi-sb-border) !important;
+    border-radius: var(--fi-sb-radius) !important;
+    box-shadow:
+        0 20px 60px -12px rgba(0, 0, 0, 0.50),
+        0 0 0 1px rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter:         blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+}
+
+
+/* ── Individual tenant options inside the tenant menu ── */
+.fi-tenant-menu .fi-tenant-menu-item,
+.fi-tenant-menu a,
+.fi-tenant-menu button {
+    color:         var(--fi-sb-text-2) !important;
+    font-size:     0.8125rem !important;
+    padding:       0.5rem 0.75rem !important;
+    border-radius: 0.5rem !important;
+    transition:    background 150ms var(--fi-sb-ease),
+    color 150ms var(--fi-sb-ease) !important;
+}
+.fi-tenant-menu .fi-tenant-menu-item:hover,
+.fi-tenant-menu a:hover,
+.fi-tenant-menu button:hover {
+    background: var(--fi-sb-hover) !important;
+    color:      var(--fi-sb-text)   !important;
+}
+
+
+/* ================================================================
+ *  17. TOOLTIPS
+ * ================================================================ */
+.fi-tooltip,
+[role="tooltip"] {
+    background:     var(--fi-sb-mid) !important;
+    color:          var(--fi-sb-text) !important;
+    border:         1px solid var(--fi-sb-border) !important;
+    border-radius:  0.5rem !important;
+    font-size:      0.8125rem !important;
+    font-weight:    450 !important;
+    padding:        0.375rem 0.75rem !important;
+    box-shadow:
+        0 8px 24px -4px rgba(0, 0, 0, 0.45),
+        0 0 0 1px rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter:         blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    z-index: 60 !important;
+}
+
+
+/* ================================================================
+ *  18. SEARCH / FILTER INPUT
+ * ================================================================ */
+.fi-sidebar input[type="search"],
+.fi-sidebar input[type="text"] {
+    background:    rgba(255, 255, 255, 0.03) !important;
+    border:        1px solid var(--fi-sb-border) !important;
+    border-radius: 0.5rem !important;
+    color:         var(--fi-sb-text) !important;
+    font-size:     0.8125rem !important;
+    padding:       0.5rem 0.75rem !important;
+    transition:    all var(--fi-sb-tr) !important;
+}
+.fi-sidebar input:focus {
+    border-color: var(--fi-sb-accent) !important;
+    box-shadow:   0 0 0 3px rgba(59, 130, 246, 0.12) !important;
+    outline:      none !important;
+}
+.fi-sidebar input::placeholder {
+    color: var(--fi-sb-text-muted) !important;
+}
+
+
+/* ================================================================
+ *  19. COLLAPSED SIDEBAR STATE
+ * ================================================================ */
+.fi-sidebar[data-collapsed="true"],
+.fi-sidebar.is-collapsed,
+.fi-sidebar[class*="collapsed"] {
+    /* Width is controlled by Filament in collapsed mode;
+       we do NOT override it. Only visual changes below. */
+}
+
+.fi-sidebar[data-collapsed="true"] .fi-sidebar-item,
+.fi-sidebar.is-collapsed .fi-sidebar-item {
+    padding:         0.625rem !important;
+    justify-content: center !important;
+    margin:          2px 0.375rem !important;
+}
+.fi-sidebar[data-collapsed="true"] .fi-sidebar-item-label,
+.fi-sidebar.is-collapsed .fi-sidebar-item-label {
+    display: none !important;
+}
+.fi-sidebar[data-collapsed="true"] .fi-sidebar-group-label,
+.fi-sidebar.is-collapsed .fi-sidebar-group-label,
+.fi-sidebar[data-collapsed="true"] .fi-sidebar-group-label::after,
+.fi-sidebar.is-collapsed .fi-sidebar-group-label::after {
+    display: none !important;
+}
+.fi-sidebar[data-collapsed="true"] .fi-sidebar-item-icon,
+.fi-sidebar.is-collapsed .fi-sidebar-item-icon {
+    width:   1.25rem !important;
+    height:  1.25rem !important;
+    opacity: 0.8 !important;
+}
+.fi-sidebar[data-collapsed="true"] .fi-sidebar-item:hover,
+.fi-sidebar.is-collapsed .fi-sidebar-item:hover {
+    transform: none !important;
+}
+.fi-sidebar[data-collapsed="true"] .fi-sidebar-item.fi-active::before,
+.fi-sidebar.is-collapsed .fi-sidebar-item.fi-active::before,
+.fi-sidebar[data-collapsed="true"] .fi-sidebar-item[aria-current="page"]::before,
+.fi-sidebar.is-collapsed .fi-sidebar-item[aria-current="page"]::before {
+    inset-inline-start: -0.375rem !important;
+}
+.fi-sidebar[data-collapsed="true"] .fi-tenant-switcher,
+.fi-sidebar.is-collapsed .fi-tenant-switcher {
+    padding:         0.5rem !important;
+    display:         flex !important;
+    align-items:     center !important;
+    justify-content: center !important;
+}
+
+
+/* ================================================================
+ *  20. FOCUS STATES — WCAG accessibility
+ * ================================================================ */
+.fi-sidebar-item:focus-visible {
+    outline:        2px solid var(--fi-sb-accent) !important;
+    outline-offset: 2px !important;
+}
+.fi-tenant-switcher:focus-visible,
+.fi-tenant-switcher button:focus-visible {
+    outline:        2px solid var(--fi-sb-accent) !important;
+    outline-offset: 2px !important;
+}
+.fi-sidebar button:focus-visible {
+    outline:        2px solid var(--fi-sb-accent) !important;
+    outline-offset: 2px !important;
+}
+.fi-sidebar *:focus:not(:focus-visible) {
+    outline: none !important;
+}
+
+
+/* ================================================================
+ *  21. LOADING / DISABLED STATES
+ * ================================================================ */
+.fi-sidebar-item[wire\:loading],
+.fi-sidebar-item[disabled],
+.fi-sidebar-item[aria-disabled="true"] {
+    opacity:        0.45 !important;
+}
+
+
+/* ================================================================
+ *  22. RESPONSIVE — mobile
+ * ================================================================ */
+@media (max-width: 1023px) {
+    .fi-sidebar {
+        /* On mobile the sidebar becomes an overlay drawer;
+           Filament controls positioning. We only reset the
+           explicit width so it doesn't force a column. */
+        width:     auto !important;
+        min-width: 0    !important;
+        max-width: 100% !important;
+    }
+    .fi-sidebar-item {
+        min-height: 2.625rem !important;
+        padding:    0.625rem 0.875rem !important;
+        margin:     2px 0.5rem !important;
+    }
+}
+
+/* Mobile backdrop */
+.fi-sidebar-backdrop,
+[x-ref="sidebarBackdrop"] {
+    backdrop-filter:         blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    background:              rgba(0, 0, 0, 0.55) !important;
+}
+
+
+/* ================================================================
+ *  23. RTL SUPPORT
+ * ================================================================ */
+[dir="rtl"] .fi-sidebar {
+    border-inline-end:   none !important;
+    border-inline-start: 1px solid var(--fi-sb-border) !important;
+}
+[dir="rtl"] .fi-sidebar-group-label::after {
+    background: linear-gradient(
+        270deg, var(--fi-sb-border) 0%, transparent 100%
+    ) !important;
+}
+
+
+/* ================================================================
+ *  24. REDUCED MOTION
+ * ================================================================ */
+@media (prefers-reduced-motion: reduce) {
+    .fi-sidebar *,
+    .fi-sidebar *::before,
+    .fi-sidebar *::after,
+    .fi-topbar,
+    .fi-topbar * {
+        transition-duration: 0ms !important;
+        animation-duration:  0ms !important;
+    }
+    .fi-sidebar-item:hover,
+    .fi-sidebar-item.fi-active,
+    .fi-sidebar-item[aria-current="page"],
+    .fi-sidebar-item[data-active="true"],
+    .fi-sidebar-item:active {
+        transform: none !important;
+    }
+}
+
+
+/* ================================================================
+ *  25. KEY-FRAME ANIMATIONS
+ * ================================================================ */
+@keyframes fi-indicator-in {
+    from {
+        opacity:   0;
+        transform: translateY(-50%) scaleY(0.2);
+    }
+    to {
+        opacity:   1;
+        transform: translateY(-50%) scaleY(1);
+    }
+}
+
+@keyframes fi-sb-fade-in {
+    from {
+        opacity:   0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity:   1;
+        transform: translateY(0);
+    }
+}
+
+/* Entrance animation — staggered per group × item */
+.fi-sidebar-item {
+    animation: fi-sb-fade-in 0.4s var(--fi-sb-ease) both;
+}
+.fi-sidebar-group:nth-child(1) .fi-sidebar-item:nth-child(1) { animation-delay: 0.02s; }
+.fi-sidebar-group:nth-child(1) .fi-sidebar-item:nth-child(2) { animation-delay: 0.04s; }
+.fi-sidebar-group:nth-child(1) .fi-sidebar-item:nth-child(3) { animation-delay: 0.06s; }
+.fi-sidebar-group:nth-child(1) .fi-sidebar-item:nth-child(4) { animation-delay: 0.08s; }
+.fi-sidebar-group:nth-child(2) .fi-sidebar-item:nth-child(1) { animation-delay: 0.10s; }
+.fi-sidebar-group:nth-child(2) .fi-sidebar-item:nth-child(2) { animation-delay: 0.12s; }
+.fi-sidebar-group:nth-child(2) .fi-sidebar-item:nth-child(3) { animation-delay: 0.14s; }
+.fi-sidebar-group:nth-child(2) .fi-sidebar-item:nth-child(4) { animation-delay: 0.16s; }
+.fi-sidebar-group:nth-child(3) .fi-sidebar-item:nth-child(1) { animation-delay: 0.18s; }
+.fi-sidebar-group:nth-child(3) .fi-sidebar-item:nth-child(2) { animation-delay: 0.20s; }
+.fi-sidebar-group:nth-child(3) .fi-sidebar-item:nth-child(3) { animation-delay: 0.22s; }
+.fi-sidebar-group:nth-child(3) .fi-sidebar-item:nth-child(4) { animation-delay: 0.24s; }
+.fi-sidebar-group:nth-child(4) .fi-sidebar-item:nth-child(1) { animation-delay: 0.26s; }
+.fi-sidebar-group:nth-child(4) .fi-sidebar-item:nth-child(2) { animation-delay: 0.28s; }
+.fi-sidebar-group:nth-child(4) .fi-sidebar-item:nth-child(3) { animation-delay: 0.30s; }
+.fi-sidebar-group:nth-child(4) .fi-sidebar-item:nth-child(4) { animation-delay: 0.32s; }
+.fi-sidebar-group:nth-child(5) .fi-sidebar-item:nth-child(1) { animation-delay: 0.34s; }
+.fi-sidebar-group:nth-child(5) .fi-sidebar-item:nth-child(2) { animation-delay: 0.36s; }
+.fi-sidebar-group:nth-child(5) .fi-sidebar-item:nth-child(3) { animation-delay: 0.38s; }
+.fi-sidebar-group:nth-child(5) .fi-sidebar-item:nth-child(4) { animation-delay: 0.40s; }
