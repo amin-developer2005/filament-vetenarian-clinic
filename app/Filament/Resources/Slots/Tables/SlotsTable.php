@@ -47,7 +47,7 @@ class SlotsTable
 
                 TextColumn::make('date')
                     ->label(__('resources/slots.table.columns.date'))
-                    ->date()
+                    ->jalaliDate('d, M Y')
                     ->sortable(),
 
 
@@ -60,10 +60,7 @@ class SlotsTable
                     })
                     ->badge()
                     ->color(Color::Lime)
-                    ->sortable(
-                        query: fn ($query, $direction) => $query->orderBy('date', $direction)
-                    ),
-
+                    ->sortable(),
 
                 TextColumn::make('start_time')
                     ->label(__('resources/slots.table.columns.start_time'))

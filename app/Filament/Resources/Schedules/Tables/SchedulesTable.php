@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Schedules\Tables;
 
 use App\Models\Schedule;
+use Carbon\Carbon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -52,13 +53,13 @@ class SchedulesTable
                     ->badge()
                     ->formatStateUsing(function ($state) {
                         $days = [
-                            0 => __('resources/schedules.schema.form.components.days_of_week.days.saturday'),
-                            1 => __('resources/schedules.schema.form.components.days_of_week.days.sunday'),
-                            2 => __('resources/schedules.schema.form.components.days_of_week.days.monday'),
-                            3 => __('resources/schedules.schema.form.components.days_of_week.days.tuesday'),
-                            4 => __('resources/schedules.schema.form.components.days_of_week.days.wednesday'),
-                            5 => __('resources/schedules.schema.form.components.days_of_week.days.thursday'),
-                            6 => __('resources/schedules.schema.form.components.days_of_week.days.friday'),
+                            Carbon::SATURDAY => __('resources/schedules.schema.form.components.days_of_week.days.saturday'),
+                            Carbon::SUNDAY => __('resources/schedules.schema.form.components.days_of_week.days.sunday'),
+                            Carbon::MONDAY => __('resources/schedules.schema.form.components.days_of_week.days.monday'),
+                            Carbon::TUESDAY => __('resources/schedules.schema.form.components.days_of_week.days.tuesday'),
+                            Carbon::WEDNESDAY => __('resources/schedules.schema.form.components.days_of_week.days.wednesday'),
+                            Carbon::THURSDAY => __('resources/schedules.schema.form.components.days_of_week.days.thursday'),
+                            Carbon::FRIDAY => __('resources/schedules.schema.form.components.days_of_week.days.friday'),
                         ];
 
                         return collect($state)->map(fn ($day) => $days[$day] ?? '')->join(',');

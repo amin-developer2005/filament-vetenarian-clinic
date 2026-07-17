@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Appointments\Tables;
+namespace App\Filament\Staff\Resources\Appointments\Tables;
 
 use App\Enums\AppointmentStatus;
 use App\Filament\Schemas\AppointmentInformation;
@@ -28,6 +28,7 @@ use Morilog\Jalali\Jalalian;
 
 class AppointmentsTable
 {
+
     public static function configure(Table $table): Table
     {
         return $table
@@ -54,7 +55,7 @@ class AppointmentsTable
                     ->label(__('resources/appointments.table.columns.time'))
                     ->formatStateUsing(
                         fn (Appointment $record) => Jalalian::fromCarbon(
-                            Carbon::parse($record->slot->start_time)
+                                Carbon::parse($record->slot->start_time)
                             )->format('H:i A').'  تا '.
                             Jalalian::fromCarbon(Carbon::parse($record->slot->end_time))->format('H:i A')
                     ),
@@ -108,37 +109,6 @@ class AppointmentsTable
                     }),
             ], FiltersLayout::Modal)
             ->recordActions([
-                Action::make('confirm')
-                    ->label(__('resources/appointments.table.actions.confirm.label'))
-                    ->button()
-                    ->color(Color::Emerald)
-                    ->icon('heroicon-o-check')
-                    ->visible(
-                        fn (Appointment $appointment) => app(AppointmentService::class)->canBeConfirmed($appointment) && Filament::auth()->user()->can('confirm', $appointment),
-                    )
-                    ->action(fn (Appointment $appointment) => app(AppointmentService::class)->confirm($appointment))
-                    ->after(fn () => Notification::make()
-                        ->title(__('resources/appointments.table.actions.confirm.notification'))
-                        ->success()
-                        ->send()
-                    ),
-                Action::make('reject')
-                    ->label(__('resources/appointments.table.actions.reject.label'))
-                    ->icon('heroicon-o-x-circle')
-                    ->button()
-                    ->color(Color::Red)
-                    ->visible(
-                        fn (Appointment $appointment) => app(AppointmentService::class)->canBeRejected($appointment) && Filament::auth()->user()->can('reject', $appointment)
-                    )
-                    ->action(function (Appointment $appointment) {
-                        app(AppointmentService::class)->reject($appointment);
-                        $appointment->slot->free();
-                    })
-                    ->after(fn () => Notification::make()
-                        ->title(__('resources/appointments.table.actions.reject.notification'))
-                        ->success()
-                        ->send()
-                    ),
                 Action::make('check_in')
                     ->label(__('resources/appointments.table.actions.check_in.label'))
                     ->button()
@@ -148,48 +118,6 @@ class AppointmentsTable
                     ->action(fn (Appointment $appointment) => app(AppointmentService::class)->checkIn($appointment))
                     ->after(fn () => Notification::make()
                         ->title(__('resources/appointments.table.actions.check_in.notification'))
-                        ->success()
-                        ->send()
-                    ),
-                Action::make('start_visit')
-                    ->label(__('resources/appointments.table.actions.start_visit.label'))
-                    ->button()
-                    ->color(Color::Cyan)
-                    ->icon('heroicon-o-play')
-                    ->visible(fn (Appointment $appointment) => app(AppointmentService::class)->canBeStartedVisiting($appointment) && Filament::auth()->user()->can('startVisit', $appointment))
-                    ->action(fn (Appointment $appointment) => app(AppointmentService::class)->startVisit($appointment))
-                    ->after(fn () => Notification::make()
-                        ->title(__('resources/appointments.table.actions.start_visit.notification'))
-                        ->success()
-                        ->send()
-                    ),
-                Action::make('cancel')
-                    ->label(__('resources/appointments.table.actions.cancel.label'))
-                    ->button()
-                    ->color(Color::Red)
-                    ->icon('heroicon-o-x-mark')
-                    ->visible(
-                        fn (Appointment $appointment) => app(AppointmentService::class)->canBeCanceled($appointment) && Filament::auth()->user()->can('cancel', $appointment),
-                    )
-                    ->action(function (Appointment $appointment) {
-                        app(AppointmentService::class)->cancel($appointment);
-                        $appointment->slot->free();
-                    })->after(fn () => Notification::make()
-                    ->title(__('resources/appointments.table.actions.cancel.notification'))
-                    ->success()
-                    ->send()
-                    ),
-                Action::make('complete')
-                    ->label(__('resources/appointments.table.actions.complete.label'))
-                    ->icon('heroicon-o-check-badge')
-                    ->button()
-                    ->color(Color::Cyan)
-                    ->visible(
-                        fn (Appointment $appointment) => app(AppointmentService::class)->canBeCompleted($appointment) && Filament::auth()->user()->can('complete', $appointment),
-                    )
-                    ->action(fn (Appointment $appointment) => app(AppointmentService::class)->complete($appointment))
-                    ->after(fn () => Notification::make()
-                        ->title(__('resources/appointments.table.actions.complete.notification'))
                         ->success()
                         ->send()
                     ),

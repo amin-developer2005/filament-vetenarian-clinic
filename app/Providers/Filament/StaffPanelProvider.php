@@ -2,9 +2,8 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Doctor\Pages\SignIn;
-use App\Filament\Doctor\Widgets\WelcomeWidget;
-use App\Http\Middleware\RoleMiddleware;
+use App\Filament\Staff\Pages\SignIn;
+use App\Filament\Staff\Widgets\WelcomeWidget;
 use App\Models\Clinic;
 use App\Services\PanelService;
 use Filament\Http\Middleware\Authenticate;
@@ -15,6 +14,8 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Widgets\AccountWidget;
+use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -22,28 +23,29 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-class DoctorPanelProvider extends PanelProvider
+class StaffPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->id('doctor')
-            ->path('doctor')
-            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->id('staff')
+            ->path('staff')
+            ->colors([
+                'primary' => Color::Cyan,
+            ])
             ->login(SignIn::class)
             ->tenant(Clinic::class)
             ->sidebarWidth('18rem')
             ->sidebarFullyCollapsibleOnDesktop()
-            ->colors([
-                'primary' => Color::Pink,
-            ])
-            ->discoverResources(in: app_path('Filament/Doctor/Resources'), for: 'App\Filament\Doctor\Resources')
-            ->discoverPages(in: app_path('Filament/Doctor/Pages'), for: 'App\Filament\Doctor\Pages')
+            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->brandName(fn() => PanelService::fetchPanelHeader())
+            ->spa()
+            ->discoverResources(in: app_path('Filament/Staff/Resources'), for: 'App\Filament\Staff\Resources')
+            ->discoverPages(in: app_path('Filament/Staff/Pages'), for: 'App\Filament\Staff\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->brandName(fn() => PanelService::fetchPanelHeader())
-            ->discoverWidgets(in: app_path('Filament/Doctor/Widgets'), for: 'App\Filament\Doctor\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Staff/Widgets'), for: 'App\Filament\Staff\Widgets')
             ->widgets([
                 WelcomeWidget::class,
             ])
@@ -60,7 +62,6 @@ class DoctorPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-                RoleMiddleware::class,
             ]);
     }
 }

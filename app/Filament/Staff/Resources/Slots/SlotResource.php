@@ -1,22 +1,19 @@
 <?php
 
-namespace App\Filament\Resources\Slots;
+namespace App\Filament\Staff\Resources\Slots;
 
-use App\Filament\Resources\Slots\Pages\CreateSlot;
-use App\Filament\Resources\Slots\Pages\EditSlot;
-use App\Filament\Resources\Slots\Pages\ListSlots;
-use App\Filament\Resources\Slots\Schemas\SlotForm;
-use App\Filament\Resources\Slots\Tables\SlotsTable;
+use App\Filament\Staff\Resources\Slots\Pages\CreateSlot;
+use App\Filament\Staff\Resources\Slots\Pages\EditSlot;
+use App\Filament\Staff\Resources\Slots\Pages\ListSlots;
+use App\Filament\Staff\Resources\Slots\Schemas\SlotForm;
+use App\Filament\Staff\Resources\Slots\Tables\SlotsTable;
+use App\Models\Slot;
 use BackedEnum;
-use Closure;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use App\Models\Slot;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
 class SlotResource extends Resource
@@ -24,6 +21,7 @@ class SlotResource extends Resource
     protected static ?string $model = Slot::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
     protected static bool $hasNavigationGroup = true;
     protected static bool $isScopedToTenant = false;
 
@@ -60,6 +58,7 @@ class SlotResource extends Resource
             'edit' => EditSlot::route('/{record}/edit'),
         ];
     }
+
 
     public static function getLabel(): ?string
     {

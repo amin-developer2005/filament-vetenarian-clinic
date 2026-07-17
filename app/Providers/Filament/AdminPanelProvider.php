@@ -3,15 +3,11 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\SignIn;
-use App\Filament\Pages\Tenancy\EditClinicProfile;
-use App\Filament\Pages\Tenancy\RegisterClinic;
-use App\Filament\Widgets\AdminDashboardStats;
 use App\Filament\Widgets\AppointmentTrendChart;
-use App\Filament\Widgets\UserAccountWidget;
 use App\Filament\Widgets\WelcomeWidget;
 use App\Http\Middleware\RoleMiddleware;
 use App\Models\Clinic;
-use App\Support\PanelBrand;
+use App\Services\PanelService;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -41,7 +37,7 @@ class AdminPanelProvider extends PanelProvider
             ->sidebarWidth('18rem')
             ->collapsedSidebarWidth('12rem')
             ->spa()
-            ->brandName(fn() => PanelBrand::fetchPanelHeader())
+            ->brandName(fn() => PanelService::fetchPanelHeader())
             ->colors([
                 'primary' => Color::Blue,
             ])

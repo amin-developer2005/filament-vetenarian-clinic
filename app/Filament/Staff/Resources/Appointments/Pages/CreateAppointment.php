@@ -1,13 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Appointments\Pages;
+namespace App\Filament\Staff\Resources\Appointments\Pages;
 
 use App\Enums\AppointmentStatus;
-use App\Filament\Resources\Appointments\AppointmentResource;
-use App\Filament\Resources\Appointments\Schemas\AppointmentForm;
+use App\Filament\Staff\Resources\Appointments\AppointmentResource;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
-use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 
 class CreateAppointment extends CreateRecord

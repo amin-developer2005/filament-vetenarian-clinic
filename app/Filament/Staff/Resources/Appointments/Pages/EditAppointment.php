@@ -1,31 +1,40 @@
 <?php
 
-namespace App\Filament\Resources\Schedules\Pages;
+namespace App\Filament\Staff\Resources\Appointments\Pages;
 
-use App\Filament\Resources\Schedules\ScheduleResource;
+use App\Filament\Staff\Resources\Appointments\AppointmentResource;
+use App\Models\Slot;
+use Filament\Actions\DeleteAction;
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Support\Htmlable;
 
-class EditSchedule extends EditRecord
+class EditAppointment extends EditRecord
 {
-    protected static string $resource = ScheduleResource::class;
+    protected static string $resource = AppointmentResource::class;
 
-    public function getTitle(): string|Htmlable
+
+    protected function beforeSave(): void
     {
-        if (filled(static::$title)) {
-            return static::$title;
+        $appointment = $this->getRecord();
+        $slotId = $this->data['slot_id'] ?? null;
+
+        if ($slotId && $appointment->slot_id !== $slotId) {
+            $slot = Slot::query()->find($slotId);
+
+            try {
+                $appointment->updateSlot($slot);
+            } catch (\Exception $exception) {
+                Notification::make()
+                    ->title($exception->getMessage())
+                    ->danger()
+                    ->send();
+
+                return;
+            }
+
         }
-
-        return __('resources/schedules.pages.edit.record.title');
-    }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-
-        ];
     }
 
     public function getRedirectUrl(): ?string

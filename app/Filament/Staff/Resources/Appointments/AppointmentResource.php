@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Filament\Resources\Appointments;
+namespace App\Filament\Staff\Resources\Appointments;
 
-use App\Filament\Resources\Appointments\Pages\CreateAppointment;
-use App\Filament\Resources\Appointments\Pages\EditAppointment;
-use App\Filament\Resources\Appointments\Pages\ListAppointments;
-use App\Filament\Resources\Appointments\Schemas\AppointmentForm;
-use App\Filament\Resources\Appointments\Tables\AppointmentsTable;
+use App\Filament\Staff\Resources\Appointments\Pages\CreateAppointment;
+use App\Filament\Staff\Resources\Appointments\Pages\EditAppointment;
+use App\Filament\Staff\Resources\Appointments\Pages\ListAppointments;
+use App\Filament\Staff\Resources\Appointments\Schemas\AppointmentForm;
+use App\Filament\Staff\Resources\Appointments\Tables\AppointmentsTable;
 use App\Models\Appointment;
 use BackedEnum;
 use Filament\Facades\Filament;
@@ -20,8 +20,11 @@ use UnitEnum;
 class AppointmentResource extends Resource
 {
     protected static ?string $model = Appointment::class;
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::CalendarDays;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
     private static bool $hasNavigationGroup = true;
+
     protected static bool $isScopedToTenant = false;
 
     public static function form(Schema $schema): Schema
@@ -101,13 +104,11 @@ class AppointmentResource extends Resource
     {
         $user = Filament::auth()->user();
 
-        return $user->isAdmin();
+        return $user->isStaff();
     }
 
     public static function canAccess(): bool
     {
-        $user = Filament::auth()->user();
-
-        return $user->isAdmin();
+        return true;
     }
 }

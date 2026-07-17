@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Doctor\Resources\Schedules\Tables;
+namespace App\Filament\Staff\Resources\Schedules\Tables;
 
 use App\Models\Schedule;
 use Carbon\Carbon;
@@ -16,6 +16,7 @@ use Morilog\Jalali\Jalalian;
 
 class SchedulesTable
 {
+
     public static function configure(Table $table): Table
     {
         return $table
@@ -35,6 +36,10 @@ class SchedulesTable
             ])
             ->defaultGroup('start_date')
             ->columns([
+                TextColumn::make('doctor.name')
+                    ->label(__('resources/schedules.table.columns.doctor.label'))
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('clinic.name')
                     ->label(__('resources/schedules.table.columns.clinics.label'))
                     ->searchable()

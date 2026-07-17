@@ -158,7 +158,7 @@ trait HasPanelRole
 
     public function isStaff(): bool
     {
-        return $this->hasPanelRole(PanelRole::Staff);
+        return $this->hasPanelRole(PanelRole::STAFF);
     }
 
     protected function fetchPanel(): ?Panel

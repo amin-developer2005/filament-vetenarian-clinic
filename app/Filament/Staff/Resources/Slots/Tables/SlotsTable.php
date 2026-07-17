@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Filament\Doctor\Resources\Slots\Tables;
+namespace App\Filament\Staff\Resources\Slots\Tables;
 
 use App\Enums\SlotStatus;
 use Carbon\Carbon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\TimePicker;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
@@ -19,9 +20,13 @@ class SlotsTable
 {
     public static function configure(Table $table): Table
     {
-
         return $table
             ->columns([
+                TextColumn::make('schedule.doctor.name')
+                    ->label(__('resources/slots.table.columns.doctor'))
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('schedule.clinic.name')
                     ->label(__('resources/slots.table.columns.clinic'))
                     ->badge()
@@ -35,31 +40,32 @@ class SlotsTable
 
                 TextColumn::make('date')
                     ->label(__('resources/slots.table.columns.date'))
-                    ->jalaliDate('d,M Y')
+                    ->jalaliDate('d, M Y')
                     ->sortable(),
+
 
                 TextColumn::make('day_of_week')
                     ->label(__('resources/slots.table.columns.dayOfWeek'))
                     ->state(function ($record) {
                         return Carbon::parse($record->date)
-                            ->locale(app()->getLocale())
+                            ->locale('fa')
                             ->dayName;
                     })
                     ->badge()
-                    ->color(Color::Emerald)
+                    ->color(Color::Lime)
                     ->sortable(),
 
                 TextColumn::make('start_time')
                     ->label(__('resources/slots.table.columns.start_time'))
-                    ->jalaliDateTime('h:i A'),
+                    ->time('h:i A'),
 
                 TextColumn::make('end_time')
                     ->label(__('resources/slots.table.columns.end_time'))
-                    ->jalaliDateTime('h:i A'),
+                    ->time('h:i A'),
 
                 TextColumn::make('created_at')
                     ->label(__('resources/slots.table.columns.created_at'))
-                    ->jalaliDateTime('d,M Y h:i A')
+                    ->dateTime()
                     ->sortable()
                     ->toggleable(),
             ])
@@ -68,30 +74,9 @@ class SlotsTable
                     ->label(__('resources/slots.table.filters.status.label'))
                     ->options(SlotStatus::class)
                     ->native(false),
-                Filter::make('start')
-                    ->schema([
-                        TimePicker::make('start')
-                            ->label(__('resources/slots.table.filters.start.label'))
-                            ->time()
-                            ->native(false)
-                            ->displayFormat('h:i A'),
-                        TimePicker::make('end')
-                            ->label(__('resources/slots.table.filters.end.label'))
-                            ->time()
-                            ->native(false)
-                            ->displayFormat('h:i A'),
-                    ])->query(function (Builder $query, array $data) {
-                        $fromTime = $data['start'] ?? null;
-                        $toTime = $data['end'] ?? null;
-
-                        return $query
-                            ->when($fromTime, fn ($q, $v) => $q->whereTime('start', $v))
-                            ->when($toTime, fn ($q, $v) => $q->whereTime('end', $v));
-                    }),
             ], FiltersLayout::Modal)
-            ->emptyStateHeading(__('doctors/slots.table.emptyStateHeading'))
-            ->emptyStateDescription(__('doctors/slots.table.emptyStateDescription'))
-            ->emptyStateIcon('heroicon-o-clock')
+            ->emptyStateHeading(__('resources/slots.table.emptyStateHeading'))
+            ->emptyStateDescription(__('resources/slots.table.emptyStateDescription'))
             ->recordActions([
             ])
             ->toolbarActions([
@@ -99,6 +84,5 @@ class SlotsTable
                     DeleteBulkAction::make(),
                 ]),
             ]);
-
     }
 }

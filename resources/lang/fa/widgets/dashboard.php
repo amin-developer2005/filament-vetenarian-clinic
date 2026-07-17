@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'appointment_trend' => [
         'heading' => 'روند نوبت‌ها',
@@ -24,52 +23,68 @@ return [
     'stats' => [
 
         'total' => [
-            'label'       => 'کل نوبت‌ها',
+            'label' => 'کل نوبت‌ها',
             'description' => 'مجموع نوبت‌های ثبت‌شده امروز',
         ],
 
         'pending' => [
-            'label'       => 'در انتظار',
+            'label' => 'در انتظار',
             'description' => 'نوبت‌های در انتظار تأیید',
         ],
 
+        'checked_in' => [
+            'label' => 'پذیرش شده',
+            'description' => 'تعداد بیماران پذیرش ‌شده امروز',
+        ],
+
         'confirmed' => [
-            'label'       => 'تأیید شده',
+            'label' => 'تأیید شده',
             'description' => 'آماده برای ویزیت',
         ],
 
+        'visiting' => [
+            'label' => 'در حال ویزیت',
+            'description' => 'نوبت های در حال ویزیت ',
+        ],
+
         'completed' => [
-            'label'       => 'تکمیل شده',
-            'description' => 'ویزیت‌های انجام‌شده',
+            'label' => 'تکمیل شده',
+            'description' => 'ویزیت‌ های انجام ‌شده',
         ],
 
         'cancelled' => [
-            'label'       => 'لغو شده',
-            'description' => 'نوبت‌های لغو‌شده',
+            'label' => 'لغو شده',
+            'description' => 'نوبت‌ های لغو ‌شده',
         ],
 
         'no_show' => [
-            'label'       => 'عدم حضور',
+            'label' => 'عدم حضور',
             'description' => 'بیمار حاضر نشده',
         ],
 
         'free_slots' => [
-            'label'       => 'وقت های های آزاد من',
+            'label' => 'وقت های های آزاد من',
             'description' => 'وقت های های آزاد امروز',
         ],
         'reserved_slots' => [
-            'label'       => 'وقت های رزرو شده من',
+            'label' => 'وقت های رزرو شده من',
             'description' => 'وقت های رزرو شده امروز',
         ],
+
+        'active_doctors' => [
+            'label' => 'پزشکان حاضر',
+            'description' => 'پزشکان دارای برنامه کاری امروز',
+        ],
+
     ],
 
     /* ── Schedule summary ─────────────────────────────── */
 
     'schedule' => [
-        'title'            => 'برنامه امروز',
+        'title' => 'برنامه امروز',
         'first_appointment' => 'اولین نوبت',
-        'last_appointment'  => 'آخرین نوبت',
-        'working_hours'     => 'مدت زمان ساعات کاری امروز',
+        'last_appointment' => 'آخرین نوبت',
+        'working_hours' => 'مدت زمان ساعات کاری امروز',
     ],
 
     'empty_schedule' => [
@@ -90,15 +105,15 @@ return [
                 'title' => 'نوبتی برای امروز ثبت نشده',
                 'description' => 'امروز هیچ نوبتی برای این کلینیک ثبت نشده است.',
             ],
-        ]
+        ],
     ],
 
     /* ── Quick information ────────────────────────────── */
 
     'quick_info' => [
-        'title'  => 'اطلاعات سریع',
+        'title' => 'اطلاعات سریع',
         'clinic' => 'کلینیک فعلی',
-        'role'   => 'نقش کاربری',
-        'tenant' => 'شعبه',
+        'role' => 'نقش کاربری',
+        'tenant' => 'کلینیک های عضو',
     ],
 ];

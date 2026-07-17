@@ -12,7 +12,7 @@ class AppointmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin();
+        return true;
     }
 
     /**
@@ -20,9 +20,7 @@ class AppointmentPolicy
      */
     public function view(User $user, Appointment $appointment): bool
     {
-        return $user->isAdmin() ||
-            ($user->isOwner() && $appointment->isBelongsToOwner($user)) ||
-            ($user->isDoctor() && $appointment->isBelongsToDoctor($user));
+        return true;
     }
 
     /**
@@ -38,7 +36,9 @@ class AppointmentPolicy
      */
     public function update(User $user, Appointment $appointment): bool
     {
-        return $user->isAdmin() || ($user->isOwner() && $appointment->isBelongsToOwner($user));
+        return ($user->isAdmin() ||
+               ($user->isOwner() && $appointment->isBelongsToOwner($user))) &&
+               ($appointment->isPending());
     }
 
     /**
@@ -46,7 +46,9 @@ class AppointmentPolicy
      */
     public function delete(User $user, Appointment $appointment): bool
     {
-        return $user->isAdmin() || ($user->isOwner() && $appointment->isBelongsToOwner($user));
+        return ($user->isAdmin() ||
+               ($user->isOwner() && $appointment->isBelongsToOwner($user))) &&
+               ($appointment->isPending());
     }
 
     /**

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Support;
+namespace App\Services;
 
 use App\Enums\PanelId;
 use Filament\Facades\Filament;
 
-class PanelBrand
+class PanelService
 {
     /**
      * Create a new class instance.

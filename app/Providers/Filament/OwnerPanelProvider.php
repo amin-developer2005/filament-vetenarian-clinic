@@ -7,8 +7,7 @@ use App\Filament\Owner\Pages\Auth\Signup;
 use App\Filament\Owner\Pages\Profile\Schemas\EditProfileSchema;
 use App\Filament\Owner\Widgets\OwnerDashboardStats;
 use App\Http\Middleware\RoleMiddleware;
-use App\Models\Clinic;
-use App\Support\PanelBrand;
+use App\Services\PanelService;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -32,13 +31,12 @@ class OwnerPanelProvider extends PanelProvider
         return $panel
             ->id('owner')
             ->path('owner')
-            ->viteTheme('resources/css/filament/owner/theme.css')
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->registration(Signup::class)
             ->login(SignIn::class)
-            ->viteTheme('resources/css/filament/admin/theme.css')
             ->sidebarWidth("18rem")
             ->collapsedSidebarWidth('12rem')
-            ->brandName(fn() => PanelBrand::fetchPanelHeader())
+            ->brandName(fn() => PanelService::fetchPanelHeader())
             ->spa()
             ->colors([
                 'primary' => Color::Emerald,

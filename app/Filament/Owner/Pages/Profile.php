@@ -117,14 +117,13 @@ class Profile extends Page
                                                     ->color('gray')
                                                     ->columnSpanFull(),
 
-                                                TextEntry::make('user.roles')
-                                                    ->label('نقش ‌ها')
+                                                TextEntry::make('roles')
+                                                    ->label('نقش ')
                                                     ->size(TextSize::Medium)
                                                     ->state(function () {
-                                                        return collect($this->user->roles)
-                                                            ->map(
-                                                                fn(Role $role) => $role->name
-                                                            )->join(' ,');
+                                                        return $this->user->roles
+                                                            ->first()
+                                                            ->name;
                                                     })
                                                     ->badge()
                                                     ->color('success'),

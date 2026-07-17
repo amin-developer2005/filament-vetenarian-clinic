@@ -65,15 +65,6 @@ class Slot extends Model
         return $this;
     }
 
-    public function expire(): static
-    {
-        $this->update([
-            'status' => SlotStatus::Expired,
-        ]);
-
-        return $this;
-    }
-
     public function isBooked(): bool
     {
         return $this->status == SlotStatus::Booked;
