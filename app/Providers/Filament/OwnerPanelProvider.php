@@ -6,6 +6,7 @@ use App\Filament\Owner\Pages\Auth\SignIn;
 use App\Filament\Owner\Pages\Auth\Signup;
 use App\Filament\Owner\Pages\Profile\Schemas\EditProfileSchema;
 use App\Filament\Owner\Widgets\OwnerDashboardStats;
+use App\Filament\Owner\Widgets\WelcomeWidget;
 use App\Http\Middleware\RoleMiddleware;
 use App\Services\PanelService;
 use Filament\Http\Middleware\Authenticate;
@@ -49,8 +50,7 @@ class OwnerPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Owner/Widgets'), for: 'App\Filament\Owner\Widgets')
             ->widgets([
-                AccountWidget::class,
-                OwnerDashboardStats::class,
+                WelcomeWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

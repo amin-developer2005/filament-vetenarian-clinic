@@ -71,6 +71,11 @@ return [
             'description' => 'وقت های رزرو شده امروز',
         ],
 
+        'myAnimals' => [
+            'label' => 'حیوانات من',
+            'description' => 'تعداد حیوانات من',
+        ],
+
         'active_doctors' => [
             'label' => 'پزشکان حاضر',
             'description' => 'پزشکان دارای برنامه کاری امروز',

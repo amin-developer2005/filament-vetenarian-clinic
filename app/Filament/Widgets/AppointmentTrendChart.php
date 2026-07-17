@@ -12,6 +12,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Morilog\Jalali\Jalalian;
 
 class AppointmentTrendChart extends ChartWidget
 {
@@ -166,15 +167,15 @@ class AppointmentTrendChart extends ChartWidget
             Appointment::query()->where('clinic_id', Filament::getTenant()->id)
         )
             ->between(
-                start: Carbon::today()->startOfDay(),
-                end: Carbon::today()->endOfDay(),
+                start: Jalalian::fromCarbon(Carbon::today()->startOfDay()),
+                end: Jalalian::fromCarbon(Carbon::today()->endOfDay()),
             )
             ->perHour()
             ->count();
 
         return $this->formatChartResponse(
             values: $data,
-            labelFormatter: static fn (TrendValue $value): string => Carbon::parse($value->date)->format('H:00'),
+            labelFormatter: static fn (TrendValue $value): string => Jalalian::fromCarbon(Carbon::parse($value->date))->format('H:00'),
         );
     }
 
@@ -184,15 +185,15 @@ class AppointmentTrendChart extends ChartWidget
             Appointment::query()->where('clinic_id', Filament::getTenant()->id)
         )
             ->between(
-                start: Carbon::today()->subDays(6)->startOfDay(),
-                end: Carbon::today()->endOfDay(),
+                start: Jalalian::fromCarbon(Carbon::today()->subDays(6)->startOfDay()),
+                end: Jalalian::fromCarbon(Carbon::today()->endOfDay()),
             )
             ->perDay()
             ->count();
 
         return $this->formatChartResponse(
             values: $data,
-            labelFormatter: static fn (TrendValue $value): string => Carbon::parse($value->date)->format('M d'),
+            labelFormatter: static fn (TrendValue $value): string => Jalalian::fromCarbon(Carbon::parse($value->date))->format('M d'),
         );
     }
 
@@ -202,15 +203,15 @@ class AppointmentTrendChart extends ChartWidget
             Appointment::query()->where('clinic_id', Filament::getTenant()->id)
         )
             ->between(
-                start: Carbon::today()->subDays(29)->startOfDay(),
-                end: Carbon::today()->endOfDay(),
+                start: Jalalian::fromCarbon(Carbon::today()->subDays(29)->startOfDay()),
+                end: Jalalian::fromCarbon(Carbon::today()->endOfDay()),
             )
             ->perDay()
             ->count();
 
         return $this->formatChartResponse(
             values: $data,
-            labelFormatter: static fn (TrendValue $value): string => Carbon::parse($value->date)->format('M d'),
+            labelFormatter: static fn (TrendValue $value): string => Jalalian::fromCarbon(Carbon::parse($value->date))->format('M d'),
         );
     }
 
@@ -220,15 +221,15 @@ class AppointmentTrendChart extends ChartWidget
             Appointment::query()->where('clinic_id', Filament::getTenant()->id)
         )
             ->between(
-                start: Carbon::today()->startOfYear(),
-                end: Carbon::today()->endOfDay(),
+                start: Jalalian::fromCarbon(Carbon::today()->startOfYear()),
+                end: Jalalian::fromCarbon(Carbon::today()->endOfDay()),
             )
             ->perMonth()
             ->count();
 
         return $this->formatChartResponse(
             values: $data,
-            labelFormatter: static fn (TrendValue $value): string => Carbon::parse($value->date)->format('M Y'),
+            labelFormatter: static fn (TrendValue $value): string => Jalalian::fromCarbon(Carbon::parse($value->date))->format('M Y'),
         );
     }
 
