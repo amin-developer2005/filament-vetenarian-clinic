@@ -28,6 +28,8 @@ class Slot extends Model
     protected $casts = [
         'status'   => SlotStatus::class,
         'date'    => 'date',
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
     ];
 
     public function owner(): BelongsTo

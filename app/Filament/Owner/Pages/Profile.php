@@ -2,28 +2,20 @@
 
 namespace App\Filament\Owner\Pages;
 
-use App\Enums\AppointmentStatus;
-use App\Enums\PanelRole;
-use App\Enums\ProfileGender;
 use App\Filament\Pages\Concerns\HasProfileRoutes;
 use App\Filament\Pages\Concerns\InteractWithProfile;
-use App\Models\Animal;
-use App\Models\Appointment;
-use Carbon\Carbon;
+use App\Models\Role;
 use Filament\Actions\Action;
-use Filament\Facades\Filament;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Image;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Text;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\IconSize;
-use Filament\Support\Enums\Size;
+use Filament\Support\Enums\TextSize;
 use Filament\Support\Icons\Heroicon;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use UnitEnum;
-
 
 class Profile extends Page
 {
@@ -33,8 +25,10 @@ class Profile extends Page
     protected static string|null|\BackedEnum $navigationIcon = Heroicon::OutlinedUserCircle;
 
     protected static ?int $navigationSort = 99;
-    protected static string $routePath = '/profile';
-    protected static ?string $slug = '/profile';
+
+    protected static string $routePath = 'profile';
+
+    protected static ?string $slug = 'profile';
 
     public static function getNavigationLabel(): string
     {
@@ -60,6 +54,10 @@ class Profile extends Page
     public function content(Schema $schema): Schema
     {
         return $schema
+            ->record([
+                $this->user,
+                $this->profile,
+            ])
             ->components([
                 Section::make(__('owner/profile.sections.header'))
                     ->icon(Heroicon::OutlinedUserCircle)
@@ -77,7 +75,9 @@ class Profile extends Page
                                                 |--------------------------------------------------------------------------
                                                 */
 
-                                        Image::make($this->profile->avatarUrl, 'image')
+                                        ImageEntry::make('profile.avatar')
+                                            ->state(fn () => $this->profile->avatarUrl)
+                                            ->label('تصویر پروفایل من')
                                             ->imageHeight(110)
                                             ->imageWidth(110)
                                             ->columnSpan([
@@ -92,7 +92,6 @@ class Profile extends Page
                                                 */
 
                                         Grid::make(2)
-
                                             ->columnSpan([
                                                 'default' => 12,
                                                 'lg' => 10,
@@ -100,69 +99,43 @@ class Profile extends Page
 
                                             ->schema([
 
-                                                Text::make(
-                                                    Filament::auth()->user()->profile?->full_name
-                                                    ?? Filament::auth()->user()->name
-                                                )
-
-                                                    ->size(Size::ExtraLarge)
-
+                                                TextEntry::make('name')
+                                                    ->label('نام کاربری')
+                                                    ->state($this->profile?->fullName)
+                                                    ->size(TextSize::Medium)
                                                     ->weight('bold')
-
-                                                    ->columnSpanFull(),
-
-                                                Text::make(Filament::auth()->user()->email)
-
-                                                    ->icon(Heroicon::OutlinedEnvelope)
-
-                                                    ->color('gray')
-
-                                                    ->columnSpanFull(),
-
-                                                Text::make(
-                                                    function () {
-                                                        $user = Filament::auth()->user();
-
-                                                        return collect($user->roles)
-                                                            ->map(fn ($role) => $role->name)
-                                                            ->join(', ');
-                                                    }
-                                                )
-                                                    ->badge()
-                                                    ->size(Size::ExtraLarge)
-                                                    ->color('success'),
-
-                                                Text::make(
-                                                    __('owner/profile.member_since', [
-                                                        'date' => Filament::auth()->user()->created_at
-                                                            ->format('Y/m/d'),
-                                                    ])
-                                                )
-
-                                                    ->icon(Heroicon::OutlinedCalendar)
-
+                                                    ->columnSpanFull()
                                                     ->color('gray'),
 
-                                                Text::make(
-                                                    Filament::auth()->user()->hasVerifiedEmail()
-                                                        ? __('owner/profile.email.verified')
-                                                        : __('owner/profile.email.unverified')
-                                                )
-
-                                                    ->badge()
-
-                                                    ->color(fn () => Filament::auth()->user()->hasVerifiedEmail()
-                                                        ? 'success'
-                                                        : 'danger')
-
-                                                    ->icon(fn () => Filament::auth()->user()->hasVerifiedEmail()
-
-                                                        ? Heroicon::OutlinedCheckBadge
-
-                                                        : Heroicon::OutlinedExclamationTriangle)
-
+                                                TextEntry::make('email')
+                                                    ->label('ایمیل')
+                                                    ->state(fn () => $this->user->email)
+                                                    ->color('gray')
+                                                    ->size(TextSize::Medium)
+                                                    ->icon(Heroicon::OutlinedEnvelope)
+                                                    ->copyable()
+                                                    ->color('gray')
                                                     ->columnSpanFull(),
 
+                                                TextEntry::make('user.roles')
+                                                    ->label('نقش ‌ها')
+                                                    ->size(TextSize::Medium)
+                                                    ->state(function () {
+                                                        return collect($this->user->roles)
+                                                            ->map(
+                                                                fn(Role $role) => $role->name
+                                                            )->join(' ,');
+                                                    })
+                                                    ->badge()
+                                                    ->color('success'),
+
+                                                TextEntry::make('created_at')
+                                                    ->label('تاریخ عضویت')
+                                                    ->state(fn () => $this->user->created_at)
+                                                    ->jalaliDateTime('d, M Y H:i')
+                                                    ->icon(Heroicon::OutlinedCalendar)
+                                                    ->size(TextSize::Medium)
+                                                    ->color('gray'),
                                             ]),
                                     ])->columnSpanFull(),
                             ]),
@@ -184,62 +157,6 @@ class Profile extends Page
                     ]),
 
                 /*
-                |--------------------------------------------------------------------------
-                | Statistics
-                |--------------------------------------------------------------------------
-                */
-
-                Section::make(__('owner/profile.sections.statistics'))
-                    ->icon(Heroicon::OutlinedChartBar)
-                    ->schema([
-                        Grid::make(4)
-                            ->schema([
-                                Stat::make(
-                                    'حیوانات من',
-                                    Animal::query()
-                                        ->where('owner_id', Filament::auth()->id())
-                                        ->count()
-                                ),
-                                Stat::make(
-                                    'نوبت های من',
-                                    Appointment::query()
-                                        ->where('owner_id', Filament::auth()->id())
-                                        ->latest()
-                                        ->count(),
-                                ),
-                                Stat::make(
-                                    'نوبت‌های در انتظار تایید',
-                                    Appointment::query()
-                                        ->where('owner_id', Filament::auth()->id())
-                                        ->where('status', AppointmentStatus::Pending)
-                                        ->count()
-                                ),
-                                Stat::make(
-                                    'آخرین مراجعه',
-                                    function () {
-                                        $lastVisit = Appointment::query()
-                                            ->where('owner_id', Filament::auth()->id())
-                                            ->where('status', AppointmentStatus::Completed)
-                                            ->first();
-
-                                        if (! $lastVisit) {
-                                            return null;
-                                        }
-
-                                        return $lastVisit->slot->date->format('Y M-d');
-                                    }
-                                )->description(
-                                    function ($value) {
-                                        if (blank($value)) {
-                                            return 'هنوز مراجعه‌ای ثبت نشده است.';
-                                        }
-                                    }
-                                )
-                                ,
-                            ]),
-
-                    ]),
-                /*
              |--------------------------------------------------------------------------
              | Personal Information
              |--------------------------------------------------------------------------
@@ -252,11 +169,32 @@ class Profile extends Page
                     ->schema([
                         Grid::make(2)
                             ->schema([
-                                Text::make($this->profile?->first_name ?? ''),
-                                Text::make($this->profile?->surname ?? ''),
-                                Text::make($this->profile?->gender?->getLabel() ?? ''),
-                                Text::make($this->profile->birth_date ? Carbon::parse($this->profile->birth_date)->format('Y M/d') : ''),
-                            ])
+                                TextEntry::make('profile.first_name')
+                                    ->size(TextSize::Medium)
+                                    ->color('gray')
+                                    ->placeholder('ثبت نشده')
+                                    ->state(fn () => $this->profile?->first_name)
+                                    ->label('نام'),
+                                TextEntry::make('profile.surname')
+                                    ->size(TextSize::Medium)
+                                    ->color('gray')
+                                    ->placeholder('ثبت نشده')
+                                    ->state(fn () => $this->profile?->surname)
+                                    ->label('نام خانوادگی'),
+                                TextEntry::make('profile.gender')
+                                    ->size(TextSize::Medium)
+                                    ->placeholder('ثبت نشده')
+                                    ->color('gray')
+                                    ->state(fn () => $this->profile?->gender?->getLabel() ?? '')
+                                    ->label('جنسیت'),
+                                TextEntry::make('profile.birth_date')
+                                    ->state(fn () => $this->profile?->birth_date)
+                                    ->size(TextSize::Medium)
+                                    ->placeholder('ثبت نشده')
+                                    ->jalaliDate('d, M Y')
+                                    ->color('gray')
+                                    ->label('تاریخ تولد'),
+                            ]),
                     ]),
 
                 /*
@@ -270,9 +208,26 @@ class Profile extends Page
                     ->icon(Heroicon::OutlinedPhone)
 
                     ->schema([
+                        Grid::make()
+                            ->schema([
 
-                        // مرحله بعد
+                                TextEntry::make('profile.mobile')
+                                    ->label('شماره موبایل')
+                                    ->state(fn () => $this->profile?->mobile)
+                                    ->icon(Heroicon::OutlinedDevicePhoneMobile)
+                                    ->size(TextSize::Medium)
+                                    ->color('gray')
+                                    ->copyable()
+                                    ->placeholder('ثبت نشده'),
 
+                                TextEntry::make('profile.address')
+                                    ->label('آدرس')
+                                    ->state(fn () => $this->profile?->address)
+                                    ->icon(Heroicon::OutlinedHomeModern)
+                                    ->size(TextSize::Medium)
+                                    ->color('gray')
+                                    ->placeholder('ثبت نشده'),
+                            ]),
                     ]),
             ]);
     }

@@ -98,7 +98,7 @@ class AnimalForm
                                                 ->required()
                                                 ->label(__('owner/animals.schema.form.components.date_of_birth.label'))
                                                 ->native(false)
-                                                ->date()
+                                                ->jalali()
                                                 ->closeOnDateSelection()
                                                 ->displayFormat('Y-m-d')
                                                 ->maxDate(now()),

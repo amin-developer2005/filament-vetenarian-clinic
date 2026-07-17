@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Slots\Tables;
 use App\Enums\SlotStatus;
 use App\Models\Clinic;
 use App\Models\Slot;
+use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -49,6 +50,21 @@ class SlotsTable
                     ->date()
                     ->sortable(),
 
+
+                TextColumn::make('day_of_week')
+                    ->label(__('resources/slots.table.columns.dayOfWeek'))
+                    ->state(function ($record) {
+                        return Carbon::parse($record->date)
+                            ->locale('fa')
+                            ->dayName;
+                    })
+                    ->badge()
+                    ->color(Color::Lime)
+                    ->sortable(
+                        query: fn ($query, $direction) => $query->orderBy('date', $direction)
+                    ),
+
+
                 TextColumn::make('start_time')
                     ->label(__('resources/slots.table.columns.start_time'))
                     ->time('h:i A'),
@@ -90,8 +106,6 @@ class SlotsTable
             ->emptyStateHeading(__('resources/slots.table.emptyStateHeading'))
             ->emptyStateDescription(__('resources/slots.table.emptyStateDescription'))
             ->recordActions([
-                ViewAction::make()
-                    ->modalHeading(__('resources/slots.table.actions.view.modal.heading')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

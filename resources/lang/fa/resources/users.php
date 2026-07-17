@@ -59,7 +59,7 @@ return [
                     'createOptionModalHeading' => 'افزودن نقش جدید',
                 ],
                 'clinics' => [
-                    'label' => 'کلینیک ها',
+                    'label' => 'کلینیک ها ',
                     'no_options_message' => 'کلینیکی یافت نشد.',
                     'createOptionForm' => [
                         'name' => 'نام کلینیک'
@@ -84,7 +84,7 @@ return [
                 'label' => 'نقش ها'
             ],
             'clinics' => [
-                'label' => 'کلینیک ها'
+                'label' => 'کلینیک های عضو'
             ],
             'email_status' => [
                 'label' => 'وضعیت ایمیل'

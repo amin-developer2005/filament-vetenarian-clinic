@@ -4,8 +4,7 @@ namespace App\Filament\Resources\Schedules\Schemas;
 
 use App\Enums\PanelRole;
 use App\Models\Clinic;
-use App\Models\User;
-use Filament\Facades\Filament;
+use Carbon\Carbon;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -15,6 +14,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 
 class ScheduleForm
 {
@@ -25,17 +25,20 @@ class ScheduleForm
                 Section::make([
                     Select::make('clinic_id')
                         ->label(__('resources/schedules.schema.form.components.clinic.label'))
-                        ->relationship('clinic', 'name')
+                        ->relationship(titleAttribute: 'name', modifyQueryUsing: function (Builder $query) {
+                            return $query
+                                ->where('is_active', true);
+                        })
                         ->required()
                         ->live()
                         ->searchable()
                         ->preload()
                         ->noOptionsMessage(__('resources/schedules.schema.form.components.clinic.no_options_message'))
-                        ->afterStateUpdated(fn(Set $set) => $set('doctor_id', null))
+                        ->afterStateUpdated(fn (Set $set) => $set('doctor_id', null))
                         ->native(false),
                     Select::make('doctor_id')
                         ->label(__('resources/schedules.schema.form.components.doctor.label'))
-                        ->options( function (Get $get) {
+                        ->options(function (Get $get) {
                             if (! $clinicId = $get('clinic_id')) {
                                 return [];
                             }
@@ -44,12 +47,12 @@ class ScheduleForm
                                 ->find($clinicId);
 
                             return $clinic->users()
-                                ->whereHas('roles', fn($query) => $query->where('name', PanelRole::DOCTOR))
+                                ->whereHas('roles', fn ($query) => $query->where('name', PanelRole::DOCTOR))
                                 ->pluck('name', 'id');
                         })
                         ->required()
                         ->live()
-                        ->disabled(fn(Get $get) => blank($get('clinic_id')))
+                        ->disabled(fn (Get $get) => blank($get('clinic_id')))
                         ->searchable()
                         ->noOptionsMessage(__('resources/schedules.schema.form.components.doctor.no_options_message'))
                         ->native(false),
@@ -61,6 +64,9 @@ class ScheduleForm
                         ->required()
                         ->jalali()
                         ->afterOrEqual(today())
+                        ->validationMessages([
+                            'after_or_equal' => 'تاریخ شروع برنامه کاری نمی‌تواند قبل از امروز باشد.',
+                        ])
                         ->closeOnDateSelection()
                         ->displayFormat('Y-m-d')
                         ->native(false),
@@ -68,7 +74,10 @@ class ScheduleForm
                         ->label(__('resources/schedules.schema.form.components.end_date.label'))
                         ->required()
                         ->jalali()
-                        ->afterOrEqual(today())
+                        ->afterOrEqual('start_date')
+                        ->validationMessages([
+                            'after_or_equal' => 'تاریخ پایان باید بعد از تاریخ شروع یا برابر با آن باشد.',
+                        ])
                         ->closeOnDateSelection()
                         ->displayFormat('Y-m-d')
                         ->afterOrEqual('start_date')
@@ -79,15 +88,15 @@ class ScheduleForm
                         ->label(__('resources/schedules.schema.form.components.days_of_week.label'))
                         ->required()
                         ->options([
-                            0 => __('resources/schedules.schema.form.components.days_of_week.days.saturday'),
-                            1 => __('resources/schedules.schema.form.components.days_of_week.days.sunday'),
-                            2 => __('resources/schedules.schema.form.components.days_of_week.days.monday'),
-                            3 => __('resources/schedules.schema.form.components.days_of_week.days.tuesday'),
-                            4 => __('resources/schedules.schema.form.components.days_of_week.days.wednesday'),
-                            5 => __('resources/schedules.schema.form.components.days_of_week.days.thursday'),
-                            6 => __('resources/schedules.schema.form.components.days_of_week.days.friday'),
+                            Carbon::SATURDAY => __('resources/schedules.schema.form.components.days_of_week.days.saturday'),
+                            Carbon::SUNDAY => __('resources/schedules.schema.form.components.days_of_week.days.sunday'),
+                            Carbon::MONDAY => __('resources/schedules.schema.form.components.days_of_week.days.monday'),
+                            Carbon::TUESDAY => __('resources/schedules.schema.form.components.days_of_week.days.tuesday'),
+                            Carbon::WEDNESDAY => __('resources/schedules.schema.form.components.days_of_week.days.wednesday'),
+                            Carbon::THURSDAY => __('resources/schedules.schema.form.components.days_of_week.days.thursday'),
+                            Carbon::FRIDAY => __('resources/schedules.schema.form.components.days_of_week.days.friday'),
                         ])
-                        ->columns(3),
+                        ->columns(2),
                 ]),
 
                 Section::make([

@@ -62,7 +62,7 @@ class AppointmentResource extends Resource
 
     public static function getLabel(): ?string
     {
-        return static::$modelLabel ?? __('resources/appointments.label');
+        return static::$modelLabel ?? __('owner/appointments.label');
     }
 
     public static function getPluralModelLabel(): string
@@ -71,7 +71,7 @@ class AppointmentResource extends Resource
             return $label;
         }
 
-        return __('resources/appointments.plural_label');
+        return __('owner/appointments.plural_label');
     }
 
     public static function getNavigationLabel(): string
@@ -80,7 +80,7 @@ class AppointmentResource extends Resource
             return $label;
         }
 
-        return __('resources/appointments.navigations.label');
+        return __('owner/appointments.navigations.label');
     }
 
     public static function getNavigationGroup(): string|UnitEnum|null
@@ -89,7 +89,7 @@ class AppointmentResource extends Resource
             return null;
         }
 
-        return static::$navigationGroup ?? __('resources/appointments.navigations.group');
+        return static::$navigationGroup ?? __('owner/appointments.navigations.group');
     }
 
     public static function getBreadcrumb(): string
@@ -98,7 +98,7 @@ class AppointmentResource extends Resource
             return $breadcrumb;
         }
 
-        return __('resources/appointments.bread_crumb');
+        return __('owner/appointments.bread_crumb');
     }
 
     public static function shouldRegisterNavigation(): bool

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Appointments\Tables;
 
 use App\Enums\AppointmentStatus;
+use App\Filament\Schemas\AppointmentInformation;
 use App\Models\Appointment;
 use App\Services\AppointmentService;
 use Carbon\Carbon;
@@ -11,17 +12,19 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Morilog\Jalali\Jalalian;
 
 class AppointmentsTable
 {
@@ -47,11 +50,21 @@ class AppointmentsTable
                     ->jalaliDate('d M ,Y')
                     ->sortable(),
 
+                TextColumn::make('day_of_week')
+                    ->label(__('resources/slots.table.columns.day_of_week'))
+                    ->badge()
+                    ->color(Color::Emerald)
+                    ->state(
+                        fn($state) => Carbon::parse($state->slot->date)->locale(app()->getLocale())->dayName
+                    ),
+
                 TextColumn::make('slot.start_time')
                     ->label(__('resources/appointments.table.columns.time'))
-                    ->jalaliDateTime()
                     ->formatStateUsing(
-                        fn (Appointment $record) => Carbon::parse($record->slot->start_time)->format('H:i A').' '.Carbon::parse($record->slot->end_time)->format('H:i A')
+                        fn (Appointment $record) => Jalalian::fromCarbon(
+                            Carbon::parse($record->slot->start_time)
+                            )->format('H:i A').'  تا '.
+                            Jalalian::fromCarbon(Carbon::parse($record->slot->end_time))->format('H:i A')
                     ),
 
                 TextColumn::make('status')
@@ -64,7 +77,7 @@ class AppointmentsTable
                     ->since()
                     ->jalaliDateTime('d M ,Y H:i A')
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('owner_id')
@@ -123,7 +136,7 @@ class AppointmentsTable
                     ->button()
                     ->color(Color::Red)
                     ->visible(
-                        fn (Appointment $appointment) =>  app(AppointmentService::class)->canBeRejected($appointment) && Filament::auth()->user()->can('reject', $appointment)
+                        fn (Appointment $appointment) => app(AppointmentService::class)->canBeRejected($appointment) && Filament::auth()->user()->can('reject', $appointment)
                     )
                     ->action(function (Appointment $appointment) {
                         app(AppointmentService::class)->reject($appointment);
@@ -139,7 +152,7 @@ class AppointmentsTable
                     ->button()
                     ->color(Color::Emerald)
                     ->icon('heroicon-o-check')
-                    ->visible(fn (Appointment $appointment) =>  app(AppointmentService::class)->canBeCheckedIn($appointment) && Filament::auth()->user()->can('checkIn', $appointment))
+                    ->visible(fn (Appointment $appointment) => app(AppointmentService::class)->canBeCheckedIn($appointment) && Filament::auth()->user()->can('checkIn', $appointment))
                     ->action(fn (Appointment $appointment) => app(AppointmentService::class)->checkIn($appointment))
                     ->after(fn () => Notification::make()
                         ->title(__('resources/appointments.table.actions.check_in.notification'))
@@ -151,7 +164,7 @@ class AppointmentsTable
                     ->button()
                     ->color(Color::Cyan)
                     ->icon('heroicon-o-play')
-                    ->visible(fn (Appointment $appointment) =>  app(AppointmentService::class)->canBeStartedVisiting($appointment) && Filament::auth()->user()->can('startVisit', $appointment))
+                    ->visible(fn (Appointment $appointment) => app(AppointmentService::class)->canBeStartedVisiting($appointment) && Filament::auth()->user()->can('startVisit', $appointment))
                     ->action(fn (Appointment $appointment) => app(AppointmentService::class)->startVisit($appointment))
                     ->after(fn () => Notification::make()
                         ->title(__('resources/appointments.table.actions.start_visit.notification'))
@@ -164,7 +177,7 @@ class AppointmentsTable
                     ->color(Color::Red)
                     ->icon('heroicon-o-x-mark')
                     ->visible(
-                        fn (Appointment $appointment) =>  app(AppointmentService::class)->canBeCanceled($appointment) && Filament::auth()->user()->can('cancel', $appointment),
+                        fn (Appointment $appointment) => app(AppointmentService::class)->canBeCanceled($appointment) && Filament::auth()->user()->can('cancel', $appointment),
                     )
                     ->action(function (Appointment $appointment) {
                         app(AppointmentService::class)->cancel($appointment);
@@ -180,7 +193,7 @@ class AppointmentsTable
                     ->button()
                     ->color(Color::Cyan)
                     ->visible(
-                        fn (Appointment $appointment) =>  app(AppointmentService::class)->canBeCompleted($appointment) && Filament::auth()->user()->can('complete', $appointment),
+                        fn (Appointment $appointment) => app(AppointmentService::class)->canBeCompleted($appointment) && Filament::auth()->user()->can('complete', $appointment),
                     )
                     ->action(fn (Appointment $appointment) => app(AppointmentService::class)->complete($appointment))
                     ->after(fn () => Notification::make()
@@ -188,6 +201,12 @@ class AppointmentsTable
                         ->success()
                         ->send()
                     ),
+                ViewAction::make()
+                    ->modalHeading('جزئیات کامل نوبت')
+                    ->color('info')
+                    ->slideOver()
+                    ->modalWidth(Width::FiveExtraLarge)
+                    ->schema(AppointmentInformation::make()),
                 EditAction::make(),
                 DeleteAction::make()
                     ->after(fn (Appointment $appointment) => $appointment->slot->free()),

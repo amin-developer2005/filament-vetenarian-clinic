@@ -36,6 +36,7 @@ class ProcessAppointments extends Command
     {
         $appointments = Appointment::query()
             ->where('status', AppointmentStatus::Confirmed)
+            ->orWhere('status', AppointmentStatus::Pending)
             ->whereHas('slot', function ($query) {
                 $query
                     ->whereDate('date', '<=', today())

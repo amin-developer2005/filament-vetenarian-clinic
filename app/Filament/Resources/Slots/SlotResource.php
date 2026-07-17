@@ -25,7 +25,6 @@ class SlotResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     protected static bool $hasNavigationGroup = true;
-    //protected static ?string $tenantOwnershipRelationshipName = 'schedule';
     protected static bool $isScopedToTenant = false;
 
     public static function getEloquentQuery(): Builder

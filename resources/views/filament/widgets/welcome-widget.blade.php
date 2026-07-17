@@ -74,7 +74,7 @@
                  SECTION 2 — Today's Appointment Statistics
             ════════════════════════════════════════════════════════════ --}}
 
-            <section class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            <section class="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 @foreach ($this->getStatsCards() as $i => $card)
                     <div
                         @class([
@@ -218,10 +218,10 @@
                                 </svg>
                             </div>
                             <h3 class="mt-4 text-base font-semibold text-gray-600 dark:text-gray-300">
-                                {{ __('widgets/dashboard.empty_schedule.title') }}
+                                {{ $this->getEmptyScheduleTitle() }}
                             </h3>
                             <p class="mt-2 max-w-sm text-center text-sm leading-relaxed text-gray-400 dark:text-gray-500">
-                                {{ __('widgets/dashboard.empty_schedule.description') }}
+                                {{ $this->getEmptyScheduleDescription() }}
                             </p>
                         </div>
                     @endif

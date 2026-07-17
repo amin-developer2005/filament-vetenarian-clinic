@@ -8,14 +8,12 @@ use App\Filament\Pages\Concerns\InteractWithProfile;
 use App\Models\Profile;
 use App\Models\User;
 use Filament\Actions\Action;
-use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Concerns\CanUseDatabaseTransactions;
 use Filament\Pages\Page;
@@ -27,19 +25,14 @@ use Filament\Support\Enums\IconSize;
 use Filament\Support\Enums\Width;
 use Filament\Support\Exceptions\Halt;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Storage;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Throwable;
-
 
 class EditProfileSchema extends Page
 {
     use CanUseDatabaseTransactions;
     use HasProfileRoutes;
-    use InteractsWithForms;
     use InteractWithProfile;
 
     protected static string $routePath = '/profile/edit';
@@ -48,7 +41,6 @@ class EditProfileSchema extends Page
     {
         return false;
     }
-
 
     protected string $personalStatePath = 'personalData';
 
@@ -106,17 +98,14 @@ class EditProfileSchema extends Page
         $this->user = $this->resolveUser();
         $this->profile = $this->resolveProfile();
 
-        $this->fillAvatarProfileForm();
         $this->fillPersonalProfileForm();
         $this->fillContactProfileForm();
     }
-
 
     public function content(Schema $schema): Schema
     {
         return $schema
             ->components([
-                $this->avatarForm(),
                 $this->personalForm(),
                 $this->contactForm(),
             ]);
@@ -205,39 +194,6 @@ class EditProfileSchema extends Page
                 ]);
     }
 
-    public function avatarForm(): Form
-    {
-        return Form::make()
-            ->id('avatarForm')
-            ->statePath($this->avatarStatePath)
-            ->schema([
-                Section::make(__('owner/edit-profile.sections.avatar.title'))
-                    ->description(__('owner/edit-profile.sections.avatar.description'))
-                    ->icon('heroicon-o-camera')
-                    ->iconColor('primary')
-                    ->columns(2)
-                    ->headerActions([
-                        $this->fetchAvatarProfileSaveAction(),
-                        $this->fetchAvatarProfileClearAction(),
-                    ])
-                    ->schema([
-                        FileUpload::make('avatar')
-                            ->label(__('owner/edit-profile.schema.form.components.sections.avatar.avatar.label'))
-                            ->image()
-                            ->live()
-                            ->maxWidth(Width::FiveExtraLarge)
-                            ->visibility('public')
-                            ->disk('public')
-                            ->directory('profiles/avatars')
-                            ->imageEditor()
-                            ->columnSpanFull()
-                            ->previewable()
-                            ->downloadable()
-                            ->openable(),
-                    ]),
-            ])->columnSpanFull();
-    }
-
     protected function fetchPersonalProfileSaveAction(): Action
     {
         return Action::make('savePersonalInformation')
@@ -264,7 +220,7 @@ class EditProfileSchema extends Page
             ->label(__('owner/edit-profile.actions.sections.avatar.save.title'))
             ->icon(Heroicon::OutlinedPhoto)
             ->color('primary')
-            ->disabled(fn(Get $get) => blank($get('avatar')))
+            ->disabled(fn (Get $get) => blank($get('avatar')))
             ->iconSize(IconSize::TwoExtraLarge)
             ->action('saveAvatar');
     }
@@ -276,7 +232,7 @@ class EditProfileSchema extends Page
             ->icon('heroicon-o-trash')
             ->color('danger')
             ->iconSize(IconSize::TwoExtraLarge)
-            ->visible(fn() => $this->profile->hasAvatar())
+            ->visible(fn () => $this->profile->hasAvatar())
             ->requiresConfirmation()
             ->modalHeading(__('owner/edit-profile.modals.sections.avatar.clear.heading'))
             ->modalDescription(
@@ -304,18 +260,16 @@ class EditProfileSchema extends Page
             ->url($url);
     }
 
-    protected function fillAvatarProfileForm(): void
+    protected function getForms(): array
     {
-        $this->callHook('beforeFill');
-
-        $this->avatarData = [
-            'avatar' => $this->profile->avatar,
+        return [
+            'personalForm',
+            'avatarForm',
+            'contactForm',
         ];
-
-        $this->callHook('afterFill');
     }
 
-    protected function fillPersonalProfileForm()
+    protected function fillPersonalProfileForm(): void
     {
         $this->callHook('beforeFill');
 
@@ -329,7 +283,7 @@ class EditProfileSchema extends Page
         $this->callHook('afterFill');
     }
 
-    protected function fillContactProfileForm()
+    protected function fillContactProfileForm(): void
     {
         $this->callHook('beforeFill');
 
@@ -396,83 +350,6 @@ class EditProfileSchema extends Page
         $this->fetchSaveContactInformationNotification()?->send();
     }
 
-    public function saveAvatar(): void
-    {
-        try {
-            $this->beginDatabaseTransaction();
-
-            $data = $this->mutateFormDataBeforeSave(
-                $this->avatarData
-            );
-
-            $this->handleAvatarUpdate($this->profile, $data);
-        } catch (Halt $exception) {
-            $exception->shouldRollbackDatabaseTransaction()
-                ? $this->rollbackDatabaseTransaction()
-                : $this->commitDatabaseTransaction();
-
-            return;
-        } catch (Throwable $exception) {
-            $this->rollBackDatabaseTransaction();
-
-            throw $exception;
-        }
-
-        $this->commitDatabaseTransaction();
-
-        $this->fetchSaveAvatarNotification()?->send();
-    }
-
-    public function clearAvatar(): void
-    {
-        if (!$this->profile->hasAvatar()) {
-            return;
-        }
-
-        try {
-            $this->beginDatabaseTransaction();
-
-            $avatar = $this->profile->avatar;
-
-            Storage::disk('public')->delete($avatar);
-            $this->avatarData['avatar'] = null;
-
-            $this->profile->update($this->avatarData);
-        } catch (Halt $exception) {
-            $exception->shouldRollbackDatabaseTransaction()
-                ? $this->rollbackDatabaseTransaction()
-                : $this->commitDatabaseTransaction();
-
-            return;
-        } catch (Throwable $exception) {
-            $this->rollBackDatabaseTransaction();
-
-            throw $exception;
-        }
-
-        $this->commitDatabaseTransaction();
-
-        $this->fetchClearAvatarNotification()?->send();
-    }
-
-    protected function fetchClearAvatarNotification(): ?Notification
-    {
-        $title = $this->fetchClearAvatarNotificationTitle();
-
-        if (!$title) {
-            return null;
-        }
-
-        return Notification::make()
-            ->title($title)
-            ->success();
-    }
-
-    protected function fetchClearAvatarNotificationTitle(): ?string
-    {
-        return __('owner/edit-profile.notifications.sections.avatar.actions.clear.title');
-    }
-
     protected function mutateFormDataBeforeSave(array $data): array
     {
         return $data;
@@ -489,7 +366,7 @@ class EditProfileSchema extends Page
     {
         $title = $this->fetchSavePersonalInformationNotificationTitle();
 
-        if (!$title) {
+        if (! $title) {
             return null;
         }
 
@@ -520,7 +397,7 @@ class EditProfileSchema extends Page
     {
         $title = $this->fetchSaveContactInformationNotificationTitle();
 
-        if (!$title) {
+        if (! $title) {
             return null;
         }
 
@@ -534,23 +411,11 @@ class EditProfileSchema extends Page
         return __('owner/edit-profile.notifications.sections.contact.actions.save.title');
     }
 
-    protected function handleAvatarUpdate(Profile $profile, array $data): Profile
-    {
-        $avatar = collect($data['avatar'])->first();
-        $newPath = $avatar->store('profiles/avatars', 'public');
-
-        $profile->update([
-            'avatar' => $newPath,
-        ]);
-
-        return $profile;
-    }
-
     protected function fetchSaveAvatarNotification(): ?Notification
     {
         $title = $this->fetchSaveAvatarNotificationTitle();
 
-        if (!$title) {
+        if (! $title) {
             return null;
         }
 

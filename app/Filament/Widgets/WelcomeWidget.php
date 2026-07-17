@@ -22,54 +22,113 @@ class WelcomeWidget extends Widget
 
     protected static ?string $heading = null;
 
+
     public ?Model $clinic {
         set => $this->clinic = $value;
-        get => $this->clinic;
+        get => $this->clinic ?? null;
     }
 
-    // ── Section 1: Greeting ──────────────────────────────
+    public ?string $userName  {
+        get => $this->userName ?? '';
+        set => $this->userName = $value;
+    }
 
-    public ?string $userName = '';
+    public string $greetingMessage  {
+        get => $this->greetingMessage ?? '';
+        set => $this->greetingMessage = $value;
+    }
 
-    public string $greetingMessage = '';
+    public string $todayDate  {
+        get => $this->todayDate ?? '';
+        set => $this->todayDate = $value;
+    }
 
-    public string $todayDate = '';
+    public string $currentTime  {
+        get => $this->currentTime ?? '';
+        set => $this->currentTime = $value;
+    }
 
-    public string $currentTime = '';
+    public int $totalAppointments {
+        get => $this->totalAppointments ?? 0;
+        set => $this->totalAppointments = $value;
+    }
 
-    // ── Section 2: Appointment Statistics ────────────────
+    public int $pendingCount {
+        get => $this->pendingCount ?? 0;
+        set => $this->pendingCount = $value;
+    }
 
-    public int $totalAppointments = 0;
+    public int $confirmedCount {
+        get => $this->confirmedCount ?? 0;
+        set => $this->confirmedCount = $value;
+    }
 
-    public int $pendingCount = 0;
+    public int $rejectedCount {
+        get => $this->rejectedCount ?? 0;
+        set => $this->rejectedCount = $value;
+    }
 
-    public int $confirmedCount = 0;
+    public int $completedCount {
+        get => $this->completedCount ?? 0;
+        set => $this->completedCount = $value;
+    }
 
-    public int $completedCount = 0;
+    public int $cancelledCount {
+        get => $this->cancelledCount ?? 0;
+        set => $this->cancelledCount = $value;
+    }
 
-    public int $cancelledCount = 0;
+    public int $noShowCount {
+        get => $this->noShowCount ?? 0;
+        set => $this->noShowCount = $value;
+    }
 
-    public int $noShowCount = 0;
+    public int $freeSlots {
+        get => $this->freeSlots ?? 0;
+        set => $this->freeSlots = $value;
+    }
 
-    // ── Section 3: Schedule Summary ──────────────────────
+    public int $reservedSlots {
+        get => $this->reservedSlots ?? 0;
+        set => $this->reservedSlots = $value;
+    }
 
-    public bool $hasSchedule = false;
+    public bool $hasSchedule {
+        get => $this->hasSchedule ?? false;
+        set => $this->hasSchedule = $value;
+    }
 
-    public string $firstAppointmentTime = '';
+    public string $firstAppointmentTime  {
+        get => $this->firstAppointmentTime ?? '';
+        set => $this->firstAppointmentTime = $value;
+    }
 
-    public string $lastAppointmentTime = '';
+    public string $lastAppointmentTime  {
+        get => $this->lastAppointmentTime ?? '';
+        set => $this->lastAppointmentTime = $value;
+    }
 
-    public string $workingHoursDisplay = '';
+    public string $workingHoursDisplay  {
+        get => $this->workingHoursDisplay ?? '';
+        set => $this->workingHoursDisplay = $value;
+    }
 
-    // ── Section 4: Quick Information ─────────────────────
+    public string $currentClinic  {
+        get => $this->currentClinic ?? '';
+        set => $this->currentClinic = $value;
+    }
 
-    public string $currentClinic = '';
+    public string $joinedClinics  {
+        get => $this->joinedClinics ?? '';
+        set => $this->joinedClinics = $value;
+    }
 
-    public string $loggedInRole = '';
+    public string $loggedInRole  {
+        get => $this->loggedInRole ?? '';
+        set => $this->loggedInRole = $value;
+    }
 
-    public string $currentTenant = '';
 
-    /* ───────────────────────── Lifecycle ───────────────────────── */
 
     public function mount(): void
     {
@@ -86,34 +145,30 @@ class WelcomeWidget extends Widget
         return true;
     }
 
-    /* ────────────── Section 2 — Appointment Statistics ──────────── */
-
     private function hydrateAppointmentStats(): void
     {
-        $today    = Carbon::today();
+        $today = Carbon::today();
 
         $stats = Appointment::query()
             ->where('clinic_id', $this->clinic->getKey())
             ->whereHas('slot', fn ($q) => $q->whereDate('date', $today))
             ->selectRaw("
-                COUNT(*)                                                AS total,
-                SUM(CASE WHEN status = 'pending'   THEN 1 ELSE 0 END)  AS pending,
-                SUM(CASE WHEN status = 'confirmed'  THEN 1 ELSE 0 END)  AS confirmed,
-                SUM(CASE WHEN status = 'completed'  THEN 1 ELSE 0 END)  AS completed,
-                SUM(CASE WHEN status = 'cancelled'  THEN 1 ELSE 0 END)  AS cancelled,
-                SUM(CASE WHEN status = 'no_show'    THEN 1 ELSE 0 END)  AS no_show
+                COUNT(*) AS total,
+                SUM(status = 'pending')  AS pending,
+                SUM(status = 'confirmed')  AS confirmed,
+                SUM(status = 'completed')  AS completed,
+                SUM(status = 'cancelled')  AS cancelled,
+                SUM(status = 'no_show'  )  AS no_show
             ")
             ->first();
 
         $this->totalAppointments = (int) ($stats?->total ?? 0);
-        $this->pendingCount      = (int) ($stats?->pending ?? 0);
-        $this->confirmedCount    = (int) ($stats?->confirmed ?? 0);
-        $this->completedCount    = (int) ($stats?->completed ?? 0);
-        $this->cancelledCount    = (int) ($stats?->cancelled ?? 0);
-        $this->noShowCount       = (int) ($stats?->no_show ?? 0);
+        $this->pendingCount = (int) ($stats?->pending ?? 0);
+        $this->confirmedCount = (int) ($stats?->confirmed ?? 0);
+        $this->completedCount = (int) ($stats?->completed ?? 0);
+        $this->cancelledCount = (int) ($stats?->cancelled ?? 0);
+        $this->noShowCount = (int) ($stats?->no_show ?? 0);
     }
-
-    /* ─────────────── Section 3 — Schedule Summary ───────────────── */
 
     private function hydrateScheduleSummary(): void
     {
@@ -121,7 +176,7 @@ class WelcomeWidget extends Widget
             return;
         }
 
-        $today    = Carbon::today();
+        $today = Carbon::today();
 
         $schedule = Appointment::query()
             ->where('clinic_id',  $this->clinic->getKey())
@@ -131,7 +186,7 @@ class WelcomeWidget extends Widget
             ->selectRaw('MIN(slots.start_time) AS first_start, MAX(slots.end_time) AS last_end')
             ->first();
 
-        if ($schedule?->first_start === null) {
+        if (blank($schedule?->first_start)) {
             return;
         }
 
@@ -144,38 +199,21 @@ class WelcomeWidget extends Widget
         $this->lastAppointmentTime  = $lastTime->format('H:i');
 
         $duration = $firstTime->diff($lastTime);
-        $hours    = $duration->h + ($duration->d * 24);
-        $minutes  = $duration->i;
+        $hours = $duration->h;
+        $minutes = $duration->i;
 
         $this->workingHoursDisplay = sprintf('%d:%02d', $hours, $minutes);
     }
 
-    /* ─────────────── Section 4 — Quick Information ──────────────── */
-
     private function hydrateQuickInfo(): void
     {
-        $user   = Auth::user();
+        $user = Auth::user();
 
         $this->currentClinic = $this->clinic?->name ?? __('widgets/dashboard.not_available');
         $this->currentTenant = $this->clinic?->name ?? __('widgets/dashboard.not_available');
         $this->loggedInRole  = $user?->roles()->first()->name->value ?? __('widgets/dashboard.not_available');
     }
 
-    /* ──────────────── Configuration Helpers ─────────────────────── */
-
-    /**
-     * Stat cards configuration consumed by the Blade view.
-     *
-     * @return array<int, array{
-     *     label: string,
-     *     value: int,
-     *     description: string,
-     *     borderColor: string,
-     *     iconBg: string,
-     *     iconColor: string,
-     *     svg: string,
-     * }>
-     */
     public function getStatsCards(): array
     {
         return [
@@ -278,5 +316,16 @@ class WelcomeWidget extends Widget
             ->format('l، j F Y');
 
         $this->currentTime = Jalalian::now()->format('H:i');
+    }
+
+
+    public function getEmptyScheduleTitle(): string
+    {
+        return __('widgets/dashboard.empty_schedule.panel.admin.title');
+    }
+
+    public function getEmptyScheduleDescription(): string
+    {
+        return __('widgets/dashboard.empty_schedule.panel.admin.description');
     }
 }

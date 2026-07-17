@@ -11,6 +11,7 @@ use App\Filament\Widgets\UserAccountWidget;
 use App\Filament\Widgets\WelcomeWidget;
 use App\Http\Middleware\RoleMiddleware;
 use App\Models\Clinic;
+use App\Support\PanelBrand;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -36,12 +37,11 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->tenant(Clinic::class)
-            ->tenantRegistration(RegisterClinic::class)
-            ->tenantProfile(EditClinicProfile::class)
             ->login(SignIn::class)
             ->sidebarWidth('18rem')
             ->collapsedSidebarWidth('12rem')
             ->spa()
+            ->brandName(fn() => PanelBrand::fetchPanelHeader())
             ->colors([
                 'primary' => Color::Blue,
             ])

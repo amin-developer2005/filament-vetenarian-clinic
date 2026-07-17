@@ -270,19 +270,6 @@
 
 
 /* ================================================================
- *  4. SIDEBAR HEADER
- * ================================================================ */
-.fi-sidebar-header {
-    flex-shrink:       0 !important;
-    padding:           1.125rem 0.875rem !important;
-    border-block-end:  1px solid var(--fi-sb-border) !important;
-    display:           flex !important;
-    flex-direction:    column !important;
-    gap:               0.75rem !important;
-}
-
-
-/* ================================================================
  *  5. TENANT SWITCHER — premium card
  * ================================================================ */
 .fi-tenant-switcher {

@@ -64,7 +64,7 @@ class AnimalsTable
 
                 TextColumn::make('date_of_birth')
                     ->label(__('owner/animals.table.columns.date_of_birth'))
-                    ->date()
+                    ->jalaliDate('Y M d')
                     ->sortable(),
 
                 TextColumn::make('microchip_number')

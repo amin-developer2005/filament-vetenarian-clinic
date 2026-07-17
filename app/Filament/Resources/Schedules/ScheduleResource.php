@@ -80,7 +80,7 @@ class ScheduleResource extends Resource
             return null;
         }
 
-        return static::$navigationGroup ?? __('resources/schedules.navigations.group');;
+        return static::$navigationGroup ?? __('resources/schedules.navigations.group');
     }
 
     public static function getBreadcrumb(): string

@@ -90,7 +90,7 @@ return [
                 'label' => 'تخصص ها'
             ],
             'clinics' => [
-                'label' => 'کلینیک ها'
+                'label' => 'کلینیک های عضو'
             ],
             'email_status' => [
                 'label' => 'وضعیت ایمیل'

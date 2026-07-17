@@ -17,7 +17,7 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check()) {
+        if (Filament::auth()->check()) {
             $user = $request->user();
             $currentPanelId = Filament::getCurrentOrDefaultPanel()->getId();
             $userPanelId = $user->resolvePanelId();
@@ -39,8 +39,9 @@ class RoleMiddleware
     {
         Notification::make()
             ->warning()
-            ->title('Unauthorized Panel Access')
-            ->body("Your role does not grant access to the $panelId panel.")
+            ->title('دسترسی به این پنل امکان‌ پذیر نیست')
+            ->body('نقش کاربری شما اجازه ورود به این پنل را ندارید. شما به‌صورت خودکار به پنل مناسب هدایت خواهید شد.')
+            ->persistent()
             ->send();
     }
 }

@@ -67,6 +67,7 @@ return [
             'doctor'        => 'دامپزشک',
             'clinic'        => 'کلینیک',
             'date'          => 'تاریخ وقت',
+            'dayOfWeek'          => 'روز هفته',
             'start_time'    => 'ساعت شروع',
             'end_time'      => 'ساعت پایان',
             'status'       => 'وضعیت',

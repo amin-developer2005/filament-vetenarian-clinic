@@ -20,7 +20,9 @@ class AppointmentPolicy
      */
     public function view(User $user, Appointment $appointment): bool
     {
-        return $user->isAdmin() || ($user->isOwner() && $appointment->isBelongsToOwner($user));
+        return $user->isAdmin() ||
+            ($user->isOwner() && $appointment->isBelongsToOwner($user)) ||
+            ($user->isDoctor() && $appointment->isBelongsToDoctor($user));
     }
 
     /**

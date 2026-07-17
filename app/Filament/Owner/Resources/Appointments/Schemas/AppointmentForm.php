@@ -5,7 +5,6 @@ namespace App\Filament\Owner\Resources\Appointments\Schemas;
 use App\Enums\PanelRole;
 use App\Enums\SlotStatus;
 use App\Models\Animal;
-use App\Models\Clinic;
 use App\Models\Slot;
 use App\Models\User;
 use Carbon\Carbon;
@@ -19,6 +18,7 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
+use Morilog\Jalali\Jalalian;
 
 class AppointmentForm
 {
@@ -33,14 +33,16 @@ class AppointmentForm
                                 ->schema([
                                     Select::make('clinic_id')
                                         ->label(__('resources/appointments.schema.form.components.clinic_id.label'))
-                                        ->relationship('clinic', 'name')
+                                        ->relationship('clinic', 'name', modifyQueryUsing: function (Builder $query) {
+                                            return $query
+                                                ->where('is_active', true);
+                                        })
                                         ->required()
                                         ->live()
                                         ->searchable()
                                         ->preload()
                                         ->native(false)
                                         ->afterStateUpdated(function (Set $set) {
-                                            $set('animal_id', null);
                                             $set('doctor_id', null);
                                             $set('selectedDate', null);
                                         }),
@@ -61,10 +63,12 @@ class AppointmentForm
                                         ->preload()
                                         ->disabled(fn (Get $get) => blank($get('clinic_id')))
                                         ->native(false),
-                                ])
+                                ]),
                         ]),
                     Wizard\Step::make('اطلاعات نوبت')
                         ->schema([
+                            Grid::make()
+                                ->schema([
                                     DatePicker::make('selectedDate')
                                         ->label(__('resources/appointments.schema.form.components.selected_date.label'))
                                         ->required()
@@ -99,8 +103,7 @@ class AppointmentForm
                                                 return $query
                                                     ->where('clinic_id', $clinicId)
                                                     ->whereDate('start_date', '<=', $selectedDate)
-                                                    ->whereDate('end_date', '>=', $selectedDate)
-                                                    ;
+                                                    ->whereDate('end_date', '>=', $selectedDate);
                                             })->pluck('name', 'id');
                                         })
                                         ->required()
@@ -110,44 +113,48 @@ class AppointmentForm
                                         ->disabled(fn (Get $get) => blank($get('selectedDate')))
                                         ->afterStateUpdated(fn (Set $set) => $set('slot_id', null))
                                         ->native(false),
-                                    Select::make('slot_id')
-                                        ->label(__('resources/appointments.schema.form.components.slot_id.label'))
-                                        ->noOptionsMessage(__('resources/appointments.schema.form.components.slot_id.no_options_message'))
-                                        ->options(function (Get $get) {
-                                            if (! $clinicId = $get('clinic_id')) {
-                                                return [];
-                                            }
+                                ]),
+                            Select::make('slot_id')
+                                ->label(__('resources/appointments.schema.form.components.slot_id.label'))
+                                ->noOptionsMessage(__('resources/appointments.schema.form.components.slot_id.no_options_message'))
+                                ->options(function (Get $get) {
+                                    if (! $clinicId = $get('clinic_id')) {
+                                        return [];
+                                    }
 
-                                            if (! $selectedDate = $get('selectedDate')) {
-                                                return [];
-                                            }
+                                    if (! $selectedDate = $get('selectedDate')) {
+                                        return [];
+                                    }
 
-                                            if (! $doctorId = $get('doctor_id')) {
-                                                return [];
-                                            }
+                                    if (! $doctorId = $get('doctor_id')) {
+                                        return [];
+                                    }
 
-                                            return Slot::query()
-                                                ->whereHas('schedule', function (Builder $query) use ($clinicId, $selectedDate, $doctorId) {
-                                                    $query
-                                                        ->where('clinic_id', $clinicId)
-                                                        ->where('doctor_id', $doctorId)
-                                                        ->whereDate('start_date', '<=', $selectedDate)
-                                                        ->whereDate('end_date', '>=', $selectedDate);
-                                                })
-                                                ->whereDate('date', $selectedDate)
-                                                ->whereDoesntHave('appointment')
-                                                ->where('status', SlotStatus::Available)
-                                                ->get()
-                                                ->mapWithKeys(fn (Slot $slot) => [
-                                                    $slot->id => Carbon::parse($slot->start_time)->format('h:i A') .' - ' . Carbon::parse($slot->end_time)->format('h:i A'),
-                                                ]);
+                                    return Slot::query()
+                                        ->whereHas('schedule', function (Builder $query) use ($clinicId, $selectedDate, $doctorId) {
+                                            $query
+                                                ->where('clinic_id', $clinicId)
+                                                ->where('doctor_id', $doctorId)
+                                                ->whereDate('start_date', '<=', $selectedDate)
+                                                ->whereDate('end_date', '>=', $selectedDate);
                                         })
-                                        ->required()
-                                        ->live()
-                                        ->searchable()
-                                        ->preload()
-                                        ->disabled(fn (Get $get) => blank($get('doctor_id')))
-                                        ->native(false),
+                                        ->whereDate('date', $selectedDate)
+                                        ->whereDoesntHave('appointment')
+                                        ->where('status', SlotStatus::Available)
+                                        ->get()
+                                        ->mapWithKeys(fn (Slot $slot) => [
+                                            $slot->id => Jalalian::fromCarbon(
+                                                    Carbon::parse($slot->start_time)
+                                                )->format('H:i A').'  تا '.
+                                                Jalalian::fromCarbon(Carbon::parse($slot->end_time))->format('H:i A'),
+                                        ]);
+                                })
+                                ->required()
+                                ->live()
+                                ->searchable()
+                                ->preload()
+                                ->disabled(fn (Get $get) => blank($get('doctor_id')))
+                                ->native(false),
                         ]),
 
                     Wizard\Step::make(__('resources/appointments.schema.form.components.sections.medical_info'))

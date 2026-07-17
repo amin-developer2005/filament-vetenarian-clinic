@@ -3,31 +3,26 @@
 namespace App\Filament\Owner\Resources\Appointments\Tables;
 
 use App\Enums\AppointmentStatus;
+use App\Filament\Schemas\AppointmentInformation;
 use App\Models\Appointment;
-use App\Models\User;
 use App\Services\AppointmentService;
 use Carbon\Carbon;
 use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Support\Colors\Color;
-use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
+use Morilog\Jalali\Jalalian;
 
 class AppointmentsTable
 {
@@ -56,7 +51,10 @@ class AppointmentsTable
                 TextColumn::make('slot.start_time')
                     ->label(__('resources/appointments.table.columns.time'))
                     ->formatStateUsing(
-                        fn (Appointment $record) => Carbon::parse($record->slot->start_time)->format('h:i A').' - '.Carbon::parse($record->slot->end_time)->format('h:i A')
+                        fn (Appointment $record) => Jalalian::fromCarbon(
+                                Carbon::parse($record->slot->start_time)
+                            )->format('H:i A').'  تا '.
+                            Jalalian::fromCarbon(Carbon::parse($record->slot->end_time))->format('H:i A')
                     ),
 
                 TextColumn::make('status')
@@ -69,7 +67,7 @@ class AppointmentsTable
                     ->since()
                     ->jalaliDateTime('d M ,Y H:i A')
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->emptyStateHeading(__('resources/appointments.table.emptyState.heading'))
             ->emptyStateDescription(__('resources/appointments.table.emptyState.description'))
@@ -86,12 +84,12 @@ class AppointmentsTable
                     ->searchable()
                     ->preload()
                     ->native(false),
-                        SelectFilter::make('doctor')
-                            ->label(__('resources/appointments.table.filters.doctor'))
-                            ->searchable()
-                            ->relationship('slot.schedule.doctor', 'name')
-                            ->preload()
-                            ->native(false),
+                SelectFilter::make('doctor')
+                    ->label(__('resources/appointments.table.filters.doctor'))
+                    ->searchable()
+                    ->relationship('slot.schedule.doctor', 'name')
+                    ->preload()
+                    ->native(false),
 
                 Filter::make('created_at')
                     ->label(__('resources/appointments.table.filters.created_at'))
@@ -122,14 +120,20 @@ class AppointmentsTable
                     ->label(__('resources/appointments.table.actions.cancel.label'))
                     ->button()
                     ->icon('heroicon-o-x-mark')
-                    ->visible(fn(Appointment $appointment) => app(AppointmentService::class)->canBeCanceled($appointment) && Filament::auth()->user()->can('cancel', $appointment))
+                    ->visible(fn (Appointment $appointment) => app(AppointmentService::class)->canBeCanceled($appointment) && Filament::auth()->user()->can('cancel', $appointment))
                     ->action(function (Appointment $appointment) {
                         app(AppointmentService::class)->cancel($appointment);
                         $appointment->slot->free();
                     }),
-                    EditAction::make(),
-                    DeleteAction::make()
-                        ->after(fn (Appointment $appointment) => $appointment->slot->free()),
+                ViewAction::make()
+                    ->modalHeading('جزئیات کامل نوبت')
+                    ->color('info')
+                    ->slideOver()
+                    ->modalWidth(Width::FiveExtraLarge)
+                    ->schema(AppointmentInformation::make()),
+                EditAction::make(),
+                DeleteAction::make()
+                    ->after(fn (Appointment $appointment) => $appointment->slot->free()),
 
             ])
             ->toolbarActions([

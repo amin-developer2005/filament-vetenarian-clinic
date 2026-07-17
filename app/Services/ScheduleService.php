@@ -5,9 +5,12 @@ namespace App\Services;
 use App\Models\Schedule;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Filament\Pages\Concerns\CanUseDatabaseTransactions;
 
 class ScheduleService
 {
+    use CanUseDatabaseTransactions;
+
     /**
      * Create a new class instance.
      */
@@ -18,32 +21,38 @@ class ScheduleService
 
     public function generateSlots(Schedule $schedule): void
     {
-        $startDate = Carbon::parse($schedule->start_date);
-        $endDate = Carbon::parse($schedule->end_date);
+        $this->wrapInDatabaseTransaction(function () use ($schedule) {
+            $startDate = Carbon::parse($schedule->start_date);
+            $endDate = Carbon::parse($schedule->end_date);
 
-        $period = CarbonPeriod::create($startDate, $endDate);
+            $period = CarbonPeriod::between($startDate, $endDate);
 
-        foreach ($period as $date) {
-            $timeStart = Carbon::parse($schedule->time_start);
-            $timeEnd = Carbon::parse($schedule->time_end);
-            $duration = $schedule->slot_duration;
+            foreach ($period as $date) {
+                if (! in_array($date->dayOfWeek, $schedule->days_of_week, true)) {
+                    continue;
+                }
 
-            $totalSlotTimes = $this->fetchTimesDifference($timeStart, $timeEnd);
-            $slotDurationTime = $this->calculateSlotDurationTime($totalSlotTimes, $duration);
+                $timeStart = Carbon::parse($schedule->time_start);
+                $timeEnd = Carbon::parse($schedule->time_end);
+                $duration = $schedule->slot_duration;
 
-            for ($i = 0; $i < $slotDurationTime; $i++) {
-                $slotEndTime = $timeStart->copy()->addMinutes($duration);
+                $totalSlotTimes = $this->fetchTimesDifference($timeStart, $timeEnd);
+                $slotDurationTime = $this->calculateSlotDurationTime($totalSlotTimes, $duration);
 
-                $schedule->slots()->create([
-                    'date'       => $date->toDateString(),
-                    'start_time' => $timeStart,
-                    'end_time'   => $slotEndTime,
-                ]);
+                for ($i = 0; $i < $slotDurationTime; $i++) {
+                    $slotEndTime = $timeStart->copy()->addMinutes($duration);
 
-                $timeStart->addMinutes($duration);
+                    $schedule->slots()->create([
+                        'date'       => $date->toDateString(),
+                        'start_time' => $timeStart,
+                        'end_time'   => $slotEndTime,
+                    ]);
+
+                    $timeStart->addMinutes($duration);
+                }
             }
+        });
 
-        }
     }
 
     private function fetchTimesDifference(Carbon $start, Carbon $end): float

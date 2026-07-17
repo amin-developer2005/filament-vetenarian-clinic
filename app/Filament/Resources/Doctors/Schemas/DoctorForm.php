@@ -31,7 +31,10 @@ class DoctorForm
                                     'unique' => __('resources/doctors.schema.form.components.email.validationMessages.unique'),
                                 ]),
                             Select::make('clinics')
-                                ->relationship(titleAttribute: 'name')
+                                ->relationship(titleAttribute: 'name', modifyQueryUsing: function ($query) {
+                                    return $query
+                                        ->where('is_active', true);
+                                })
                                 ->label(__('resources/doctors.schema.form.components.clinics.label'))
                                 ->required()
                                 ->multiple()

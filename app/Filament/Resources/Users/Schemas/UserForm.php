@@ -4,12 +4,14 @@ namespace App\Filament\Resources\Users\Schemas;
 
 use App\Enums\PanelRole;
 use App\Models\Role;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 
 class UserForm
@@ -52,7 +54,10 @@ class UserForm
                                 ])
                                 ->createOptionModalHeading(__('resources/users.schema.form.components.roles.createOptionModalHeading')),
                             Select::make('clinics')
-                                ->relationship(titleAttribute: 'name')
+                                ->relationship(titleAttribute: 'name', modifyQueryUsing: function (Builder $query) {
+                                    return $query
+                                        ->where('is_active', true);
+                                })
                                 ->label(__('resources/users.schema.form.components.clinics.label'))
                                 ->required()
                                 ->multiple()

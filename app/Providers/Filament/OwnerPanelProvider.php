@@ -8,6 +8,7 @@ use App\Filament\Owner\Pages\Profile\Schemas\EditProfileSchema;
 use App\Filament\Owner\Widgets\OwnerDashboardStats;
 use App\Http\Middleware\RoleMiddleware;
 use App\Models\Clinic;
+use App\Support\PanelBrand;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -37,6 +38,7 @@ class OwnerPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->sidebarWidth("18rem")
             ->collapsedSidebarWidth('12rem')
+            ->brandName(fn() => PanelBrand::fetchPanelHeader())
             ->spa()
             ->colors([
                 'primary' => Color::Emerald,
